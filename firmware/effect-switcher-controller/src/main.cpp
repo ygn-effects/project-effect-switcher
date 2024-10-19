@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "hardware.h"
+#include "hal/hardware.h"
 
 Hardware hardware;
 

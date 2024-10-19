@@ -1,12 +1,12 @@
 #include <Arduino.h>
-#include "menu.h"
-#include "encoder.h"
-#include "led.h"
-#include "switch.h"
-#include "preset.h"
-#include "memory.h"
-#include "leddriver.h"
-#include "switchmatrix.h"
+#include "logic/menu.h"
+#include "logic/preset.h"
+#include "logic/memory.h"
+#include "peripherals/encoder.h"
+#include "peripherals/led.h"
+#include "peripherals/switch.h"
+#include "peripherals/leddriver.h"
+#include "peripherals/switchmatrix.h"
 
 #ifndef HARDWARE_H
 #define HARDWARE_H

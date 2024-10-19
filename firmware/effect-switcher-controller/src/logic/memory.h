@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "eeprom.h"
+#include "peripherals/eeprom.h"
 
 #ifndef MEMORY_H
 #define MEMORY_H
