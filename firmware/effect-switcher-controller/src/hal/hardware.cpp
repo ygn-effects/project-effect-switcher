@@ -21,57 +21,23 @@ SwitchMatrix matrix(2);
 Preset presetBank[c_maxPresets];
 Loops presetLoops[c_maxPresets];
 
-extern MenuItem presetEdit[];
-extern MenuItem presetEditLoops[];
-
-MenuItem preset[] =
-{
-    MenuItemTwoIntFullScreenHeader("Preset"),
-    MenuItemTwoIntFullScreen(),
-    MenuItemTwoIntFullScreen(),
-    MenuItemFooter()
-};
-
-MenuItem presetEdit[] =
-{
-    MenuItemHeader("Edit menu"),
-    MenuItemSubMenu("Loops setup", presetEditLoops),
-    MenuItemSubMenu("MIDI setup", presetEditLoops),
-    MenuItemFooter()
-};
-
-MenuItem presetEditLoops[] =
-{
-    MenuItemListIntToggleHeader("Loops setup"),
-    MenuItemListIntToggle(),
-    MenuItem(),
-    MenuItem(),
-    MenuItem(),
-    MenuItem(),
-    MenuItemSubMenuBack("Back", presetEdit),
-    MenuItemFooter()
-};
-
-Menu presetMenu(128, 64, 7, 9, 1, false);
-Menu presetEditMenu(128, 64, 7, 9, 1);
-
 void Hardware::hardwareSetup()
 {
     Serial.begin(115200);
     delay(500);
-    mem.memorySetup();
-    selector.setup();
-    selectorSwitch.setup();
-    editSwitch.setup();
-    editSwitchLed.setup();
-    presetUpFsw.setup();
-    presetDownFsw.setup();
-    preset0Fsw.setup();
-    preset1Fsw.setup();
-    preset2Fsw.setup();
-    preset3Fsw.setup();
-    presetLed.setup();
-    matrix.switchMatrixSetup();
+    // mem.memorySetup();
+    // selector.setup();
+    // selectorSwitch.setup();
+    // editSwitch.setup();
+    // editSwitchLed.setup();
+    // presetUpFsw.setup();
+    // presetDownFsw.setup();
+    // preset0Fsw.setup();
+    // preset1Fsw.setup();
+    // preset2Fsw.setup();
+    // preset3Fsw.setup();
+    // presetLed.setup();
+    // matrix.switchMatrixSetup();
 
     //mem.memoryReset();
 }
@@ -188,7 +154,6 @@ void Hardware::restoreLastState()
     m_currentPreset = mem.readCurrentPreset();
     p_currentPreset = &presetBank[m_currentPreset];
     loadPresetBank();
-    displayPresetMenu();
 }
 
 void Hardware::resetHardwareTriggers()
@@ -210,77 +175,17 @@ void Hardware::resetHardwareTriggers()
 
 void Hardware::processSelector()
 {
-    if (selector.getState() == Encoder::INCREMENT)
-    {
-        p_currentMenu->menuCursorUp();
-    }
-    else if (selector.getState() == Encoder::DECREMENT)
-    {
-        p_currentMenu->menuCursorDown();
-    }
+
 }
 
 void Hardware::processSelectorSwitchPress()
 {
-    if (p_currentMenu->getCurrentItemType() == c_menuItemTypeSubMenu ||
-        p_currentMenu->getCurrentItemType() == c_menuItemTypeSubMenuBack )
-    {
-        p_currentMenu->menuCursorEnter();
-    }
-    else if (p_currentMenu->getCurrentItemType() == c_menuItemTypeListIntToggle)
-    {
-        p_currentPreset->toggleLoopState(p_currentMenu->getMenuListCursorPosition());
-        p_currentMenu->menuRefresh();
-    }
+
 }
 
 void Hardware::processSelectorSwitchLongPress()
 {
-    if (p_currentMenu->getCurrentItemType() == c_menuItemTypeListIntToggle)
-    {
-        uint8_t itemToSwap1Order = p_currentMenu->getMenuListCursorPosition();
-        uint8_t itemToSwap1 = p_currentPreset->getPresetLoopIdByOrder(itemToSwap1Order);
 
-        presetEditLoops[1].setMenuItemListIntToggleHasSelectedItem(true);
-        presetEditLoops[1].setMenuItemListIntToggleSelectedItem(itemToSwap1Order);
-        p_currentMenu->menuRefresh();
-
-        while (! selectorSwitch.isReleased())
-        {
-            selectorSwitch.poll();
-        }
-
-        m_presetEditSwapLoopDisplay = true;
-
-        while (m_presetEditSwapLoopDisplay)
-        {
-            selectorSwitch.poll();
-
-            if (selector.poll())
-            {
-                processSelector();
-            }
-
-            if (selectorSwitch.isReleased())
-            {
-                if (p_currentMenu->getCurrentItemType() == c_menuItemTypeListIntToggle)
-                {
-                    uint8_t itemToSwap2Order = p_currentMenu->getMenuListCursorPosition();
-                    uint8_t itemToSwap2 = p_currentPreset->getPresetLoopIdByOrder(itemToSwap2Order);
-
-                    if (itemToSwap1 != itemToSwap2)
-                    {
-                        p_currentPreset->swapPresetLoopsOrder(itemToSwap1, itemToSwap1Order, itemToSwap2, itemToSwap2Order);
-                        m_presetEditSwapLoopDisplay = false;
-                    }
-                }
-            }
-        }
-
-        presetEditLoops[1].setMenuItemListIntToggleHasSelectedItem(false);
-        presetEditLoops[1].setMenuItemListIntToggleSelectedItem(0);
-        p_currentMenu->menuRefresh();
-    }
 }
 
 void Hardware::setupMatrixLoops()
@@ -330,37 +235,6 @@ void Hardware::connectMatrixLoops()
     }
 }
 
-void Hardware::menuSetup()
-{
-    presetEditMenu.menuSetup(presetEdit, false);
-    presetMenu.menuSetup(preset, false);
-}
-
-void Hardware::resetMenuStates()
-{
-    m_presetMenuDisplay = false;
-    m_presetEditMenuDisplay = false;
-    m_presetLoopEditMenuDisplay = false;
-    m_mainMenuDisplay = false;
-}
-
-void Hardware::displayPresetMenu()
-{
-    m_presetMenuDisplay = true;
-    preset[1].setMenuItemIntValue(&m_currentPresetBank);
-    preset[2].setMenuItemIntValue(p_currentPreset->getPreset());
-    p_currentMenu = &presetMenu;
-    p_currentMenu->menuRefresh();
-}
-
-void Hardware::displayPresetEditMenu()
-{
-    resetMenuStates();
-    m_presetEditMenuDisplay = true;
-    editSwitchLed.turnOn();
-    p_currentMenu = &presetEditMenu;
-    p_currentMenu->menuRefresh();
-}
 
 void Hardware::loadPresetBank()
 {
@@ -387,38 +261,12 @@ void Hardware::loadPresetBank()
 
 void Hardware::loadPreset()
 {
-    p_currentPreset = &presetBank[m_currentPreset];
 
-    mem.writeCurrentPreset(*p_currentPreset->getPreset());
-
-    preset[2].setMenuItemIntValue(p_currentPreset->getPreset());
-    presetEditLoops[1].setMenuItemListIntToggleList(p_currentPreset->getPresetLoopsId());
-    presetEditLoops[1].setMenuItemListIntToggleState(p_currentPreset->getPresetLoopsStates());
-    presetEditLoops[1].setMenuItemListIntToggleOrder(p_currentPreset->getPresetLoopsOrder());
-    presetEditLoops[1].setMenuItemListIntToggleCount(c_maxLoops);
-
-    presetLed.setLedStateByMask(0x3 + (1 << (m_currentPreset + 2)));
-
-    presetMenu.menuRefresh();
 }
 
 void Hardware::savePreset()
 {
-    while (! editSwitch.isReleased())
-    {
-        editSwitchLed.blink(100);
-        editSwitch.poll();
-    }
 
-    mem.writePreset(m_currentPresetBank, p_currentPreset->getPreset(), p_currentPreset->getPresetLoopsId(), p_currentPreset->getPresetLoopsStates(), p_currentPreset->getPresetLoopsOrder(), c_maxLoops);
-
-    connectMatrixLoops();
-
-    p_currentMenu->menuReset(presetEdit);
-    resetMenuStates();
-    m_presetMenuDisplay = true;
-    p_currentMenu = &presetMenu;
-    p_currentMenu->menuRefresh();
 }
 
 bool Hardware::getSelectorMove()

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "logic/menu.h"
 #include "logic/preset.h"
 #include "logic/memory.h"
 #include "peripherals/encoder.h"
@@ -63,7 +62,6 @@ class Hardware
         bool m_presetEditSwapLoopDisplay = false;
         bool m_presetLoopEditMenuDisplay = false;
         bool m_mainMenuDisplay = false;
-        Menu *p_currentMenu = NULL;
 
         // Presets logic
         uint8_t m_currentPresetBank = 0;
@@ -84,11 +82,6 @@ class Hardware
         void setupMatrixLoops();
         void connectMatrixLoops();
         void connectTunerMatrixLoops();
-
-        void menuSetup();
-        void resetMenuStates();
-        void displayPresetMenu();
-        void displayPresetEditMenu();
 
         void loadPresetBank();
         void loadPreset();
