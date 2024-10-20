@@ -1,93 +1,59 @@
+#pragma once
+
 #include <Arduino.h>
 
-#ifndef LED_H
-#define LED_H
+/// @brief Drives an LED, it can be turned on or off,
+/// have its state toggled and blink
+class Led {
+  protected:
+    uint8_t m_pin;
+    uint8_t m_ledState;
+    uint32_t m_lastBlinkTime = 0;
+    uint8_t m_lastBlinkState = 0;
 
-/**
- * @brief Drives an LED, it can be turned on or off or have its state switched.
- */
-class Led
-{
-    protected:
-        uint8_t m_pin; // LED pin #
-        uint8_t m_ledState = 0;
-        uint32_t m_blinkTime = 0;
-        uint32_t m_lastBlinkTime = 0;
-        uint8_t m_lastBlinkState = 0;
+  public:
+    /// @brief Construct an LED object
+    /// @param t_pin Pin #
+    /// @param t_initialState Initial state of the LED
+    Led(uint8_t t_pin, uint8_t t_initialState = LOW) :
+      m_pin(t_pin),
+      m_ledState(t_initialState) { };
 
-    public:
-        /**
-         * @brief Construct a new Led object
-         *
-         * @param pin LED pin #
-         */
-        Led(uint8_t pin) : m_pin(pin) { }
+    /// @brief Initialize the LED pin as an output and set the initial state
+    void setup();
 
-        /**
-         * @brief Setup the µC's pins and set the LED to its startup state
-         */
-        void ledSetup();
+    /// @brief Turn the LED on
+    void turnOn();
 
-        /**
-         * @brief Turn the LED on
-         */
-        void ledTurnOn();
+    /// @brief Turn the LED off
+    void turnOff();
 
-        /**
-         * @brief Turn the LED off
-         */
-        void ledTurnOff();
+    /// @brief Set the LED to a desired state
+    /// @param state The new state of the LED (HIGH or LOW)
+    void setState(uint8_t t_state);
 
-        /**
-         * @brief Set the LED to a desired state
-         *
-         * @param state
-         */
-        void ledSetState(uint8_t state);
+    /// @brief Toggle the LED state between on/off
+    void toggle();
 
-        /**
-         * @brief Switch the LED state off/on or on/off
-         */
-        void ledSwitchState();
+    /// @brief Get the current state of the LED (HIGH/LOW)
+    /// @return uint8_t 1 : ON / 0 : OFF
+    uint8_t getState() const;
 
-        /**
-         * @brief Get the Led State object
-         *
-         * @return uint8_t
-         */
-        uint8_t getLedState();
-
-        /**
-         * @brief Set the Led State object
-         *
-         * @param state
-         */
-        void setLedState(uint8_t state);
-
-        /**
-         * @brief Blink the LED
-         *
-         * @param interval ON/OFF interval
-         */
-        void blinkLed(uint8_t interval);
+    /// @brief Blink the LED at a specified interval
+    /// @param interval The ON/OFF interval in milliseconds
+    void blink(uint8_t t_interval);
 };
 
-class PwmLed : public Led
-{
-    public:
-    /**
-     * @brief Construct a new Pwm Led object
-     *
-     * @param cspin
-     */
-    PwmLed(uint8_t pin) : Led(pin) { }
+/// @brief Drives a PWM-controlled LED with variable brightness
+class PwmLed : public Led {
+  public:
+    /// @brief Construct a new Pwm Led object
+    /// @param pin pin #
+    PwmLed(uint8_t t_pin) :
+      Led(t_pin) { };
 
-    /**
-     * @brief Set the Pwm Led State object
-     *
-     * @param state
-     */
-    void setPwmLedState(uint8_t state);
+    /// @brief Set the brightness of the PWM LED
+    /// @param brightness Brightness level (0-255)
+    void setBrightness(uint8_t brightness);
 };
 
-#endif

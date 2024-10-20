@@ -63,7 +63,7 @@ void Hardware::hardwareSetup()
     selector.encoderSetup();
     selectorSwitch.setup();
     editSwitch.setup();
-    editSwitchLed.ledSetup();
+    editSwitchLed.setup();
     presetUpFsw.setup();
     presetDownFsw.setup();
     preset0Fsw.setup();
@@ -357,7 +357,7 @@ void Hardware::displayPresetEditMenu()
 {
     resetMenuStates();
     m_presetEditMenuDisplay = true;
-    editSwitchLed.ledTurnOn();
+    editSwitchLed.turnOn();
     p_currentMenu = &presetEditMenu;
     p_currentMenu->menuRefresh();
 }
@@ -406,7 +406,7 @@ void Hardware::savePreset()
 {
     while (! editSwitch.isReleased())
     {
-        editSwitchLed.blinkLed(100);
+        editSwitchLed.blink(100);
         editSwitch.poll();
     }
 

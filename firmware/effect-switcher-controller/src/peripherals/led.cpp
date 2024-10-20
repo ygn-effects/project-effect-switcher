@@ -1,97 +1,51 @@
-#define DEBUG 1
-
-#include <Arduino.h>
 #include "led.h"
+#include "utils/logging.h"
 
-void Led::ledSetup()
-{
-    pinMode(m_pin, OUTPUT);
-    digitalWrite(m_pin, m_ledState);
+void Led::setup() {
+  pinMode(m_pin, OUTPUT);
+  digitalWrite(m_pin, m_ledState);
 }
 
-void Led::ledTurnOn()
-{
-    m_ledState = 1;
-    digitalWrite(m_pin, m_ledState);
+void Led::turnOn() {
+  setState(HIGH);
 
-    #ifdef DEBUG
-        Serial.print("LED ");
-        Serial.print(m_pin);
-        Serial.println(" on");
-    #endif
+  LOG_DEBUG("LED pin %d : ON", m_pin);
 }
 
-void Led::ledTurnOff()
-{
-    m_ledState = 0;
-    digitalWrite(m_pin, m_ledState);
+void Led::turnOff() {
+  setState(LOW);
 
-    #ifdef DEBUG
-        Serial.print("LED ");
-        Serial.print(m_pin);
-        Serial.println(" off");
-    #endif
+  LOG_DEBUG("LED pin %d : OFF", m_pin);
 }
 
-void Led::ledSetState(uint8_t state)
-{
-    m_ledState = state;
-    digitalWrite(m_pin, m_ledState);
+void Led::setState(uint8_t t_state) {
+  m_ledState = t_state;
+  digitalWrite(m_pin, m_ledState);
 
-    #ifdef DEBUG
-        Serial.print("LED ");
-        Serial.print(m_pin);
-        Serial.print(" switched state : ");
-        Serial.println(m_ledState);
-    #endif
+  LOG_DEBUG("LED pin %d : set %d", m_pin, m_ledState);
 }
 
-void Led::ledSwitchState()
-{
-    m_ledState = !m_ledState;
-    digitalWrite(m_pin, m_ledState);
+void Led::toggle() {
+  setState(!m_ledState);
 
-    #ifdef DEBUG
-        Serial.print("LED ");
-        Serial.print(m_pin);
-        Serial.print(" switched state : ");
-        Serial.println(m_ledState);
-    #endif
+  LOG_DEBUG("LED pin %d : toggle %d", m_pin, m_ledState);
 }
 
-uint8_t Led::getLedState()
-{
-    return m_ledState;
+uint8_t Led::getState() const {
+  return m_ledState;
 }
 
-void Led::setLedState(uint8_t state)
-{
-    m_ledState = state;
+void Led::blink(uint8_t t_interval) {
+  uint32_t currentTime = millis();
+
+  if ((currentTime - m_lastBlinkTime) >= t_interval) {
+    toggle();
+    m_lastBlinkTime = currentTime;
+  }
 }
 
-void Led::blinkLed(uint8_t interval)
-{
-    m_blinkTime = millis();
+void PwmLed::setBrightness(uint8_t t_brightness) {
+  analogWrite(m_pin, t_brightness);
 
-    if ((m_blinkTime - m_lastBlinkTime) >= interval)
-    {
-        if (m_lastBlinkState)
-        {
-            m_lastBlinkState = 0;
-            ledTurnOff();
-        }
-        else
-        {
-            m_lastBlinkState = 1;
-            ledTurnOn();
-        }
-
-        m_lastBlinkTime = m_blinkTime;
-    }
-}
-
-void PwmLed::setPwmLedState(uint8_t state)
-{
-    m_ledState = state;
-    analogWrite(m_pin, m_ledState);
+  LOG_DEBUG("PWM LED pin %d : brightness %d", m_pin, t_brightness);
 }
