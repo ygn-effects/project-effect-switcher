@@ -60,7 +60,7 @@ void Hardware::hardwareSetup()
     Serial.begin(115200);
     delay(500);
     mem.memorySetup();
-    selector.encoderSetup();
+    selector.setup();
     selectorSwitch.setup();
     editSwitch.setup();
     editSwitchLed.setup();
@@ -140,7 +140,7 @@ void Hardware::hardwarePoll()
     }
     else if (m_presetEditMenuDisplay)
     {
-        if (selector.encoderPoll())
+        if (selector.poll())
         {
             m_selectorMove = true;
         }
@@ -171,7 +171,7 @@ void Hardware::hardwarePoll()
 void Hardware::hardwareStartup()
 {
     selectorSwitch.poll();
-    selector.encoderPoll();
+    selector.poll();
     editSwitch.poll();
     presetUpFsw.poll();
     presetDownFsw.poll();
@@ -210,11 +210,11 @@ void Hardware::resetHardwareTriggers()
 
 void Hardware::processSelector()
 {
-    if (selector.getEncoderState() == c_encoderIncrement)
+    if (selector.getState() == Encoder::INCREMENT)
     {
         p_currentMenu->menuCursorUp();
     }
-    else if (selector.getEncoderState() == c_encoderDrecrement)
+    else if (selector.getState() == Encoder::DECREMENT)
     {
         p_currentMenu->menuCursorDown();
     }
@@ -256,7 +256,7 @@ void Hardware::processSelectorSwitchLongPress()
         {
             selectorSwitch.poll();
 
-            if (selector.encoderPoll())
+            if (selector.poll())
             {
                 processSelector();
             }

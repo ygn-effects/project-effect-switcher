@@ -1,96 +1,68 @@
-#define DEBUG 1
-
-#include <Arduino.h>
 #include "encoder.h"
+#include "utils/logging.h"
 
-void Encoder::encoderSetup()
-{
-    pinMode(m_encoderPinA, INPUT);
-    pinMode(m_encoderPinB, INPUT);
+void Encoder::setup() {
+  pinMode(m_encoderPinA, INPUT);
+  pinMode(m_encoderPinB, INPUT);
 
-    digitalWrite(m_encoderPinA, HIGH);
-    digitalWrite(m_encoderPinB, HIGH);
+  // Enable pull-up resistors
+  digitalWrite(m_encoderPinA, HIGH);
+  digitalWrite(m_encoderPinB, HIGH);
 }
 
-uint8_t Encoder::readEncoderState()
-{
-    m_lastEncoderState = (digitalRead(m_encoderPinB) << 1) | digitalRead(m_encoderPinA);
-    m_encoderState = c_encoderStates[m_encoderState & 0xf][m_lastEncoderState];
-
-    return m_encoderState & 0x30;
+uint8_t Encoder::readState() {
+  m_lastEncoderState = (digitalRead(m_encoderPinB) << 1) | digitalRead(m_encoderPinA);
+  m_encoderState = c_encoderStates[m_encoderState & 0xF][m_lastEncoderState];
+  return m_encoderState & (INCREMENT | DECREMENT);  // Return only increment/decrement flags
 }
 
-bool Encoder::encoderPoll()
-{
-    uint8_t state = readEncoderState();
+bool Encoder::poll() {
+  uint8_t state = readState();
 
-    if (state == 0x10)
-    {
-        m_counter --;
-        if (m_counter == 255 || m_counter < m_minCounterValue)
-        {
-            m_counter = m_maxCounterValue;
-        }
-        #ifdef DEBUG
-            Serial.print("Encoder counter decrement : ");
-            Serial.println(m_counter);
-        #endif
-
-        return true;
+  if (state == DECREMENT) {
+    m_counter--;
+    if (m_counter == 255 || m_counter < m_minCounterValue) {
+      m_counter = m_maxCounterValue;
     }
+    LOG_DEBUG("Encoder pins %d/%d decremented : %d", m_encoderPinA, m_encoderPinB, m_counter);
+    return true;
 
-    else if (state == 0x20)
-    {
-        m_counter ++;
-        if(m_counter == m_maxCounterValue + 1)
-        {
-            m_counter = m_minCounterValue;
-        }
-        #ifdef DEBUG
-            Serial.print("Selector counter increment : ");
-            Serial.println(m_counter);
-        #endif
-
-        return  true;
+  } else if (state == INCREMENT) {
+    m_counter++;
+    if (m_counter > m_maxCounterValue) {
+      m_counter = m_minCounterValue;
     }
+    LOG_DEBUG("Encoder pins %d/%d incremented : %d", m_encoderPinA, m_encoderPinB, m_counter);
+    return true;
+  }
 
-    else
-    {
-        return false;
-    }
+  return false;
 }
 
-uint8_t Encoder::getCounter()
-{
-    return m_counter;
+uint8_t Encoder::getCounter() const {
+  return m_counter;
 }
 
-void Encoder::setCounter(uint8_t counter)
-{
-    m_counter = counter;
+void Encoder::setCounter(uint8_t counter) {
+  m_counter = counter;
 }
 
-uint8_t Encoder::getMinCounterValue()
-{
-    return m_minCounterValue;
+uint8_t Encoder::getMinValue() const {
+  return m_minCounterValue;
 }
 
-uint8_t Encoder::getMaxCounterValue()
-{
-    return m_maxCounterValue;
+uint8_t Encoder::getMaxValue() const {
+  return m_maxCounterValue;
 }
 
-void Encoder::setMinCounterValue(uint8_t value)
-{
-    m_minCounterValue = value;
+void Encoder::setMinValue(uint8_t value) {
+  m_minCounterValue = value;
 }
 
-void Encoder::setMaxCounterValue(uint8_t value)
-{
-    m_maxCounterValue = value;
+void Encoder::setMaxValue(uint8_t value) {
+  m_maxCounterValue = value;
 }
 
-uint8_t Encoder::getEncoderState()
-{
-    return m_encoderState;
+uint8_t Encoder::getState() const {
+  return m_encoderState;
 }
