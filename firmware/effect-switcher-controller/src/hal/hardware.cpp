@@ -70,7 +70,7 @@ void Hardware::hardwareSetup()
     preset1Fsw.setup();
     preset2Fsw.setup();
     preset3Fsw.setup();
-    presetLed.ledDriverSetup();
+    presetLed.setup();
     matrix.switchMatrixSetup();
 
     //mem.memoryReset();
