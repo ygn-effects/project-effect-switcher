@@ -3,16 +3,16 @@
 Memory mem(0);
 
 Encoder selector(12, 13);
-TemporarySwitch selectorSwitch(14, 1000);
-TemporarySwitch editSwitch(11, 1000);
+MomentarySwitch selectorSwitch(14, 1000);
+MomentarySwitch editSwitch(11, 1000);
 Led editSwitchLed(10);
 
-TemporarySwitch presetUpFsw(24, 1000);
-TemporarySwitch presetDownFsw(25, 1000);
-TemporarySwitch preset0Fsw(26, 1000);
-TemporarySwitch preset1Fsw(27, 1000);
-TemporarySwitch preset2Fsw(28, 1000);
-TemporarySwitch preset3Fsw(29, 1000);
+MomentarySwitch presetUpFsw(24, 1000);
+MomentarySwitch presetDownFsw(25, 1000);
+MomentarySwitch preset0Fsw(26, 1000);
+MomentarySwitch preset1Fsw(27, 1000);
+MomentarySwitch preset2Fsw(28, 1000);
+MomentarySwitch preset3Fsw(29, 1000);
 
 LedDriver16 presetLed(1);
 
@@ -61,15 +61,15 @@ void Hardware::hardwareSetup()
     delay(500);
     mem.memorySetup();
     selector.encoderSetup();
-    selectorSwitch.tempSwitchSetup();
-    editSwitch.tempSwitchSetup();
+    selectorSwitch.setup();
+    editSwitch.setup();
     editSwitchLed.ledSetup();
-    presetUpFsw.tempSwitchSetup();
-    presetDownFsw.tempSwitchSetup();
-    preset0Fsw.tempSwitchSetup();
-    preset1Fsw.tempSwitchSetup();
-    preset2Fsw.tempSwitchSetup();
-    preset3Fsw.tempSwitchSetup();
+    presetUpFsw.setup();
+    presetDownFsw.setup();
+    preset0Fsw.setup();
+    preset1Fsw.setup();
+    preset2Fsw.setup();
+    preset3Fsw.setup();
     presetLed.ledDriverSetup();
     matrix.switchMatrixSetup();
 
@@ -80,60 +80,60 @@ void Hardware::hardwarePoll()
 {
     if (m_presetMenuDisplay)
     {
-        presetUpFsw.tempSwitchPoll();
-        if (presetUpFsw.tempSwitchPushed())
+        presetUpFsw.poll();
+        if (presetUpFsw.isPushed())
         {
             m_currentPresetBank++;
             m_currentPreset = 0;
             m_presetUpFswPress = true;
         }
-        if (presetUpFsw.tempSwitchLongPress())
+        if (presetUpFsw.isLongPress())
         {
             m_presetUpFswLongPress = true;
         }
 
-        presetDownFsw.tempSwitchPoll();
-        if (presetDownFsw.tempSwitchPushed())
+        presetDownFsw.poll();
+        if (presetDownFsw.isPushed())
         {
             m_currentPresetBank--;
             m_currentPreset = 0;
             m_presetDownFswPress = true;
         }
-        if (presetDownFsw.tempSwitchLongPress())
+        if (presetDownFsw.isLongPress())
         {
             m_presetDownFswLongPress = true;
         }
 
-        preset0Fsw.tempSwitchPoll();
-        if (preset0Fsw.tempSwitchPushed())
+        preset0Fsw.poll();
+        if (preset0Fsw.isPushed())
         {
             m_currentPreset = 0;
             m_preset0FswPress = true;
         }
 
-        preset1Fsw.tempSwitchPoll();
-        if (preset1Fsw.tempSwitchPushed())
+        preset1Fsw.poll();
+        if (preset1Fsw.isPushed())
         {
             m_currentPreset = 1;
             m_preset1FswPress = true;
         }
 
-        preset2Fsw.tempSwitchPoll();
-        if (preset2Fsw.tempSwitchPushed())
+        preset2Fsw.poll();
+        if (preset2Fsw.isPushed())
         {
             m_currentPreset = 2;
             m_preset2FswPress = true;
         }
 
-        preset3Fsw.tempSwitchPoll();
-        if (preset3Fsw.tempSwitchPushed())
+        preset3Fsw.poll();
+        if (preset3Fsw.isPushed())
         {
             m_currentPreset = 3;
             m_preset2FswPress = true;
         }
 
-        editSwitch.tempSwitchPoll();
-        if (editSwitch.tempSwitchPushed())
+        editSwitch.poll();
+        if (editSwitch.isPushed())
         {
             m_editSwitchPress = true;
         }
@@ -145,19 +145,19 @@ void Hardware::hardwarePoll()
             m_selectorMove = true;
         }
 
-        selectorSwitch.tempSwitchPoll();
-        if (selectorSwitch.tempSwitchReleased())
+        selectorSwitch.poll();
+        if (selectorSwitch.isReleased())
         {
             m_selectorSwitchPress = true;
         }
 
-        if (selectorSwitch.tempSwitchLongPress())
+        if (selectorSwitch.isLongPress())
         {
             m_selectorSwitchLongPress = true;
         }
 
-        editSwitch.tempSwitchPoll();
-        if (editSwitch.tempSwitchLongPress())
+        editSwitch.poll();
+        if (editSwitch.isLongPress())
         {
             m_editSwitchLongPress = true;
         }
@@ -170,15 +170,15 @@ void Hardware::hardwarePoll()
 
 void Hardware::hardwareStartup()
 {
-    selectorSwitch.tempSwitchPoll();
+    selectorSwitch.poll();
     selector.encoderPoll();
-    editSwitch.tempSwitchPoll();
-    presetUpFsw.tempSwitchPoll();
-    presetDownFsw.tempSwitchPoll();
-    preset0Fsw.tempSwitchPoll();
-    preset1Fsw.tempSwitchPoll();
-    preset2Fsw.tempSwitchPoll();
-    preset3Fsw.tempSwitchPoll();
+    editSwitch.poll();
+    presetUpFsw.poll();
+    presetDownFsw.poll();
+    preset0Fsw.poll();
+    preset1Fsw.poll();
+    preset2Fsw.poll();
+    preset3Fsw.poll();
 }
 
 void Hardware::restoreLastState()
@@ -245,23 +245,23 @@ void Hardware::processSelectorSwitchLongPress()
         presetEditLoops[1].setMenuItemListIntToggleSelectedItem(itemToSwap1Order);
         p_currentMenu->menuRefresh();
 
-        while (! selectorSwitch.tempSwitchReleased())
+        while (! selectorSwitch.isReleased())
         {
-            selectorSwitch.tempSwitchPoll();
+            selectorSwitch.poll();
         }
 
         m_presetEditSwapLoopDisplay = true;
 
         while (m_presetEditSwapLoopDisplay)
         {
-            selectorSwitch.tempSwitchPoll();
+            selectorSwitch.poll();
 
             if (selector.encoderPoll())
             {
                 processSelector();
             }
 
-            if (selectorSwitch.tempSwitchReleased())
+            if (selectorSwitch.isReleased())
             {
                 if (p_currentMenu->getCurrentItemType() == c_menuItemTypeListIntToggle)
                 {
@@ -404,10 +404,10 @@ void Hardware::loadPreset()
 
 void Hardware::savePreset()
 {
-    while (! editSwitch.tempSwitchReleased())
+    while (! editSwitch.isReleased())
     {
         editSwitchLed.blinkLed(100);
-        editSwitch.tempSwitchPoll();
+        editSwitch.poll();
     }
 
     mem.writePreset(m_currentPresetBank, p_currentPreset->getPreset(), p_currentPreset->getPresetLoopsId(), p_currentPreset->getPresetLoopsStates(), p_currentPreset->getPresetLoopsOrder(), c_maxLoops);

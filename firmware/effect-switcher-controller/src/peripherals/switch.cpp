@@ -1,126 +1,83 @@
-#define DEBUG 1
-
 #include <Arduino.h>
 #include "switch.h"
+#include "utils/logging.h"
 
-void TemporarySwitch::tempSwitchSetup()
-{
-    pinMode(m_pin, INPUT_PULLUP);
+void MomentarySwitch::setup() {
+  pinMode(m_pin, INPUT_PULLUP);
 }
 
-void TemporarySwitch::tempSwitchPoll()
-{
-    m_tempSwitchState = digitalRead(m_pin);
-    m_now = millis();
+void MomentarySwitch::poll() {
+  // Read the current state of the switch
+  m_switchState = digitalRead(m_pin);
+  m_now = millis();
 
-    if (m_tempSwitchState == m_lasttempswithState)
+  // Debounce handling
+  if (m_switchState != m_lastSwitchState) {
+    // Reset the debounce timer
+    m_lastDebounceTime = m_now;
+  }
+
+  if ((m_now - m_lastDebounceTime) > m_debouncePeriod) {
+    // If the button state has changed
+    if (m_switchState != m_debouncedState)
     {
-        m_rawState = 1;
-    }
-    else
-    {
-        m_rawState = 0;
-        m_deglitchTime = m_now;
-    }
+      m_debouncedState = m_switchState;
 
-    if (m_rawState && ((m_now - m_deglitchTime) > m_deglitchPeriod))
-    {
-        m_deglitchedState = m_tempSwitchState;
-        m_deglitchTime = m_now;
-    }
-
-    m_lasttempswithState = m_tempSwitchState;
-
-    m_tempSwitchSwitched = 0;
-
-    if ((m_deglitchedState != m_debouncedState) && (m_now - m_lastSwitchedTime) > m_debouncePeriod)
-    {
-        m_debouncedState = m_deglitchedState;
-        m_tempSwitchSwitched = 1;
-    }
-
-    m_tempSwitchLongPress = 0;
-
-    if (tempSwitchReleased())
-    {
+      if (m_debouncedState == HIGH) {
+        // Button released
         m_longPressActive = false;
 
-        #ifdef DEBUG
-            Serial.print("tempSwitch ");
-            Serial.print(m_pin);
-            Serial.println(" released");
-        #endif
-    }
+        LOG_DEBUG("Switch pin %d : released", m_pin);
+      }
+      else {
+        // Button pressed
+        m_lastPushedTime = m_now;
 
-    if (!m_longPressActive)
+        LOG_DEBUG("Switch pin %d : pushed", m_pin);
+      }
+
+      // Record the switch event
+      m_tempSwitchSwitched = true;
+
+      LOG_DEBUG("Switch pin %d : switched", m_pin);
+    }
+    else if (m_debouncedState == LOW && !m_longPressActive)
     {
-        m_tempSwitchLongPress = !tempSwitchSwitched() && tempSwitchOn() &&((m_now - m_lastPushedTime) > m_longPressPeriod);
-        m_longPressActive = m_tempSwitchLongPress;
+      // Check for long press
+      if ((m_now - m_lastPushedTime) > m_longPressPeriod) {
+        m_longPressActive = true;
+        m_tempSwitchLongPress = true;
 
-        #ifdef DEBUG
-            if (tempSwitchLongPress())
-            {
-                Serial.print("tempSwitch ");
-                Serial.print(m_pin);
-                Serial.println(" long press");
-            }
-        #endif
+        LOG_DEBUG("Switch pin %d : long press", m_pin);
+      }
     }
+  }
+  else {
+    m_tempSwitchSwitched = false;
+    m_tempSwitchLongPress = false;
+  }
 
-    if (tempSwitchSwitched())
-    {
-        m_lastSwitchedTime = m_now;
-
-        #ifdef DEBUG
-            Serial.print("tempSwitch ");
-            Serial.print(m_pin);
-            Serial.println(" switched");
-        #endif
-
-        if (tempSwitchPushed())
-        {
-            m_lastPushedTime = m_now;
-
-            #ifdef DEBUG
-                Serial.print("tempSwitch ");
-                Serial.print(m_pin);
-                Serial.println(" pushed");
-            #endif
-        }
-    }
+  // Save the reading for next time
+  m_lastSwitchState = m_switchState;
 }
 
-bool TemporarySwitch::tempSwitchSwitched()
-{
-    return m_tempSwitchSwitched;
+
+bool MomentarySwitch::isSwitched() const {
+  return m_tempSwitchSwitched;
 }
 
-bool TemporarySwitch::tempSwitchOn()
-{
-    return !m_debouncedState;
+bool MomentarySwitch::isOn() const {
+  return !m_debouncedState;
 }
 
-bool TemporarySwitch::tempSwitchPushed()
-{
-    return m_tempSwitchSwitched && !m_debouncedState;
+bool MomentarySwitch::isPushed() const {
+  return m_tempSwitchSwitched && !m_debouncedState;
 }
 
-bool TemporarySwitch::tempSwitchReleased()
-{
-    return m_tempSwitchSwitched && m_debouncedState;
+bool MomentarySwitch::isReleased() const {
+  return m_tempSwitchSwitched && m_debouncedState;
 }
 
-bool TemporarySwitch::tempSwitchLongPress()
-{
-    return m_tempSwitchLongPress;
-}
-
-uint32_t TemporarySwitch::getLastPushedTime()
-{
-    return m_lastPushedTime;
-}
-
-void TemporarySwitch::setLastPushedTime(uint32_t time)
-{
-    m_lastPushedTime = time;
+bool MomentarySwitch::isLongPress() const {
+  return m_tempSwitchLongPress;
 }
