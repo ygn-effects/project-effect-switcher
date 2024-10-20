@@ -6,7 +6,7 @@
 
 void Memory::memorySetup()
 {
-    eeprom0.eepromSetup();
+    eeprom0.setup();
 
     uint8_t statusRegister = eeprom0.readStatusRegister();
 
@@ -245,9 +245,4 @@ void Memory::readPreset(uint8_t bank, uint8_t* preset, uint8_t* loopsid, uint8_t
             Serial.println(loopsstate[i]);
         }
     #endif
-}
-
-void Memory::memoryTest()
-{
-    eeprom0.testInt8();
 }

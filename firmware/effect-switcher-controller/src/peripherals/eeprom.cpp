@@ -1,250 +1,139 @@
-#define DEBUG 1
-
-#include <Arduino.h>
 #include <SPI.h>
-#include "eeprom.h"
 
-void Eeprom::eepromSetup()
-{
+#include "eeprom.h"
+#include "utils/logging.h"
+
+void Eeprom::setup() {
     pinMode(m_csPin, OUTPUT);
     digitalWrite(m_csPin, HIGH);
-	SPI.begin();
+    SPI.begin();
 }
 
-void Eeprom::select()
-{
+void Eeprom::select() {
     SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
-	digitalWrite(m_csPin, LOW);
+    digitalWrite(m_csPin, LOW);
 }
 
-void Eeprom::deselect()
-{
+void Eeprom::deselect() {
     digitalWrite(m_csPin, HIGH);
-	SPI.endTransaction();
+    SPI.endTransaction();
 }
 
-void Eeprom::enableWrite()
-{
+void Eeprom::enableWrite() {
     select();
-	SPI.transfer(WREN);
-	deselect();
+    SPI.transfer(EEPROM_WREN);
+    deselect();
 }
 
-void Eeprom::sendAddress(uint16_t addr)
-{
-	SPI.transfer(highByte(addr));
-	SPI.transfer(lowByte(addr));
+void Eeprom::sendAddress(uint16_t t_address) {
+    SPI.transfer(highByte(t_address));
+    SPI.transfer(lowByte(t_address));
 }
 
-void Eeprom::writeStatusRegister()
-{
-while (isWip()) {};
+void Eeprom::writeStatusRegister() {
+    while (isWip()) {}
 
-	enableWrite();
-
-	select();
-	SPI.transfer(WRSR);
-	SPI.transfer(0);
-	deselect();
+    enableWrite();
+    select();
+    SPI.transfer(EEPROM_WRSR);
+    SPI.transfer(0);  // Reset status register to default
+    deselect();
 }
 
-uint8_t Eeprom::readStatusRegister()
-{
-	select();
-	SPI.transfer(RDSR);
-	uint8_t data = SPI.transfer(0x00);
-	deselect();
+uint8_t Eeprom::readStatusRegister() {
+    select();
+    SPI.transfer(EEPROM_RDSR);
+    uint8_t data = SPI.transfer(0x00);
+    deselect();
+
     return data;
 }
 
-bool Eeprom::isWip()
-{
-	uint8_t data = readStatusRegister();
-	return (data & (1 << 0));
+bool Eeprom::isWip() {
+    uint8_t status = readStatusRegister();
+
+    return (status & 0x01);
 }
 
-uint8_t Eeprom::readInt8(uint16_t address)
-{
-	while (isWip()) {};
+uint8_t Eeprom::readInt8(uint16_t t_address) {
+    while (isWip()) {}
 
-	select();
-	SPI.transfer(READ);
-	sendAddress(address);
-	uint8_t data = SPI.transfer(0x00);
-	deselect();
+    select();
+    SPI.transfer(EEPROM_READ);
+    sendAddress(t_address);
+    uint8_t data = SPI.transfer(0x00);
+    deselect();
 
-	return data;
+    LOG_DEBUG("EEPROM read 8-bit value : 0x%02X address : 0x%04X", data, t_address);
+    return data;
 }
 
-void Eeprom::readInt8(uint16_t address, uint8_t* data)
-{
-	while (isWip()) {};
+void Eeprom::readInt8(uint16_t t_address, uint8_t* t_data) {
+    while (isWip()) {}
 
-	select();
-	SPI.transfer(READ);
-	sendAddress(address);
-	*data = SPI.transfer(0x00);
-	deselect();
+    select();
+    SPI.transfer(EEPROM_READ);
+    sendAddress(t_address);
+    *t_data = SPI.transfer(0x00);
+    deselect();
+
+    LOG_DEBUG("EEPROM read 8-bit value: 0x%02X, address : 0x%04X", *t_data, t_address);
 }
 
-void Eeprom::writeInt8(uint16_t address, uint8_t data)
-{
-	while (isWip()) {};
+void Eeprom::writeInt8(uint16_t t_address, uint8_t t_data) {
+    while (isWip()) {}
 
-	enableWrite();
+    enableWrite();
+    select();
+    SPI.transfer(EEPROM_WRITE);
+    sendAddress(t_address);
+    SPI.transfer(t_data);
+    deselect();
 
-	select();
-	SPI.transfer(WRITE);
-	sendAddress(address);
-	SPI.transfer(data);
-	deselect();
+    LOG_DEBUG("EEPROM wrote 8-bit value : 0x%02X, address : 0x%04X", t_data, t_address);
 }
 
-uint16_t Eeprom::readInt16(uint16_t address)
-{
-	while (isWip()) {};
+uint16_t Eeprom::readInt16(uint16_t t_address) {
+    while (isWip()) {}
 
-	select();
-	SPI.transfer(READ);
-	sendAddress(address);
-	uint8_t highbyte = SPI.transfer(0x00);
-	uint8_t lowbyte = SPI.transfer(0x00);
-	deselect();
+    select();
+    SPI.transfer(EEPROM_READ);
+    sendAddress(t_address);
+    uint8_t highbyte = SPI.transfer(0x00);
+    uint8_t lowbyte = SPI.transfer(0x00);
+    deselect();
 
-	return (highbyte << 8) + lowbyte;
+    uint16_t result = (highbyte << 8) | lowbyte;
+    LOG_DEBUG("EEPROM read 16-bit value : 0x%04X address : 0x%04X", result, t_address);
+    return result;
 }
 
-void Eeprom::writeInt16(uint16_t address, uint16_t data)
-{
-	while (isWip()) {};
+void Eeprom::writeInt16(uint16_t t_address, uint16_t t_data) {
+    while (isWip()) {}
 
-	enableWrite();
+    enableWrite();
+    select();
+    SPI.transfer(EEPROM_WRITE);
+    sendAddress(t_address);
+    SPI.transfer(t_data >> 8);
+    SPI.transfer(t_data & 0xFF);
+    deselect();
 
-	select();
-	SPI.transfer(WRITE);
-	sendAddress(address);
-	SPI.transfer(data >> 8);
-	SPI.transfer(data & 0xFF);
-	deselect();
-}
-/**
-void Eeprom::readArray(uint16_t address, uint8_t* data, uint8_t length)
-{
-	while (isWip()) {};
-
-	select();
-	SPI.transfer(READ);
-	sendAddress(address);
-	for(uint8_t i = 0; i < length; i++)
-	{
-		data[i] = SPI.transfer(0x00);
-	}
-	deselect();
+    LOG_DEBUG("EEPROM wrote 16-bit value : 0x%04X address : 0x%04X", t_data, t_address);
 }
 
-void Eeprom::writeArray(uint16_t address, uint8_t* data, uint8_t length)
-{
-	while (isWip()) {};
+void Eeprom::readArray(uint16_t t_address, uint8_t* t_data, uint8_t t_length) {
+    for (uint8_t i = 0; i < t_length; i++) {
+        t_data[i] = readInt8(t_address + i);
+    }
 
-	enableWrite();
-
-	select();
-	SPI.transfer(WRITE);
-	sendAddress(address);
-	for(uint8_t i = 0; i < length; i++)
-	{
-		SPI.transfer(data[i]);
-	}
-	deselect();
-}
-**/
-
-void Eeprom::readArray(uint16_t address, uint8_t* data, uint8_t length)
-{
-	for(uint8_t i = 0; i < length; i++)
-	{
-		data[i] = readInt8(address + i);
-	}
+    LOG_DEBUG("EEPROM read %d bytes from address 0x%04X", t_length, t_address);
 }
 
-void Eeprom::writeArray(uint16_t address, uint8_t* data, uint8_t length)
-{
-	for(uint8_t i = 0; i < length; i++)
-	{
-		writeInt8(address + i, data[i]);
-	}
+void Eeprom::writeArray(uint16_t t_address, uint8_t* t_data, uint8_t t_length) {
+    for (uint8_t i = 0; i < t_length; i++) {
+        writeInt8(t_address + i, t_data[i]);
+    }
+
+    LOG_DEBUG("EEPROM wrote %d bytes from address 0x%04X", t_length, t_address);
 }
-
-#ifdef DEBUG
-	void Eeprom::testInt8()
-	{
-		for (uint32_t i = 1; i < 20; i++)
-		{
-			writeInt8(i, 1);
-			Serial.print("Reading address : ");
-			Serial.print(i);
-			Serial.print(" | Value : ");
-			Serial.println(readInt8(i));
-
-			delay(500);
-
-			writeInt8(i, 0);
-			Serial.print("Reading address : ");
-			Serial.print(i);
-			Serial.print(" | Value : ");
-			Serial.println(readInt8(i));
-
-			delay(500);
-		}
-	}
-
-	void Eeprom::testInt16()
-	{
-		writeInt16(985, 1000);
-		Serial.print("Reading address : 985");
-		Serial.print(" | Value : ");
-		Serial.println(readInt16(985));
-
-		delay(500);
-
-		writeInt16(985, 0);
-		Serial.print("Reading address : 985");
-		Serial.print(" | Value : ");
-		Serial.println(readInt16(985));
-
-		delay(500);
-	}
-
-	void Eeprom::testArray()
-	{
-		//uint8_t blah1[5] = { 0, 0, 0, 0, 0 };
-		uint8_t blah2[5] = { 5, 10, 95, 159, 254 };
-
-		uint8_t result[5] = { };
-
-		writeArray(0, blah2, 5);
-		readArray(0, result, 5);
-		Serial.println(result[0]);
-		Serial.println(result[1]);
-		Serial.println(result[2]);
-		Serial.println(result[3]);
-		Serial.println(result[4]);
-
-		delay(1000);
-
-		writeArray(0, blah2, 5);
-		readArray(0, result, 5);
-		Serial.println(result[0]);
-		Serial.println(result[1]);
-		Serial.println(result[2]);
-		Serial.println(result[3]);
-		Serial.println(result[4]);
-
-		delay(1000);
-	}
-
-	uint8_t Eeprom::test()
-	{
-		return readStatusRegister();
-	}
-#endif
