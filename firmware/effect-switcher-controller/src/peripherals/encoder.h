@@ -15,6 +15,9 @@ class Encoder {
     uint8_t m_encoderState = 0;
     uint8_t m_lastEncoderState = 0;
 
+    bool m_movedRight = false;
+    bool m_movedLeft = false;
+
     /// @brief Encoder state transition table
     const uint8_t c_encoderStates[7][4] = {
       {0x0, 0x2, 0x4, 0x0},
@@ -87,4 +90,12 @@ class Encoder {
     /// @brief Get the current encoder state
     /// @return uint8_t Encoder state (INCREMENT/DECREMENT)
     uint8_t getState() const;
+
+    /// @brief Check if the encoder was last moved to the right
+    /// @return bool true if last moved to the right
+    bool isMovedRight() const;
+
+    /// @brief Check if the encoder was last moved to the left
+    /// @return bool true if last moved to the left
+    bool isMovedLeft() const;
 };

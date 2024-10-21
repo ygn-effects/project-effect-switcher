@@ -21,18 +21,28 @@ bool Encoder::poll() {
 
   if (state == DECREMENT) {
     m_counter--;
+    m_movedLeft = true;
+    m_movedRight = false;
+
     if (m_counter == 255 || m_counter < m_minCounterValue) {
       m_counter = m_maxCounterValue;
     }
+
     LOG_DEBUG("Encoder pins %d/%d decremented : %d", m_encoderPinA, m_encoderPinB, m_counter);
+
     return true;
 
   } else if (state == INCREMENT) {
     m_counter++;
+    m_movedLeft = false;
+    m_movedRight = true;
+
     if (m_counter > m_maxCounterValue) {
       m_counter = m_minCounterValue;
     }
+
     LOG_DEBUG("Encoder pins %d/%d incremented : %d", m_encoderPinA, m_encoderPinB, m_counter);
+
     return true;
   }
 
@@ -65,4 +75,12 @@ void Encoder::setMaxValue(uint8_t value) {
 
 uint8_t Encoder::getState() const {
   return m_encoderState;
+}
+
+bool Encoder::isMovedRight() const {
+  return m_movedRight;
+}
+
+bool Encoder::isMovedLeft() const {
+  return m_movedLeft;
 }
