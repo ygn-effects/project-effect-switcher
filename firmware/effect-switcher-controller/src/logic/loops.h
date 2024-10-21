@@ -1,107 +1,74 @@
+#pragma once
+
 #include <Arduino.h>
+#include "utils/logging.h"
 
-#ifndef LOOPS_H
-#define LOOPS_H
+/// @brief Represents an array of audio loops, where each loop has an ID, state, order, send/return
+class Loops {
+  private:
+    uint8_t m_loopsId[16];      // Loop IDs
+    uint8_t m_loopsState[16];   // Loop states (on/off)
+    uint8_t m_loopsOrder[16];   // Loop order
+    uint8_t m_loopsSend[16];    // Loop send state
+    uint8_t m_loopsReturn[16];  // Loop return state
+    uint8_t m_loopsCount;       // Number of loops
 
-/**
- * @brief A loop represents an array oh physical audio loops using input/output jacks, a loop has an id and a state
- *
- */
-class Loops
-{
-    private:
-        uint8_t m_loopsId[16] = {0}; // Loops ID array
-        uint8_t m_loopsState[16] = {0}; // Loops states array
-        uint8_t m_loopsOrder[16] = {0};
-        uint8_t m_loopsSend[16] = {0};
-        uint8_t m_loopsReturn[16] = {0};
-        uint8_t m_loopsCount = 0; // Number of loops
+  public:
+    /// @brief Default constructor
+    Loops() : m_loopsCount(0) { };
 
-    public:
-        /**
-         * @brief Construct a new Loops object
-         */
-        Loops() {}
+    /// @brief Parameterized constructor
+    /// @param t_count Number of loops
+    Loops(uint8_t t_count) :
+        m_loopsCount(t_count) { };
 
-        /**
-         * @brief Construct a new Loops object
-         *
-         * @param count Number of loops
-         */
-        Loops(uint8_t count) :
-            m_loopsCount(count) {}
+    /// @brief Initialize the loop IDs and states
+    void loopsSetup();
 
-        /**
-         * @brief Initialize the id and states array according to the loop count
-         */
-        void loopsSetup();
+    /// @brief Get the loop IDs
+    /// @return Pointer to the loop IDs
+    uint8_t* getLoopsId();
 
-        /**
-         * @brief Get the Loops object
-         *
-         * @return uint8_t*
-         */
-        uint8_t* getLoopsId();
+    /// @brief Get the loop states
+    /// @return Pointer to the loop states
+    uint8_t* getLoopsState();
 
-        /**
-         * @brief Get the States object
-         *
-         * @return uint8_t*
-         */
-        uint8_t* getLoopsState();
+    /// @brief Get the state of a loop
+    uint8_t getLoopState(uint8_t t_loop);
 
-        /**
-         * @brief Get the state of a loop
-         *
-         * @param loop loop #
-         * @return uint8_t
-         */
-        uint8_t getLoopState(uint8_t loop);
+    /// @brief Set the state of a loop (on/off)
+    void setLoopState(uint8_t t_loop, uint8_t t_state);
 
-        /**
-         * @brief Set the state of a loop
-         *
-         * @param loop loop #
-         * @param state 1: open | 0 : close
-         */
-        void setLoopState(uint8_t loop, uint8_t state);
+    /// @brief Get the loop order
+    uint8_t* getLoopsOrder();
 
-        uint8_t* getLoopsOrder();
+    /// @brief Get the order of a specific loop
+    uint8_t getLoopOrder(uint8_t t_loop);
 
-        uint8_t getLoopOrder(uint8_t loop);
+    /// @brief Get the loop ID by its order in the chain
+    uint8_t getLoopIdByOrder(uint8_t t_order);
 
-        uint8_t getLoopIdByOrder(uint8_t order);
+    /// @brief Set the order of a specific loop
+    void setLoopOrder(uint8_t t_loop, uint8_t t_order);
 
-        void setLoopOrder(uint8_t loop, uint8_t order);
+    /// @brief Get the send state of a loop
+    uint8_t getLoopSend(uint8_t t_loop);
 
-        uint8_t getLoopSend(uint8_t loop);
+    /// @brief Set the send state of a loop
+    void setLoopSend(uint8_t t_loop, uint8_t t_send);
 
-        void setLoopSend(uint8_t loop, uint8_t send);
+    /// @brief Get the return state of a loop
+    uint8_t getLoopReturn(uint8_t t_loop);
 
-        uint8_t getLoopReturn(uint8_t loop);
+    /// @brief Set the return state of a loop
+    void setLoopReturn(uint8_t t_loop, uint8_t t_ret);
 
-        void setLoopReturn(uint8_t loop, uint8_t ret);
+    /// @brief Get the number of loops
+    uint8_t getLoopsCount();
 
-        /**
-         * @brief Get the Count object
-         *
-         * @return uint8_t
-         */
-        uint8_t getLoopsCount();
+    /// @brief Set the number of loops
+    void setLoopsCount(uint8_t t_count);
 
-        /**
-         * @brief Set the Count object
-         *
-         * @param count Number of loops used
-         */
-        void setLoopsCount(uint8_t count);
-
-        /**
-         * @brief Toggle the state of a loop (open/close)
-         *
-         * @param loop loop #
-         */
-        void toggleLoopsState(uint8_t loop);
+    /// @brief Toggle the state of a loop (on/off)
+    void toggleLoopsState(uint8_t t_loop);
 };
-
-#endif
