@@ -6,16 +6,15 @@ Hardware hardware;
 void setup()
 {
   Serial.begin(115200);
-  hardware.hardwareSetup();
+  hardware.setup();
   delay(500);
-  hardware.hardwareStartup();
+  hardware.startup();
   delay(500);
 }
 
 void loop()
 {
-  hardware.hardwarePoll();
+  hardware.poll();
 
-
-  hardware.resetHardwareTriggers();
+  hardware.resetTriggers();
 }
