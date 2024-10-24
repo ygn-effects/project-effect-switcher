@@ -84,14 +84,6 @@ class Hardware
     void restoreLastState();
     void resetTriggers();
 
-    void processSelector();
-    void processSelectorSwitchPress();
-    void processSelectorSwitchLongPress();
-
-    void setupMatrixLoops();
-    void connectMatrixLoops();
-    void connectTunerMatrixLoops();
-
     void loadPresetBank();
     void loadPreset();
     void savePreset();
