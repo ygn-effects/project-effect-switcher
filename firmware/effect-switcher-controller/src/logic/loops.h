@@ -14,7 +14,7 @@ class Loop {
 
   public:
     /// @brief Default constructor
-    Loop();
+    Loop() : m_loopState(0), m_loopOrder(0), m_loopSend(0), m_loopReturn(0) {}
 
     /// @brief Parametrized constructor
     /// @param t_state Loop state
