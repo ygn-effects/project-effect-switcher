@@ -1,74 +1,60 @@
 #pragma once
 
 #include <Arduino.h>
-#include "utils/logging.h"
 
-/// @brief Represents an array of audio loops, where each loop has an ID, state, order, send/return
-class Loops {
+
+/// @brief Represents an audio loop where each loop has a state,
+/// order, and a send/return loop mapped to a switch matrix
+class Loop {
   private:
-    uint8_t m_loopsId[16];      // Loop IDs
-    uint8_t m_loopsState[16];   // Loop states (on/off)
-    uint8_t m_loopsOrder[16];   // Loop order
-    uint8_t m_loopsSend[16];    // Loop send state
-    uint8_t m_loopsReturn[16];  // Loop return state
-    uint8_t m_loopsCount;       // Number of loops
+    uint8_t m_loopState;
+    uint8_t m_loopOrder;
+    uint8_t m_loopSend;
+    uint8_t m_loopReturn;
 
   public:
     /// @brief Default constructor
-    Loops() : m_loopsCount(0) { };
+    Loop();
 
-    /// @brief Parameterized constructor
-    /// @param t_count Number of loops
-    Loops(uint8_t t_count) :
-        m_loopsCount(t_count) { };
-
-    /// @brief Initialize the loop IDs and states
-    void loopsSetup();
-
-    /// @brief Get the loop IDs
-    /// @return Pointer to the loop IDs
-    uint8_t* getLoopsId();
-
-    /// @brief Get the loop states
-    /// @return Pointer to the loop states
-    uint8_t* getLoopsState();
+    /// @brief Parametrized constructor
+    /// @param t_state Loop state
+    /// @param t_order Loop order
+    /// @param t_send Loop send #
+    /// @param t_returnLoop return #
+    Loop(uint8_t t_state,
+      uint8_t t_order,
+      uint8_t t_send,
+      uint8_t t_return
+    ) :
+      m_loopState(t_state),
+      m_loopOrder(t_order),
+      m_loopSend(t_send),
+      m_loopReturn(t_return) { };
 
     /// @brief Get the state of a loop
-    uint8_t getLoopState(uint8_t t_loop);
+    uint8_t getLoopState() const;
 
     /// @brief Set the state of a loop (on/off)
-    void setLoopState(uint8_t t_loop, uint8_t t_state);
+    void setLoopState(uint8_t t_state);
 
-    /// @brief Get the loop order
-    uint8_t* getLoopsOrder();
+    /// @brief Get the order of a loop
+    uint8_t getLoopOrder() const;
 
-    /// @brief Get the order of a specific loop
-    uint8_t getLoopOrder(uint8_t t_loop);
-
-    /// @brief Get the loop ID by its order in the chain
-    uint8_t getLoopIdByOrder(uint8_t t_order);
-
-    /// @brief Set the order of a specific loop
-    void setLoopOrder(uint8_t t_loop, uint8_t t_order);
+    /// @brief Set the order of a loop
+    void setLoopOrder(uint8_t t_order);
 
     /// @brief Get the send state of a loop
-    uint8_t getLoopSend(uint8_t t_loop);
+    uint8_t getLoopSend() const;
 
     /// @brief Set the send state of a loop
-    void setLoopSend(uint8_t t_loop, uint8_t t_send);
+    void setLoopSend(uint8_t t_send);
 
     /// @brief Get the return state of a loop
-    uint8_t getLoopReturn(uint8_t t_loop);
+    uint8_t getLoopReturn();
 
     /// @brief Set the return state of a loop
-    void setLoopReturn(uint8_t t_loop, uint8_t t_ret);
-
-    /// @brief Get the number of loops
-    uint8_t getLoopsCount();
-
-    /// @brief Set the number of loops
-    void setLoopsCount(uint8_t t_count);
+    void setLoopReturn(uint8_t t_ret);
 
     /// @brief Toggle the state of a loop (on/off)
-    void toggleLoopsState(uint8_t t_loop);
+    void toggleLoopState();
 };
