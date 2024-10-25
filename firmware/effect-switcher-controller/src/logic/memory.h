@@ -1,44 +1,65 @@
+#pragma once
+
 #include <Arduino.h>
-
 #include "peripherals/eeprom.h"
+#include "logic/preset.h"
 
-#ifndef MEMORY_H
-#define MEMORY_H
+constexpr uint16_t c_deviceStateAddress = 0x0;
+constexpr uint16_t c_banksStartAddress = 0x80;
+constexpr uint16_t c_presetSize = 64;
+constexpr uint8_t c_presetsPerBank = 4;
 
-/**
- * @brief Interface between the hardware and the eeprom
- */
-class Memory
-{
-    private:
-        Eeprom eeprom0;
+class MemoryManager {
+  private:
+    Eeprom eeprom;
 
-        const uint8_t c_initialSetupStateAddress = 0;
-        const uint8_t c_currentPresetBankAddress = 1;
-        const uint8_t c_currentPresetAddress = 2;
-        const uint8_t c_presetSaveStartAddress = 128;
-        const uint16_t c_presetBankSaveSize = 256;
-        const uint8_t c_presetSaveSize = 64;
+    /// @brief Calculate the memory address of a preset
+    /// @param t_bank Preset bank
+    /// @param t_presetIndex Preset index in the bank
+    /// @return uint16_t Address of the preset
+    uint16_t calculatePresetAddress(uint8_t t_bank, uint8_t t_presetIndex) const;
 
-    public:
-        Memory(uint8_t pin) : eeprom0(pin) {}
+    /// @brief Serialize a Preset object into a byte array
+    /// @param t_preset Preset to serialize
+    /// @param t_buffer Data buffer
+    void serializePreset(const Preset& t_preset, uint8_t* t_buffer) const;
 
-        void memorySetup();
-        void memoryInitialization();
-        void memoryReset();
-        void memoryTest();
+    /// @brief Deserialize a byte array into a buffer object
+    /// @param t_buffer Data buffer
+    /// @param t_preset Preset to deserialize the data into
+    void deserializePreset(const uint8_t* t_buffer, Preset& t_preset) const;
 
-        uint8_t readInitialSetupState();
-        void writeInitialSetupState(uint8_t state);
+  public:
+    /// @brief Constructor for an SPI EEPROM
+    /// @param t_csPin EEPROM CS pin
+    MemoryManager(uint8_t t_csPin) :
+      eeprom(t_csPin) {
+        eeprom.setup();
+      };
 
-        uint8_t readCurrentPresetBank();
-        void writeCurrentPresetBank(uint8_t bank);
+    /// @brief Saves the device's current state (last bank and preset) to EEPROM
+    /// @param t_bank Current bank
+    /// @param t_preset Current preset
+    void saveDeviceState(uint8_t t_bank, uint8_t t_preset);
 
-        uint8_t readCurrentPreset();
-        void writeCurrentPreset(uint8_t preset);
+    /// @brief Loads the last saved device state (bank and preset) from EEPROM
+    /// @param t_bank Saved bank
+    /// @param t_preset Saved preset
+    void loadDeviceState(uint8_t& t_bank, uint8_t& t_preset);
 
-        void writePreset(uint8_t bank, uint8_t* preset, uint8_t* loopsid, uint8_t* loopsstate, uint8_t* loopsorder, uint8_t loopscount);
-        void readPreset(uint8_t bank, uint8_t* preset, uint8_t* loopsid, uint8_t* loopsstate, uint8_t* loopsorder, uint8_t loopscount);
+    /// @brief Saves a specific preset to EEPROM
+    /// @param t_bank Current bank
+    /// @param t_presetIndex Preset index in the bank
+    /// @param t_preset Reference to the preset to save
+    void savePreset(uint8_t t_bank, uint8_t t_presetIndex, const Preset& t_preset);
+
+    /// @brief Load a preset from EEPROM
+    /// @param t_bank Target bank
+    /// @param t_presetIndex Preset index in the bank
+    /// @param t_preset Reference to the preset to load into
+    void loadPreset(uint8_t t_bank, uint8_t t_presetIndex, Preset& t_preset);
+
+    /// Test functions
+    void initializeTestData();
+    void readTestData();
 };
-
-#endif

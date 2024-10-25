@@ -1,248 +1,116 @@
-#define DEBUG 1
-
-#include <Arduino.h>
-
 #include "memory.h"
 
-void Memory::memorySetup()
-{
-    eeprom0.setup();
+uint16_t MemoryManager::calculatePresetAddress(uint8_t t_bank, uint8_t t_presetIndex) const {
+  return c_banksStartAddress + (t_bank * c_presetsPerBank + t_presetIndex) * c_presetSize;
+}
 
-    uint8_t statusRegister = eeprom0.readStatusRegister();
 
-    #ifdef DEBUG
-        Serial.print("Status register : ");
-        Serial.println(statusRegister);
-    #endif
+void MemoryManager::serializePreset(const Preset& t_preset, uint8_t* t_buffer) const {
+  t_buffer[0] = t_preset.getBank(); // Address 0
+  t_buffer[1] = t_preset.getPreset(); // Address 1
+  t_buffer[2] = t_preset.getLoopsCount(); // Address 2
 
-    if ((statusRegister & B10000000) == 1 || // SRWD is set
-    (statusRegister & B00001000) == 1 || // BP1 is set
-    (statusRegister & B00000100) == 1)   // BP0 is set
-    {
-        #ifdef DEBUG
-            Serial.println("Doing status register reinitialization");
-        #endif
+  for (uint8_t i = 0; i < t_preset.getLoopsCount(); i++) {
+    t_buffer[3 + i * 4] = t_preset.getLoopState(i); // First loop, address 3
+    t_buffer[3 + i * 4 + 1] = t_preset.getLoopOrder(i); // First loop, address 4
+    t_buffer[3 + i * 4 + 2] = t_preset.getLoopSend(i); // First loop, address 5
+    t_buffer[3 + i * 4 + 3] = t_preset.getLoopReturn(i); // First loop, address 6
+  }
+}
 
-        eeprom0.writeStatusRegister(); // Reset the status register
+void MemoryManager::deserializePreset(const uint8_t* t_buffer, Preset& t_preset) const {
+  t_preset.setBank(t_buffer[0]);
+  t_preset.setPreset(t_buffer[1]);
+
+  uint8_t loopsCount = t_buffer[2];
+  t_preset.setLoopsCount(loopsCount);
+
+  for (uint8_t i = 0; i < loopsCount; i++) {
+    t_preset.setLoopState(i, t_buffer[3 + i * 4]);
+    t_preset.setLoopOrder(i, t_buffer[3 + i * 4 + 1]);
+    t_preset.setLoopSend(i, t_buffer[3 + i * 4 + 2]);
+    t_preset.setLoopReturn(i, t_buffer[3 + i * 4 + 3]);
+  }
+}
+
+void MemoryManager::saveDeviceState(uint8_t t_bank, uint8_t t_preset) {
+  eeprom.writeInt8(c_deviceStateAddress, t_bank);
+  eeprom.writeInt8(c_deviceStateAddress + 1, t_preset);
+}
+
+void MemoryManager::loadDeviceState(uint8_t& t_bank, uint8_t& t_preset) {
+  t_bank = eeprom.readInt8(c_deviceStateAddress);
+  t_preset = eeprom.readInt8(c_deviceStateAddress + 1);
+}
+
+void MemoryManager::savePreset(uint8_t t_bank, uint8_t t_presetIndex, const Preset& t_preset) {
+  uint16_t address = calculatePresetAddress(t_bank, t_presetIndex);
+  uint8_t buffer[c_presetSize];
+
+  serializePreset(t_preset, buffer);
+
+  for (uint16_t i = 0; i < c_presetSize; i++) {
+      eeprom.writeInt8(address + i, buffer[i]);
+  }
+}
+
+void MemoryManager::loadPreset(uint8_t t_bank, uint8_t t_presetIndex, Preset& t_preset) {
+uint16_t address = calculatePresetAddress(t_bank, t_presetIndex);
+  uint8_t buffer[c_presetSize];
+
+  for (uint16_t i = 0; i < c_presetSize; i++) {
+      buffer[i] = eeprom.readInt8(address + i);
+  }
+
+  deserializePreset(buffer, t_preset);
+}
+
+/// Test functions
+
+void MemoryManager::initializeTestData() {
+  // Loop through 8 banks
+  for (uint8_t bank = 0; bank < 8; bank++) {
+    // Loop through 4 presets per bank
+    for (uint8_t presetIndex = 0; presetIndex < 4; presetIndex++) {
+      Preset testPreset(bank, presetIndex, 8);  // Initialize Preset with 8 loops
+
+      // Set each loop's test data
+      for (uint8_t loopIndex = 0; loopIndex < 8; loopIndex++) {
+        testPreset.setLoopState(loopIndex, loopIndex % 2);    // Alternating states (0,1)
+        testPreset.setLoopOrder(loopIndex, loopIndex);        // Sequential order
+        testPreset.setLoopSend(loopIndex, loopIndex * 2);     // Example send values
+        testPreset.setLoopReturn(loopIndex, loopIndex * 3);   // Example return values
+      }
+
+      // Save initialized preset to EEPROM
+      savePreset(bank, presetIndex, testPreset);
     }
+  }
+}
 
-    if (readInitialSetupState() != 1) // First startup, need to initialize
-    {
-        memoryInitialization();
+void MemoryManager::readTestData() {
+  // Loop through 8 banks
+  for (uint8_t bank = 0; bank < 8; bank++) {
+    LOG_DEBUG("Reading Bank %d:", bank);
+
+    // Loop through 4 presets per bank
+    for (uint8_t presetIndex = 0; presetIndex < 4; presetIndex++) {
+      Preset testPreset;  // Empty preset to load data into
+
+      // Load the preset from EEPROM
+      loadPreset(bank, presetIndex, testPreset);
+
+      LOG_DEBUG("  Preset %d:", presetIndex);
+      LOG_DEBUG("    Bank: %d, Preset: %d", testPreset.getBank(), testPreset.getPreset());
+
+      // Log each loop in the preset
+      for (uint8_t loopIndex = 0; loopIndex < testPreset.getLoopsCount(); loopIndex++) {
+        LOG_DEBUG("    Loop %d:", loopIndex);
+        LOG_DEBUG("      State: %d", testPreset.getLoopState(loopIndex));
+        LOG_DEBUG("      Order: %d", testPreset.getLoopOrder(loopIndex));
+        LOG_DEBUG("      Send: %d", testPreset.getLoopSend(loopIndex));
+        LOG_DEBUG("      Return: %d", testPreset.getLoopReturn(loopIndex));
+      }
     }
-}
-
-void Memory::memoryInitialization()
-{
-    writeInitialSetupState(1);
-}
-
-void Memory::memoryReset()
-{
-    uint8_t startPresetBank = 65; // A
-    uint8_t startPreset = 48; // 0
-    uint8_t maxPresetBanks = 10; // Number of banks
-    uint8_t maxPresets = 4; // Number of presets per banks
-    uint8_t startLoop = 49; // 1
-    uint8_t bufferLoop = 66; // B
-    uint8_t maxLoops = 8; // Number of loops per preset
-
-    uint8_t loops[maxLoops] = {0};
-    uint8_t states[maxLoops] = {0};
-    uint8_t orders[maxLoops] = {0};
-
-    for (uint8_t i = 0; i < maxLoops - 2; i++) // Last 2 loops are reserved for the internal buffers
-    {
-        loops[i] = startLoop + i;
-    }
-
-    loops[maxLoops - 1] = bufferLoop; // Buffer 1
-    loops[maxLoops - 2] = bufferLoop; // Buffer 2
-
-    for (uint8_t i = 0; i < maxLoops; i++)
-    {
-        orders[i] = i;
-    }
-
-    writeInitialSetupState(1);
-    writeCurrentPresetBank(startPresetBank); // A
-    writeCurrentPreset(startPreset); // 0
-
-    for (uint8_t i = startPresetBank; i < startPresetBank + maxPresetBanks; i++)
-    {
-        for (uint8_t j = startPreset; j < startPreset + maxPresets; j++)
-        {
-            writePreset(i, &j, &loops[0], &states[0], &orders[0], maxLoops);
-        }
-    }
-}
-
-uint8_t Memory::readInitialSetupState()
-{
-    uint8_t value = eeprom0.readInt8(c_initialSetupStateAddress);
-
-    #ifdef DEBUG
-        Serial.print("Reading initial state : ");
-        Serial.println(value);
-    #endif
-
-    return value;
-}
-
-void Memory::writeInitialSetupState(uint8_t state)
-{
-    eeprom0.writeInt8(c_initialSetupStateAddress, state);
-
-    #ifdef DEBUG
-        Serial.print("Writing initial state : ");
-        Serial.println(state);
-    #endif
-}
-
-uint8_t Memory::readCurrentPresetBank()
-{
-    uint8_t value = eeprom0.readInt8(c_currentPresetBankAddress);
-
-    #ifdef DEBUG
-        Serial.print("Reading current preset bank : ");
-        Serial.println(value);
-    #endif
-
-    return value;
-}
-
-void Memory::writeCurrentPresetBank(uint8_t bank)
-{
-    eeprom0.writeInt8(c_currentPresetBankAddress, bank);
-
-    #ifdef DEBUG
-        Serial.print("Writing current preset bank : ");
-        Serial.println(bank);
-    #endif
-}
-
-uint8_t Memory::readCurrentPreset()
-{
-    uint8_t value = eeprom0.readInt8(c_currentPresetAddress);
-
-    #ifdef DEBUG
-        Serial.print("Reading current preset : ");
-        Serial.println(value);
-    #endif
-
-    return value;
-}
-
-void Memory::writeCurrentPreset(uint8_t preset)
-{
-    eeprom0.writeInt8(c_currentPresetAddress, preset);
-
-    #ifdef DEBUG
-        Serial.print("Writing current preset : ");
-        Serial.println(preset);
-    #endif
-}
-
-void Memory::writePreset(uint8_t bank, uint8_t* preset, uint8_t* loopsid, uint8_t* loopsstate, uint8_t* loopsorder, uint8_t loopscount)
-{
-    uint16_t startAdress = c_presetSaveStartAddress + ((bank - 65) * c_presetBankSaveSize) + (c_presetSaveSize * (*preset - 48));
-
-    #ifdef DEBUG
-        Serial.print("Address : ");
-        Serial.println(startAdress);
-    #endif
-
-    #ifdef DEBUG
-        Serial.println("Writing preset : ");
-    #endif
-
-    eeprom0.writeInt8(startAdress, bank);
-    startAdress++;
-
-    #ifdef DEBUG
-        Serial.print("Preset bank : ");
-        Serial.println(bank);
-    #endif
-
-    eeprom0.writeInt8(startAdress, *preset);
-    startAdress++;
-
-    #ifdef DEBUG
-        Serial.print("Preset : ");
-        Serial.println(*preset);
-    #endif
-
-    eeprom0.writeArray(startAdress, loopsid, loopscount);
-    startAdress += loopscount + 1;
-
-    eeprom0.writeArray(startAdress, loopsstate, loopscount);
-    startAdress += loopscount + 1;
-
-    eeprom0.writeArray(startAdress, loopsorder, loopscount);
-    startAdress += loopscount + 1;
-
-
-    #ifdef DEBUG
-        for (uint8_t i = 0; i < loopscount; i++)
-        {
-            Serial.print("Loop : ");
-            Serial.print(loopsid[i]);
-            Serial.print(" | Order : ");
-            Serial.print(loopsorder[i]);
-            Serial.print(" | State : ");
-            Serial.println(loopsstate[i]);
-        }
-    #endif
-}
-
-void Memory::readPreset(uint8_t bank, uint8_t* preset, uint8_t* loopsid, uint8_t* loopsstate, uint8_t* loopsorder, uint8_t loopscount)
-{
-    uint16_t startAdress = c_presetSaveStartAddress + ((bank - 65) * c_presetBankSaveSize) + (c_presetSaveSize * (*preset));
-
-    #ifdef DEBUG
-        Serial.print("Address : ");
-        Serial.println(startAdress);
-    #endif
-
-
-    #ifdef DEBUG
-        Serial.println("Reading preset : ");
-    #endif
-
-    startAdress ++;
-
-    #ifdef DEBUG
-        Serial.print("Preset bank : ");
-        Serial.println(bank);
-    #endif
-
-    eeprom0.readInt8(startAdress, preset);
-    startAdress ++;
-
-    #ifdef DEBUG
-        Serial.print("Preset : ");
-        Serial.println(*preset);
-    #endif
-
-    eeprom0.readArray(startAdress, loopsid, loopscount);
-    startAdress += loopscount + 1;
-
-    eeprom0.readArray(startAdress, loopsstate, loopscount);
-    startAdress += loopscount + 1;
-
-    eeprom0.readArray(startAdress, loopsorder, loopscount);
-    startAdress += loopscount + 1;
-
-
-    #ifdef DEBUG
-        for (uint8_t i = 0; i < loopscount; i++)
-        {
-            Serial.print("Loop : ");
-            Serial.print(loopsid[i]);
-            Serial.print(" | Order : ");
-            Serial.print(loopsorder[i]);
-            Serial.print(" | State : ");
-            Serial.println(loopsstate[i]);
-        }
-    #endif
+  }
 }
