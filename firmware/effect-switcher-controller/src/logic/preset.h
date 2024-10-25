@@ -22,7 +22,7 @@ class Preset {
     /// @brief Parameterized constructor
     /// @param t_bank Bank number
     /// @param t_preset Preset number
-    /// @param t_loopsCount Pointer to the loops object
+    /// @param t_loopsCount Loops count
     Preset(uint8_t t_bank,
       uint8_t t_preset,
       uint8_t t_loopsCount
@@ -44,17 +44,46 @@ class Preset {
     void setPreset(uint8_t t_preset);
 
     /// @brief Get the number of loops in the preset
-    uint8_t getLoopsCount() const {
-      return m_loopsCount;
-    }
+    uint8_t getLoopsCount() const;
+
+    /// @brief Set the number of loops in the preset
+    /// @param t_count Loops count
+    void setLoopsCount(uint8_t t_count);
 
     /// @brief Get the state of a specific loop
     uint8_t getLoopState(uint8_t t_loop) const;
 
+    /// @brief Set a loop state
+    /// @param t_loop Loop index
+    /// @param t_state Loop state
+    void setLoopState(uint8_t t_loop, uint8_t t_state);
+
+    /// @brief Get the order of a specific loop
+    uint8_t getLoopOrder(uint8_t t_loop) const;
+
+    /// @brief Set a loop order
+    /// @param t_loop Loop index
+    /// @param t_order Loop order
+    void setLoopOrder(uint8_t t_loop, uint8_t t_order);
+
+    /// @brief Get the send value of a specific loop
+    uint8_t getLoopSend(uint8_t t_loop) const;
+
+    /// @brief Set a loop send value
+    /// @param t_loop Loop index
+    /// @param t_send Loop send value
+    void setLoopSend(uint8_t t_loop, uint8_t t_send);
+
+    /// @brief Get the return value of a specific loop
+    uint8_t getLoopReturn(uint8_t t_loop) const;
+
+    /// @brief Set a loop return value
+    /// @param t_loop Loop index
+    /// @param t_return Loop return value
+    void setLoopReturn(uint8_t t_loop, uint8_t t_return);
+
     /// @brief Toggle the state of a specific loop
-    void toggleLoopState(uint8_t t_loop) {
-      m_loops[t_loop].toggleLoopState();
-    }
+    void toggleLoopState(uint8_t t_loop);
 
     /// @brief Swap the order of two loops in the preset
     /// @param t_id1 Loop 1

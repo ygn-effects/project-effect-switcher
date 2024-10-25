@@ -20,8 +20,28 @@ void Preset::setPreset(uint8_t t_preset) {
   LOG_DEBUG("Preset set to %d", t_preset);
 }
 
+uint8_t Preset::getLoopsCount() const {
+  return m_loopsCount;
+}
+
 uint8_t Preset::getLoopState(uint8_t t_loop) const {
   return m_loops[t_loop].getLoopState();
+}
+
+uint8_t Preset::getLoopOrder(uint8_t t_loop) const {
+  return m_loops[t_loop].getLoopOrder();
+}
+
+uint8_t Preset::getLoopSend(uint8_t t_loop) const {
+  return m_loops[t_loop].getLoopSend();
+}
+
+uint8_t Preset::getLoopReturn(uint8_t t_loop) const {
+  return m_loops[t_loop].getLoopReturn();
+}
+
+void Preset::toggleLoopState(uint8_t t_loop) {
+  m_loops[t_loop].toggleLoopState();
 }
 
 void Preset::swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_order1, uint8_t t_loop2, uint8_t t_order2) {
