@@ -50,7 +50,7 @@ class Loop {
     void setLoopSend(uint8_t t_send);
 
     /// @brief Get the return state of a loop
-    uint8_t getLoopReturn();
+    uint8_t getLoopReturn() const;
 
     /// @brief Set the return state of a loop
     void setLoopReturn(uint8_t t_ret);

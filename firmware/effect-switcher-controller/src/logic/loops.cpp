@@ -25,7 +25,7 @@ void Loop::setLoopSend(uint8_t t_send) {
   m_loopSend = t_send;
 }
 
-uint8_t Loop::getLoopReturn() {
+uint8_t Loop::getLoopReturn() const {
   return m_loopReturn;
 }
 
