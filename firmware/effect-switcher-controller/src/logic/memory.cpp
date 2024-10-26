@@ -86,6 +86,8 @@ void MemoryManager::initializeTestData() {
       savePreset(bank, presetIndex, testPreset);
     }
   }
+
+  saveDeviceState(1, 0);
 }
 
 void MemoryManager::readTestData() {
@@ -113,4 +115,9 @@ void MemoryManager::readTestData() {
       }
     }
   }
+  uint8_t lastBank = 0;
+  uint8_t lastPreset = 0;
+  loadDeviceState(lastBank, lastPreset);
+
+  LOG_DEBUG("Last bank: %d, Last preset: %d", lastBank, lastPreset);
 }
