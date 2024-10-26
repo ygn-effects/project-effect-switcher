@@ -24,20 +24,40 @@ uint8_t Preset::getLoopsCount() const {
   return m_loopsCount;
 }
 
+void Preset::setLoopsCount(uint8_t t_count) {
+  m_loopsCount = t_count;
+}
+
 uint8_t Preset::getLoopState(uint8_t t_loop) const {
   return m_loops[t_loop].getLoopState();
+}
+
+void Preset::setLoopState(uint8_t t_loop, uint8_t t_state) {
+  m_loops[t_loop].setLoopState(t_state);
 }
 
 uint8_t Preset::getLoopOrder(uint8_t t_loop) const {
   return m_loops[t_loop].getLoopOrder();
 }
 
+void Preset::setLoopOrder(uint8_t t_loop, uint8_t t_order) {
+  m_loops[t_loop].setLoopOrder(t_order);
+}
+
 uint8_t Preset::getLoopSend(uint8_t t_loop) const {
   return m_loops[t_loop].getLoopSend();
 }
 
+void Preset::setLoopSend(uint8_t t_loop, uint8_t t_send) {
+  m_loops[t_loop].setLoopSend(t_send);
+}
+
 uint8_t Preset::getLoopReturn(uint8_t t_loop) const {
   return m_loops[t_loop].getLoopReturn();
+}
+
+void Preset::setLoopReturn(uint8_t t_loop, uint8_t t_return) {
+  m_loops[t_loop].setLoopReturn(t_return);
 }
 
 void Preset::toggleLoopState(uint8_t t_loop) {
