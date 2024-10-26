@@ -1,7 +1,6 @@
 #include <SPI.h>
 
 #include "eeprom.h"
-#include "utils/logging.h"
 
 void Eeprom::setup() {
   pinMode(m_csPin, OUTPUT);
