@@ -26,6 +26,12 @@ class Display {
     /// @return The width in pixels
     uint16_t calcTextWidth(const char* text);
 
+    /// @brief Calculates the height of the text
+    /// @param text The text to calculate height for
+    /// @return The height in pixels
+    uint16_t calcTextHeight(const char* text);
+
+
   public:
     /// @brief Construct a display object
     /// @param width Width of the display

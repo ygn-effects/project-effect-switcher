@@ -31,6 +31,14 @@ uint16_t Display::calcTextWidth(const char* text) {
   return textWidth;
 }
 
+uint16_t Display::calcTextHeight(const char* text) {
+  int16_t x1, y1;
+  uint16_t textWidth, height;
+  m_ssd1306.getTextBounds(text, 0, 0, &x1, &y1, &textWidth, &height);
+
+  return height;
+}
+
 void Display::renderHeader(const char* text) {
   clear();
   resetCursor();
@@ -50,7 +58,7 @@ void Display::renderBankAndPreset(char bank, uint8_t preset) {
 
   // Center the bank and preset on the screen
   uint16_t textWidth = calcTextWidth("A-1");  // Assume max width for "A | 1"
-  m_ssd1306.setCursor((m_width - textWidth) / 2, m_height);  // Center the text
+  m_ssd1306.setCursor((m_width - textWidth) / 2, m_height - m_newLine / 2);  // Center the text
 
   m_ssd1306.print(bank);      // Print the bank character
   m_ssd1306.print("-");     // Separator
