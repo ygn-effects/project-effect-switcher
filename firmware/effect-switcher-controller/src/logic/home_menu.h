@@ -14,18 +14,20 @@ class HomeMenu : public MenuBase {
     /// @param display Pointer to the display driver
     /// @param lastBank The last used bank
     /// @param lastPreset The last used preset
-    HomeMenu(Display* display, char lastBank, uint8_t lastPreset)
-      : MenuBase(display), m_lastBank(lastBank), m_lastPreset(lastPreset) {}
+    HomeMenu(Display* display, char lastBank, uint8_t lastPreset) :
+      MenuBase(display),
+      m_lastBank(lastBank),
+      m_lastPreset(lastPreset) { };
 
     /// @brief Update the home menu (render the current bank and preset)
     void update() override {
-        m_display->clear();
-        m_display->renderHeader("Current Preset");         // Display header
-        m_display->renderBankAndPreset(m_lastBank, m_lastPreset);  // Display bank and preset
+      m_display->clear();
+      m_display->renderHeader("Current Preset");         // Display header
+      m_display->renderBankAndPreset(m_lastBank, m_lastPreset);  // Display bank and preset
     }
 
     /// @brief Handle input (home menu doesn't need input handling)
     void handleInput(uint8_t t_input) override {
-        // No input handling needed for the home menu
+      // No input handling needed for the home menu
     }
 };
