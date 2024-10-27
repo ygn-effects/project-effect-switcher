@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "loops.h"
+#include "logic/loops.h"
 #include "utils/logging.h"
 
 constexpr uint8_t c_maxLoops = 16;
