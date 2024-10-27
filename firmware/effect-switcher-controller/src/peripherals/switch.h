@@ -23,7 +23,6 @@ class MomentarySwitch {
     uint8_t m_tempSwitchLongPress = 0;
     uint8_t m_longPressActive = 0;
 
-
   public:
     /// @brief Create a temporary switch object
     /// @param pin pin #
@@ -58,4 +57,7 @@ class MomentarySwitch {
 
     /// @brief Check if the switch has been held down for a long press
     bool isLongPress() const;
+
+    /// @brief Reset the temporary state flags (switched, long press)
+    void reset();
 };

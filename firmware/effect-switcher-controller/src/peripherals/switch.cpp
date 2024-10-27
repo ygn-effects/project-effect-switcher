@@ -36,7 +36,7 @@ void MomentarySwitch::poll() {
         LOG_DEBUG("Switch pin %d : pushed", m_pin);
       }
 
-      // Record the switch event
+      // Record the switch event as toggled
       m_tempSwitchSwitched = true;
 
       LOG_DEBUG("Switch pin %d : switched", m_pin);
@@ -52,15 +52,10 @@ void MomentarySwitch::poll() {
       }
     }
   }
-  else {
-    m_tempSwitchSwitched = false;
-    m_tempSwitchLongPress = false;
-  }
 
   // Save the reading for next time
   m_lastSwitchState = m_switchState;
 }
-
 
 bool MomentarySwitch::isSwitched() const {
   return m_tempSwitchSwitched;
@@ -80,4 +75,9 @@ bool MomentarySwitch::isReleased() const {
 
 bool MomentarySwitch::isLongPress() const {
   return m_tempSwitchLongPress;
+}
+
+void MomentarySwitch::reset() {
+  m_tempSwitchSwitched = false;
+  m_tempSwitchLongPress = false;
 }
