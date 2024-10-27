@@ -69,7 +69,7 @@ uint16_t address = calculatePresetAddress(t_bank, t_presetIndex);
 
 void MemoryManager::initializeTestData() {
   // Loop through 8 banks
-  for (uint8_t bank = 0; bank < 8; bank++) {
+  for (uint8_t bank = 0; bank < 16; bank++) {
     // Loop through 4 presets per bank
     for (uint8_t presetIndex = 0; presetIndex < 4; presetIndex++) {
       Preset testPreset(bank, presetIndex, 8);  // Initialize Preset with 8 loops
@@ -92,7 +92,7 @@ void MemoryManager::initializeTestData() {
 
 void MemoryManager::readTestData() {
   // Loop through 8 banks
-  for (uint8_t bank = 0; bank < 8; bank++) {
+  for (uint8_t bank = 0; bank < 16; bank++) {
     LOG_DEBUG("Reading Bank %d:", bank);
 
     // Loop through 4 presets per bank
