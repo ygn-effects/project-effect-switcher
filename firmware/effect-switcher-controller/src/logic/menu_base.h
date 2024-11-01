@@ -2,6 +2,14 @@
 #include <Arduino.h>
 #include "peripherals/display.h"
 
+enum class MenuInputAction {
+  kNone,
+  kUp,
+  kDown,
+  kPress,
+  kLongPress
+};
+
 /// @brief Base class for all menu types
 class MenuBase {
   protected:
@@ -15,5 +23,5 @@ class MenuBase {
     virtual void update() = 0;
 
     /// @brief Handle user input (e.g., button press, encoder turn)
-    virtual void handleInput(uint8_t t_input) = 0;
+    virtual void handleInput(MenuInputAction t_action) = 0;
 };

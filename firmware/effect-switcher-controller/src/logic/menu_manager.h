@@ -12,9 +12,9 @@ class MenuManager {
     MenuManager() : m_currentMenu(nullptr) {}
 
     /// @brief Set the active menu (switch state)
-    /// @param menu Pointer to the new menu to set as active
-    void setMenu(MenuBase* menu) {
-      m_currentMenu = menu;
+    /// @param t_menu Pointer to the new menu to set as active
+    void setMenu(MenuBase* t_menu) {
+      m_currentMenu = t_menu;
     }
 
     /// @brief Update the current menu (called in the main loop)
@@ -26,9 +26,9 @@ class MenuManager {
 
     /// @brief Handle input for the current menu
     /// @param input The input event (e.g., button press, encoder turn)
-    void handleInput(uint8_t input) {
+    void handleInput(MenuInputAction t_action) {
       if (m_currentMenu) {
-        m_currentMenu->handleInput(input);   // Delegate input handling to the current menu
+        m_currentMenu->handleInput(t_action);   // Delegate input handling to the current menu
       }
     }
 };

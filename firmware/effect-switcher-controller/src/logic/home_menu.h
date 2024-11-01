@@ -34,7 +34,7 @@ class HomeMenu : public MenuBase {
     }
 
     /// @brief Handle input (home menu doesn't need input handling)
-    void handleInput(uint8_t t_input) override {
+    void handleInput(MenuInputAction t_action) override {
 
     }
 };
