@@ -87,10 +87,8 @@ class Preset {
 
     /// @brief Swap the order of two loops in the preset
     /// @param t_id1 Loop 1
-    /// @param t_order1 Loop 1 order
     /// @param t_id2 Loop 2
-    /// @param t_order2 Loop 2 order
-    void swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_order1, uint8_t t_loop2, uint8_t t_order2);
+    void swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_loop2);
 
     /// @brief Set the send and return state of a loop
     void setPresetLoopSendReturn(uint8_t t_loop, uint8_t t_send, uint8_t t_return);

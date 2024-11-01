@@ -64,9 +64,12 @@ void Preset::toggleLoopState(uint8_t t_loop) {
   m_loops[t_loop].toggleLoopState();
 }
 
-void Preset::swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_order1, uint8_t t_loop2, uint8_t t_order2) {
-  m_loops[t_loop1].setLoopOrder(t_order2);
-  m_loops[t_loop2].setLoopOrder(t_order1);
+void Preset::swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_loop2) {
+  uint8_t loop1Order = m_loops[t_loop1].getLoopOrder();
+  uint8_t loop2Order = m_loops[t_loop2].getLoopOrder();
+
+  m_loops[t_loop1].setLoopOrder(loop2Order);
+  m_loops[t_loop2].setLoopOrder(loop1Order);
 }
 
 void Preset::setPresetLoopSendReturn(uint8_t t_loop, uint8_t t_send, uint8_t t_return) {
