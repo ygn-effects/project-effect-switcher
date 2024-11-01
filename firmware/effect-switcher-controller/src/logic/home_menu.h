@@ -11,11 +11,11 @@ class HomeMenu : public MenuBase {
 
   public:
     /// @brief Constructor for HomeMenu
-    /// @param display Pointer to the display driver
-    /// @param currentPreset Pointer to the current preset
-    HomeMenu(Display* display, const Preset* currentPreset) :
-      MenuBase(display),
-      m_currentPreset(currentPreset) { };
+    /// @param t_display Pointer to the display driver
+    /// @param t_currentPreset Pointer to the current preset
+    HomeMenu(Display* t_display, const Preset* t_currentPreset) :
+      MenuBase(t_display),
+      m_currentPreset(t_currentPreset) { };
 
     /// @brief Update the home menu (render the current bank and preset)
     void update() override {
@@ -29,8 +29,8 @@ class HomeMenu : public MenuBase {
 
     /// @brief Update the current preset pointer
     /// @param currentPreset Pointer to the new current preset
-    void setCurrentPreset(const Preset* currentPreset) {
-      m_currentPreset = currentPreset;
+    void setCurrentPreset(const Preset* t_currentPreset) {
+      m_currentPreset = t_currentPreset;
     }
 
     /// @brief Handle input (home menu doesn't need input handling)
