@@ -1,19 +1,5 @@
 #include "display.h"
 
-void Display::setup() {
-  m_ssd1306.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // Initialize SSD1306 with I2C address 0x3C
-  clear();
-  render();
-}
-
-void Display::clear() {
-  m_ssd1306.clearDisplay();  // Clear the display buffer
-}
-
-void Display::render() {
-  m_ssd1306.display();  // Push the buffer to the OLED display
-}
-
 void Display::resetCursor() {
   m_ssd1306.setCursor(0, 0);  // Reset the cursor to the top-left corner
 }
@@ -37,6 +23,38 @@ uint16_t Display::calcTextHeight(const char* text) {
   m_ssd1306.getTextBounds(text, 0, 0, &x1, &y1, &textWidth, &height);
 
   return height;
+}
+
+void Display::renderScrollIndicator(bool t_up) {
+  if (t_up) {
+    m_ssd1306.setCursor(m_width - 8, m_newLine); // Top right corner
+    m_ssd1306.write(c_scrollUpArrow); // Up arrow character
+  } else {
+    m_ssd1306.setCursor(m_width - 8, m_height - m_newLine); // Bottom right corner
+    m_ssd1306.write(c_scrollDownArrow); // Down arrow character
+  }
+}
+
+void Display::setup() {
+  m_ssd1306.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // Initialize SSD1306 with I2C address 0x3C
+  clear();
+  render();
+}
+
+void Display::clear() {
+  m_ssd1306.clearDisplay();  // Clear the display buffer
+}
+
+void Display::render() {
+  m_ssd1306.display();  // Push the buffer to the OLED display
+}
+
+uint8_t Display::getHeight() {
+  return m_height;
+}
+
+uint8_t Display::getLineHeight() {
+  return m_newLine;
 }
 
 void Display::renderHeader(const char* text) {
@@ -65,4 +83,43 @@ void Display::renderBankAndPreset(char bank, uint8_t preset) {
   m_ssd1306.print(preset);    // Print the preset number
 
   render();  // Push the buffer to the display
+}
+
+void Display::renderListMenu(const char* items[], uint8_t itemCount, uint8_t startIndex, uint8_t selectedIndex) {
+  resetCursor();
+
+  // Calculate how many items fit on the screen
+  uint8_t maxVisibleItems = (m_height - m_newLine) / m_newLine;
+
+  // Adjust startIndex to ensure selectedIndex is in view
+  if (selectedIndex >= startIndex + maxVisibleItems) {
+    startIndex = selectedIndex - maxVisibleItems + 1;
+  } else if (selectedIndex < startIndex) {
+    startIndex = selectedIndex;
+  }
+
+  // Render each item
+  for (uint8_t i = 0; i < maxVisibleItems && (startIndex + i) < itemCount; i++) {
+    const char* item = items[startIndex + i];
+
+    // Highlight the selected item
+    if (startIndex + i == selectedIndex) {
+      m_ssd1306.setCursor(0, i * m_newLine + m_headerOffset + m_newLine);
+      m_ssd1306.write(c_menuCursor);
+    }
+
+    m_ssd1306.setCursor(c_newTab, i * m_newLine + m_headerOffset + m_newLine);
+    m_ssd1306.print(item);
+  }
+
+  // Render scroll indicators if needed
+  if (startIndex > 0) {
+    renderScrollIndicator(true); // Up indicator
+  }
+  if (startIndex + maxVisibleItems < itemCount) {
+    renderScrollIndicator(false); // Down indicator
+  }
+
+  m_ssd1306.setTextColor(SSD1306_WHITE); // Reset text color after rendering the list
+  render(); // Push the buffer to the display
 }
