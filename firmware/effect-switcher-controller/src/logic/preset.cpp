@@ -64,6 +64,14 @@ void Preset::toggleLoopState(uint8_t t_loop) {
   m_loops[t_loop].toggleLoopState();
 }
 
+uint8_t Preset::getLoopIndexByOrder(uint8_t t_order) {
+  for (uint8_t i = 0; i < m_loopsCount; i++) {
+    if (m_loops[i].getLoopOrder() == t_order) {
+      return i;
+    }
+  }
+}
+
 void Preset::swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_loop2) {
   uint8_t loop1Order = m_loops[t_loop1].getLoopOrder();
   uint8_t loop2Order = m_loops[t_loop2].getLoopOrder();

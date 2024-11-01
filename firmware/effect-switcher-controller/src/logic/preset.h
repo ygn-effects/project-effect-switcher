@@ -85,6 +85,10 @@ class Preset {
     /// @brief Toggle the state of a specific loop
     void toggleLoopState(uint8_t t_loop);
 
+    /// @brief Returns a loop index by its order member
+    /// @param t_oder Loop order
+    uint8_t getLoopIndexByOrder(uint8_t t_oder);
+
     /// @brief Swap the order of two loops in the preset
     /// @param t_id1 Loop 1
     /// @param t_id2 Loop 2
