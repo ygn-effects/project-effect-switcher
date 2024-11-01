@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Arduino.h>
 #include "logic/preset.h"
 #include "logic/memory.h"
