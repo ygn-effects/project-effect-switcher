@@ -6,6 +6,7 @@
 #include "logic/menu_base.h"
 #include "logic/menu_manager.h"
 #include "logic/home_menu.h"
+#include "logic/list_menu.h"
 #include "logic/preset_manager.h"
 #include "peripherals/encoder.h"
 #include "peripherals/led.h"
@@ -21,7 +22,7 @@ constexpr uint8_t c_firstLoop = 0;
 
 enum SystemState {
   kPresetState,
-  kEditMenuState
+  kSettingsState
 };
 
 class Hardware
@@ -53,11 +54,14 @@ class Hardware
     void pollMenuEditSwitch();
     void pollFootSwitches();
 
+    void transitionToState(SystemState t_newState);
+    void processPresetState();
+    void ProcessSettingsState();
+
   public:
     void setup();
     void startup();
     void poll();
     void process();
-    void processPresetState();
     void resetTriggers();
 };

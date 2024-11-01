@@ -25,6 +25,8 @@ Preset presetBank[c_maxPresets];
 Display display(128, 64, 9, 1);
 MenuManager menuManager;
 HomeMenu homeMenu(&display, nullptr);
+const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System", "Other1", "Othe2r", "Other3"};
+ListMenu settingsMenu(&display, settingsItems, 7);
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -67,8 +69,76 @@ void Hardware::pollFootSwitches() {
   pollSwitch(preset3Fsw, m_preset3FswPress);
 }
 
-void Hardware::setup()
-{
+void Hardware::transitionToState(SystemState t_newState) {
+  m_systemState = t_newState;
+
+  if (t_newState == SystemState::kPresetState) {
+    menuManager.setMenu(&homeMenu);
+    menuManager.update();
+  }
+  else if (t_newState == SystemState::kSettingsState) {
+    menuManager.setMenu(&settingsMenu);
+    menuManager.update();
+  }
+}
+
+void Hardware::processPresetState() {
+  if (m_presetBankUpFswPress) {
+    presetManager.setPresetBankUp();
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_presetBankDownFswPress) {
+    presetManager.setPresetBankDown();
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_preset0FswPress) {
+    presetManager.setCurrentPreset(0);
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_preset1FswPress) {
+    presetManager.setCurrentPreset(1);
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_preset2FswPress) {
+    presetManager.setCurrentPreset(2);
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_preset3FswPress) {
+    presetManager.setCurrentPreset(3);
+    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+
+  if (m_menuEditSwitchPress) {
+    transitionToState(kSettingsState);
+  }
+}
+
+void Hardware::ProcessSettingsState() {
+  if (m_menuEncoderMoveLeft) {
+    menuManager.handleInput(MenuInputAction::kUp);
+  }
+
+  if (m_menuEncoderMoveRight) {
+    menuManager.handleInput(MenuInputAction::kDown);
+  }
+
+  if (m_menuEditSwitchLongPress) {
+    transitionToState(kPresetState);
+  }
+}
+
+void Hardware::setup() {
   delay(500);
   display.setup();
   menuEncoder.setup();
@@ -88,8 +158,7 @@ void Hardware::setup()
   delay(100);
 }
 
-void Hardware::startup()
-{
+void Hardware::startup() {
   menuEncoderSwitch.poll();
   menuEncoder.poll();
   menuEditSwitch.poll();
@@ -103,7 +172,7 @@ void Hardware::startup()
   presetManager.initialize();
   delay(200);
   homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-  homeMenu.update();
+  menuManager.update();
   delay(100);
 }
 
@@ -116,7 +185,7 @@ void Hardware::poll() {
 
       break;
 
-    case kEditMenuState:
+    case kSettingsState:
       pollMenuEditSwitch();
       pollMenuEncoder();
       pollMenuEditSwitch();
@@ -135,50 +204,13 @@ void Hardware::process() {
     processPresetState();
     break;
 
-  case kEditMenuState:
+  case kSettingsState:
+    ProcessSettingsState();
 
     break;
 
   default:
     break;
-  }
-}
-
-void Hardware::processPresetState() {
-  if (m_presetBankUpFswPress) {
-    presetManager.setPresetBankUp();
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
-  }
-
-  if (m_presetBankDownFswPress) {
-    presetManager.setPresetBankDown();
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
-  }
-
-  if (m_preset0FswPress) {
-    presetManager.setCurrentPreset(0);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
-  }
-
-  if (m_preset1FswPress) {
-    presetManager.setCurrentPreset(1);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
-  }
-
-  if (m_preset2FswPress) {
-    presetManager.setCurrentPreset(2);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
-  }
-
-  if (m_preset3FswPress) {
-    presetManager.setCurrentPreset(3);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    homeMenu.update();
   }
 }
 
