@@ -67,4 +67,10 @@ class PresetManager {
 
     /// @brief Save the current preset to storage
     void saveCurrentPreset();
+
+    void toggleLoopState(uint8_t t_loop);
+
+    void swapLoops(uint8_t t_loop1, uint8_t t_loop2);
+
+    uint8_t getLoopByOrder(uint8_t t_order);
 };

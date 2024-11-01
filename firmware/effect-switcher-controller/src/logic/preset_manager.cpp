@@ -79,3 +79,15 @@ void PresetManager::saveCurrentPreset() {
   m_memoryManager.savePreset(m_currentPresetBank, m_currentPresetIndex, *p_currentPreset);
   LOG_DEBUG("Saved current preset: Bank %d, Preset %d", m_currentPresetBank, m_currentPresetIndex);
 }
+
+void PresetManager::toggleLoopState(uint8_t t_loop) {
+  p_currentPreset->toggleLoopState(t_loop);
+}
+
+void PresetManager::swapLoops(uint8_t t_loop1, uint8_t t_loop2) {
+  p_currentPreset->swapPresetLoopsOrder(t_loop1, t_loop2);
+}
+
+uint8_t PresetManager::getLoopByOrder(uint8_t t_order) {
+  return p_currentPreset->getLoopIndexByOrder(t_order);
+}
