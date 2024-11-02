@@ -9,6 +9,8 @@ class ListMenu : public MenuBase {
     uint8_t m_selectedIndex;
     uint8_t m_startIndex;
 
+    bool m_itemSelected = false;
+
   public:
     ListMenu(Display* t_display, const char** t_items, uint8_t t_count) :
       MenuBase(t_display),
@@ -23,13 +25,21 @@ class ListMenu : public MenuBase {
       m_display->renderListMenu(m_menuItems, m_itemCount, m_startIndex, m_selectedIndex);
     }
 
+    bool isItemSelected() {
+      return m_itemSelected;
+    }
+
+    uint8_t getSelectedIndex() {
+      m_itemSelected = false;
+      return m_selectedIndex;
+    }
+
     void handleInput(MenuInputAction t_action) override {
       switch (t_action) {
         case MenuInputAction::kUp:
           if (m_selectedIndex > 0) {
             m_selectedIndex--;
-            if (m_selectedIndex < m_startIndex) m_startIndex--;  // Scroll up
-            update();
+            if (m_selectedIndex < m_startIndex) m_startIndex--;
           }
           break;
 
@@ -37,17 +47,15 @@ class ListMenu : public MenuBase {
           if (m_selectedIndex < m_itemCount - 1) {
             m_selectedIndex++;
             if (m_selectedIndex >= m_startIndex + (m_display->getHeight() / m_display->getLineHeight()))
-              m_startIndex++;  // Scroll down
-            update();
+              m_startIndex++;
           }
           break;
 
         case MenuInputAction::kPress:
-          // Handle selection or other action on press
+          m_itemSelected = true;
           break;
 
         case MenuInputAction::kLongPress:
-          // Handle long-press action (e.g., enter a sub-menu or settings)
           break;
 
         default:
