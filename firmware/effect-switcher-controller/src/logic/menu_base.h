@@ -22,6 +22,9 @@ class MenuBase {
     /// @brief Update the menu (called in the main loop)
     virtual void update() = 0;
 
+    /// @brief Reset the menu so its initial state
+    virtual void reset() = 0;
+
     /// @brief Handle user input (e.g., button press, encoder turn)
     virtual void handleInput(MenuInputAction t_action) = 0;
 };
