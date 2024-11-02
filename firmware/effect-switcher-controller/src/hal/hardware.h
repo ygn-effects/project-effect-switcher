@@ -7,6 +7,7 @@
 #include "logic/menu_manager.h"
 #include "logic/home_menu.h"
 #include "logic/list_menu.h"
+#include "logic/loop_menu.h"
 #include "logic/preset_manager.h"
 #include "peripherals/encoder.h"
 #include "peripherals/led.h"
@@ -22,7 +23,8 @@ constexpr uint8_t c_firstLoop = 0;
 
 enum SystemState {
   kPresetState,
-  kSettingsState
+  kSettingsState,
+  kLoopsEditState
 };
 
 class Hardware
@@ -56,7 +58,8 @@ class Hardware
 
     void transitionToState(SystemState t_newState);
     void processPresetState();
-    void ProcessSettingsState();
+    void processSettingsState();
+    void processLoopsEditState();
 
   public:
     void setup();
