@@ -125,7 +125,7 @@ void Display::renderListMenu(const char* items[], uint8_t itemCount, uint8_t sta
 }
 
 void Display::renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loopOrders, const uint8_t* loopStates, uint8_t loopCount, uint8_t selectedIndex, bool swappingMode) {
-  m_ssd1306.setCursor(0, ((m_height + m_newLine + m_headerOffset) / 2));
+  m_ssd1306.setCursor(0, (m_height / 2));
 
   for (uint8_t i = 0; i < loopCount; i++) {
     // Highlight active loops
@@ -142,8 +142,13 @@ void Display::renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loo
     }
   }
 
+  if (selectedIndex == loopCount) {
+    m_ssd1306.setCursor(0, m_height - m_newLine);
+    m_ssd1306.write(c_menuCursor);
+  }
+  else {
   // The width of a character is 6 pixels, so 12 to account for the arrows
-  m_ssd1306.setCursor((selectedIndex * 12), ((m_height + m_headerOffset - m_newLine) / 2));
+  m_ssd1306.setCursor((selectedIndex * 12), ((m_height - m_newLine * 2) / 2));
   {
     if (swappingMode) {
       m_ssd1306.write(c_loopOrderSwap);
@@ -152,6 +157,10 @@ void Display::renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loo
       m_ssd1306.write(c_scrollDownArrow);
     }
   }
+  }
+
+  m_ssd1306.setCursor(c_newTab, m_height - m_newLine);
+  m_ssd1306.print("Back");
 
   render();
 }
