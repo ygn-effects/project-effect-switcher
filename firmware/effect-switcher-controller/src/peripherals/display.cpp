@@ -123,3 +123,35 @@ void Display::renderListMenu(const char* items[], uint8_t itemCount, uint8_t sta
   m_ssd1306.setTextColor(SSD1306_WHITE); // Reset text color after rendering the list
   render(); // Push the buffer to the display
 }
+
+void Display::renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loopOrders, const uint8_t* loopStates, uint8_t loopCount, uint8_t selectedIndex, bool swappingMode) {
+  m_ssd1306.setCursor(0, ((m_height + m_newLine + m_headerOffset) / 2));
+
+  for (uint8_t i = 0; i < loopCount; i++) {
+    // Highlight active loops
+    if (loopStates[i]) {
+      m_ssd1306.setTextColor(BLACK, WHITE);
+      m_ssd1306.print(loopIndexes[i]);
+      m_ssd1306.setTextColor(WHITE);
+    }
+    else {
+      m_ssd1306.print(loopIndexes[i]);
+    }
+    if (i < loopCount - 1) {
+      m_ssd1306.write(c_menuCursor);
+    }
+  }
+
+  // The width of a character is 6 pixels, so 12 to account for the arrows
+  m_ssd1306.setCursor((selectedIndex * 12), ((m_height + m_headerOffset - m_newLine) / 2));
+  {
+    if (swappingMode) {
+      m_ssd1306.write(c_loopOrderSwap);
+    }
+    else {
+      m_ssd1306.write(c_scrollDownArrow);
+    }
+  }
+
+  render();
+}

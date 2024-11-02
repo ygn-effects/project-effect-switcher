@@ -17,6 +17,8 @@ class Display {
     const uint8_t c_newTab = 8;
 
     const uint8_t c_menuCursor = 26;
+    const uint8_t c_loopOrder = 16;
+    const uint8_t c_loopOrderSwap = 42;
     const uint8_t c_scrollDownArrow = 25;
     const uint8_t c_scrollUpArrow = 24;
 
@@ -85,5 +87,13 @@ class Display {
     /// @param startIndex Index of the first visible item
     /// @param selectedIndex Index of the currently selected item
     void renderListMenu(const char* items[], uint8_t itemCount, uint8_t startIndex, uint8_t selectedIndex);
+
+    /// @brief Render the loop order list
+    /// @param loopOrders Array of loop order numbers
+    /// @param loopStates Array of loop states (active/inactive)
+    /// @param loopCount Total number of loops
+    /// @param selectedIndex Currently selected loop index
+    /// @param swappingMode Flag indicating if in swap selection mode
+    void renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loopOrders, const uint8_t* loopStates, uint8_t loopCount, uint8_t selectedIndex, bool swappingMode);
 };
 
