@@ -25,6 +25,9 @@ void LoopOrderMenu::update() {
 
 void LoopOrderMenu::reset() {
   m_swappingMode = false;
+  m_toggleRequested = false;
+  m_swapRequested = false;
+  m_goBackRequested = false;
   m_sourceLoop = 0;
   m_targetLoop = 0;
   m_selectedLoop = 0;
@@ -39,7 +42,7 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
       break;
 
     case MenuInputAction::kUp:
-      if (m_selectedLoop < m_currentPreset->getLoopsCount() - 1) {
+      if (m_selectedLoop < m_currentPreset->getLoopsCount()) {
         m_selectedLoop++;
       }
       break;
@@ -51,7 +54,13 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
         m_swappingMode = false;  // Exit swapping mode after setting the flag
       }
       else {
-        m_toggleRequested = true; // Flag that a toggle has been requested
+        if (m_selectedLoop < m_currentPreset->getLoopsCount() - 1)
+        {
+          m_toggleRequested = true; // Flag that a toggle has been requested
+        }
+        else {
+          m_goBackRequested = true; // Out of bounds so go back
+        }
       }
       break;
 
@@ -79,6 +88,13 @@ bool LoopOrderMenu::isToggleRequested() {
 bool LoopOrderMenu::isSwapRequested() {
   bool requested = m_swapRequested;
   m_swapRequested = false; // Reset after checking
+
+  return requested;
+}
+
+bool LoopOrderMenu::isGoBackRequested() {
+  bool requested = m_goBackRequested;
+  m_goBackRequested = false;
 
   return requested;
 }

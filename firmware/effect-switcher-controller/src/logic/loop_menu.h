@@ -13,6 +13,7 @@ class LoopOrderMenu : public MenuBase {
     bool m_swappingMode;
     bool m_toggleRequested;
     bool m_swapRequested;
+    bool m_goBackRequested;
 
   public:
     LoopOrderMenu(Display* t_display, Preset* t_currentPreset) :
@@ -22,7 +23,8 @@ class LoopOrderMenu : public MenuBase {
       m_targetLoop(0),
       m_swappingMode(false),
       m_toggleRequested(false),
-      m_swapRequested(false) { };
+      m_swapRequested(false),
+      m_goBackRequested(false) { };
 
     void update() override;
     void reset() override;
@@ -31,6 +33,7 @@ class LoopOrderMenu : public MenuBase {
     void setCurrentPreset(Preset* t_currentPreset);
     bool isToggleRequested();
     bool isSwapRequested();
+    bool isGoBackRequested();
     uint8_t getSelectedLoop() const;
     uint8_t getSourceLoop() const;
     uint8_t getTargetLoop() const;
