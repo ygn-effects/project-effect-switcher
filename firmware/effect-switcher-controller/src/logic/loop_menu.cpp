@@ -23,6 +23,13 @@ void LoopOrderMenu::update() {
   m_display->renderLoopOrderList(loopIndexes, loopOrders, loopStates, loopsCount, m_selectedLoop, m_swappingMode);
 }
 
+void LoopOrderMenu::reset() {
+  m_swappingMode = false;
+  m_sourceLoop = 0;
+  m_targetLoop = 0;
+  m_selectedLoop = 0;
+}
+
 void LoopOrderMenu::handleInput(MenuInputAction t_action) {
   switch (t_action) {
     case MenuInputAction::kDown:

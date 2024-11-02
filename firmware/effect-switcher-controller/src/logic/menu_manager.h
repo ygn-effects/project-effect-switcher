@@ -24,6 +24,13 @@ class MenuManager {
       }
     }
 
+    /// @brief Reset the menu to its initial state
+    void reset() {
+      if (m_currentMenu) {
+        m_currentMenu->reset();
+      }
+    }
+
     /// @brief Handle input for the current menu
     /// @param input The input event (e.g., button press, encoder turn)
     void handleInput(MenuInputAction t_action) {

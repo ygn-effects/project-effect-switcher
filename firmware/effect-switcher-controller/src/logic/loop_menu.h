@@ -25,6 +25,7 @@ class LoopOrderMenu : public MenuBase {
       m_swapRequested(false) { };
 
     void update() override;
+    void reset() override;
     void handleInput(MenuInputAction t_action) override;
 
     void setCurrentPreset(Preset* t_currentPreset);

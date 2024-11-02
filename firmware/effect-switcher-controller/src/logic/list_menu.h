@@ -25,6 +25,11 @@ class ListMenu : public MenuBase {
       m_display->renderListMenu(m_menuItems, m_itemCount, m_startIndex, m_selectedIndex);
     }
 
+    void reset() override {
+      m_itemSelected = false;
+      m_selectedIndex = 0;
+    }
+
     bool isItemSelected() {
       return m_itemSelected;
     }
