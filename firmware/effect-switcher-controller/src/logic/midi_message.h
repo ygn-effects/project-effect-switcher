@@ -8,9 +8,15 @@ class MidiMessage {
     uint8_t m_statusByte;
     uint8_t m_dataByte1;
     uint8_t m_dataByte2;
-    bool m_hasDataByte2;
+    uint8_t m_hasDataByte2;
 
   public:
+    MidiMessage() :
+      m_statusByte(0),
+      m_dataByte1(0),
+      m_dataByte2(0),
+      m_hasDataByte2(0) { };
+
     /// @brief Constructor for a 2 bytes MIDI message
     /// @param t_type MIDI message type
     /// @param t_channel MIDI message channel
