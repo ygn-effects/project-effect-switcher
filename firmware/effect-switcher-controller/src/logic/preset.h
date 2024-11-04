@@ -2,9 +2,11 @@
 
 #include <Arduino.h>
 #include "logic/loops.h"
+#include "logic/midi_message.h"
 #include "utils/logging.h"
 
 constexpr uint8_t c_maxLoops = 16;
+constexpr uint8_t c_maxMidiMessages = 20;
 
 /// @brief Represents a preset that contains a bank, a preset number,
 /// and an array of loops
@@ -13,7 +15,9 @@ class Preset {
     uint8_t m_bank;
     uint8_t m_preset;
     uint8_t m_loopsCount;
+    uint8_t m_midiMessagesCount;
     Loop m_loops[c_maxLoops];
+    MidiMessage m_midiMessages[c_maxMidiMessages];
 
   public:
     /// @brief Default constructor
@@ -102,4 +106,23 @@ class Preset {
 
     /// @brief Get the return state of a loop
     uint8_t getPresetLoopReturn(uint8_t t_loop);
+
+    /// @brief Get the number of MIDI messages
+    uint8_t getMidiMessagesCount() const;
+
+    /// @brief Get the type of a MIDI message
+    /// @param t_message MIDI message index
+    uint8_t getMidiMessageType(uint8_t t_message);
+
+    /// @brief Get the channel of a MIDI message
+    /// @param t_message MIDI message index
+    uint8_t getMidiMessageChannel(uint8_t t_message);
+
+    /// @brief Get the first data byte of a MIDI message
+    /// @param t_message MIDI message index
+    uint8_t getMidiMessageDataByte1(uint8_t t_message);
+
+    /// @brief Get the second data byte of a MIDI message, return 255 if no 2nd byte
+    /// @param t_message MIDI message index
+    uint8_t getMidiMessageDataByte2(uint8_t t_message);
 };

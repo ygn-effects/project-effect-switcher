@@ -70,6 +70,8 @@ uint8_t Preset::getLoopIndexByOrder(uint8_t t_order) {
       return i;
     }
   }
+
+  return m_loopsCount + 1; // Invalid return in case the loop isn't found
 }
 
 void Preset::swapPresetLoopsOrder(uint8_t t_loop1, uint8_t t_loop2) {
@@ -91,4 +93,29 @@ uint8_t Preset::getPresetLoopSend(uint8_t t_loop) {
 
 uint8_t Preset::getPresetLoopReturn(uint8_t t_loop) {
   return m_loops[t_loop].getLoopReturn();
+}
+
+uint8_t Preset::getMidiMessagesCount() const {
+  return m_midiMessagesCount;
+}
+
+uint8_t Preset::getMidiMessageType(uint8_t t_message) {
+  return m_midiMessages[t_message].getMessageType();
+}
+
+uint8_t Preset::getMidiMessageChannel(uint8_t t_message) {
+  return m_midiMessages[t_message].getChannel();
+}
+
+uint8_t Preset::getMidiMessageDataByte1(uint8_t t_message) {
+  return m_midiMessages[t_message].getDataByte1();
+}
+
+uint8_t Preset::getMidiMessageDataByte2(uint8_t t_message) {
+  if (m_midiMessages[t_message].hasDataByte2()) {
+    return m_midiMessages[t_message].getDataByte2();
+  }
+  else {
+    return 0xFF; // Invalid value for no data byte
+  }
 }
