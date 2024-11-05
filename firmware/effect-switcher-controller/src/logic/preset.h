@@ -35,6 +35,21 @@ class Preset {
       m_preset(t_preset),
       m_loopsCount(t_loopsCount) { };
 
+    /// @brief Parameterized constructor
+    /// @param t_bank Bank number
+    /// @param t_preset Preset number
+    /// @param t_loopsCount Loops count
+    /// @param t_midiMessagesCount MIDI messages count
+    Preset(uint8_t t_bank,
+      uint8_t t_preset,
+      uint8_t t_loopsCount,
+      uint8_t t_midiMessagesCount
+    ) :
+      m_bank(t_bank),
+      m_preset(t_preset),
+      m_loopsCount(t_loopsCount),
+      m_midiMessagesCount(t_midiMessagesCount) { };
+
     /// @brief Get the bank number
     uint8_t getBank() const;
 
@@ -110,19 +125,42 @@ class Preset {
     /// @brief Get the number of MIDI messages
     uint8_t getMidiMessagesCount() const;
 
+    /// @brief Set the MIDI messages count
+    /// @param t_count Messages count
+    void setMidiMessagesCount(uint8_t t_count);
+
+    /// @brief Get the status byte a MIDI message
+    /// @param t_message MIDI message index
+    uint8_t getMidiMessageStatusByte(uint8_t t_message) const;
+
+    /// @brief Set a MIDI message status byte
+    /// @param t_message MIDI message index
+    /// @param t_byte Status byte
+    void setMidiMessageStatusByte(uint8_t t_message, uint8_t t_byte);
+
     /// @brief Get the type of a MIDI message
     /// @param t_message MIDI message index
-    uint8_t getMidiMessageType(uint8_t t_message);
+    uint8_t getMidiMessageType(uint8_t t_message) const;
 
     /// @brief Get the channel of a MIDI message
     /// @param t_message MIDI message index
-    uint8_t getMidiMessageChannel(uint8_t t_message);
+    uint8_t getMidiMessageChannel(uint8_t t_message) const;
 
     /// @brief Get the first data byte of a MIDI message
     /// @param t_message MIDI message index
-    uint8_t getMidiMessageDataByte1(uint8_t t_message);
+    uint8_t getMidiMessageDataByte1(uint8_t t_message)const;
+
+    /// @brief Set the first data byte of a MIDI message
+    /// @param t_message MIDI message index
+    /// @param t_byte Data byte 1
+    void setMidiMessageDataByte1(uint8_t t_message, uint8_t t_byte);
 
     /// @brief Get the second data byte of a MIDI message, return 255 if no 2nd byte
     /// @param t_message MIDI message index
-    uint8_t getMidiMessageDataByte2(uint8_t t_message);
+    uint8_t getMidiMessageDataByte2(uint8_t t_message) const;
+
+    /// @brief Set the second data byte of a MIDI message
+    /// @param t_message MIDI message index
+    /// @param t_byte Data byte 2
+    void setMidiMessageDataByte2(uint8_t t_message, uint8_t t_byte);
 };
