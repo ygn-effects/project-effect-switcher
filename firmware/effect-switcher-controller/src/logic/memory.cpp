@@ -4,32 +4,59 @@ uint16_t MemoryManager::calculatePresetAddress(uint8_t t_bank, uint8_t t_presetI
   return c_banksStartAddress + (t_bank * c_presetsPerBank + t_presetIndex) * c_presetSize;
 }
 
-
 void MemoryManager::serializePreset(const Preset& t_preset, uint8_t* t_buffer) const {
-  t_buffer[0] = t_preset.getBank(); // Address 0
-  t_buffer[1] = t_preset.getPreset(); // Address 1
-  t_buffer[2] = t_preset.getLoopsCount(); // Address 2
+  // Basic preset data
+  t_buffer[0] = t_preset.getBank();
+  t_buffer[1] = t_preset.getPreset();
+  t_buffer[2] = t_preset.getLoopsCount();
+  t_buffer[3] = t_preset.getMidiMessagesCount();
 
+  // Loops data: start at address 4, each loop occupies 4 bytes
   for (uint8_t i = 0; i < t_preset.getLoopsCount(); i++) {
-    t_buffer[3 + i * 4] = t_preset.getLoopState(i); // First loop, address 3
-    t_buffer[3 + i * 4 + 1] = t_preset.getLoopOrder(i); // First loop, address 4
-    t_buffer[3 + i * 4 + 2] = t_preset.getLoopSend(i); // First loop, address 5
-    t_buffer[3 + i * 4 + 3] = t_preset.getLoopReturn(i); // First loop, address 6
+    uint16_t loopOffset = 4 + i * 4;  // Start at byte 4, 4 bytes per loop
+    t_buffer[loopOffset] = t_preset.getLoopState(i);
+    t_buffer[loopOffset + 1] = t_preset.getLoopOrder(i);
+    t_buffer[loopOffset + 2] = t_preset.getLoopSend(i);
+    t_buffer[loopOffset + 3] = t_preset.getLoopReturn(i);
+  }
+
+  // MIDI messages data: start after loops data, each message occupies 4 bytes
+  uint8_t midiOffset = 4 + t_preset.getLoopsCount() * 4;  // Calculate start address for MIDI messages
+  for (uint8_t j = 0; j < t_preset.getMidiMessagesCount(); j++) {
+    uint8_t msgOffset = midiOffset + j * 4;
+    t_buffer[msgOffset] = t_preset.getMidiMessageStatusByte(j);
+    t_buffer[msgOffset + 1] = t_preset.getMidiMessageDataByte1(j);
+    t_buffer[msgOffset + 2] = t_preset.getMidiMessageDataByte2(j);
   }
 }
 
 void MemoryManager::deserializePreset(const uint8_t* t_buffer, Preset& t_preset) const {
+  // Basic preset data
   t_preset.setBank(t_buffer[0]);
   t_preset.setPreset(t_buffer[1]);
 
   uint8_t loopsCount = t_buffer[2];
   t_preset.setLoopsCount(loopsCount);
 
+  uint8_t midiMessageCount = t_buffer[3];
+  t_preset.setMidiMessagesCount(midiMessageCount);
+
+  // Loops data: start at address 4, each loop occupies 4 bytes
   for (uint8_t i = 0; i < loopsCount; i++) {
-    t_preset.setLoopState(i, t_buffer[3 + i * 4]);
-    t_preset.setLoopOrder(i, t_buffer[3 + i * 4 + 1]);
-    t_preset.setLoopSend(i, t_buffer[3 + i * 4 + 2]);
-    t_preset.setLoopReturn(i, t_buffer[3 + i * 4 + 3]);
+    uint8_t loopOffset = 4 + i * 4;
+    t_preset.setLoopState(i, t_buffer[loopOffset]);
+    t_preset.setLoopOrder(i, t_buffer[loopOffset + 1]);
+    t_preset.setLoopSend(i, t_buffer[loopOffset + 2]);
+    t_preset.setLoopReturn(i, t_buffer[loopOffset + 3]);
+  }
+
+  // MIDI messages data: start after loops data, each message occupies 4 bytes
+  uint8_t midiOffset = 4 + loopsCount * 4;  // Calculate start address for MIDI messages
+  for (uint8_t j = 0; j < midiMessageCount; j++) {
+    uint8_t msgOffset = midiOffset + j * 4;
+    t_preset.setMidiMessageStatusByte(j, t_buffer[msgOffset]);
+    t_preset.setMidiMessageDataByte1(j, t_buffer[msgOffset + 1]);
+    t_preset.setMidiMessageDataByte2(j, t_buffer[msgOffset + 2]);
   }
 }
 
@@ -68,11 +95,11 @@ uint16_t address = calculatePresetAddress(t_bank, t_presetIndex);
 /// Test functions
 
 void MemoryManager::initializeTestData() {
-  // Loop through 8 banks
-  for (uint8_t bank = 0; bank < 16; bank++) {
+  // Loop through 16 banks
+  for (uint8_t bank = 0; bank < 4; bank++) {
     // Loop through 4 presets per bank
     for (uint8_t presetIndex = 0; presetIndex < 4; presetIndex++) {
-      Preset testPreset(bank, presetIndex, 8);  // Initialize Preset with 8 loops
+      Preset testPreset(bank, presetIndex, 8, 1);  // Initialize Preset with 8 loops and 1 MIDI message
 
       // Set each loop's test data
       for (uint8_t loopIndex = 0; loopIndex < 8; loopIndex++) {
@@ -80,6 +107,12 @@ void MemoryManager::initializeTestData() {
         testPreset.setLoopOrder(loopIndex, loopIndex);        // Sequential order
         testPreset.setLoopSend(loopIndex, loopIndex * 2);     // Example send values
         testPreset.setLoopReturn(loopIndex, loopIndex * 3);   // Example return values
+      }
+
+      for (uint8_t midiIndex = 0; midiIndex < 1; midiIndex ++){
+        testPreset.setMidiMessageStatusByte(midiIndex, 0xB0 | 0x1); // CC message channel 1
+        testPreset.setMidiMessageDataByte1(midiIndex, 32);
+        testPreset.setMidiMessageDataByte2(midiIndex, 64);
       }
 
       // Save initialized preset to EEPROM
@@ -91,8 +124,8 @@ void MemoryManager::initializeTestData() {
 }
 
 void MemoryManager::readTestData() {
-  // Loop through 8 banks
-  for (uint8_t bank = 0; bank < 16; bank++) {
+  // Loop through 16 banks
+  for (uint8_t bank = 0; bank < 4; bank++) {
     LOG_DEBUG("Reading Bank %d:", bank);
 
     // Loop through 4 presets per bank
@@ -113,11 +146,22 @@ void MemoryManager::readTestData() {
         LOG_DEBUG("      Send: %d", testPreset.getLoopSend(loopIndex));
         LOG_DEBUG("      Return: %d", testPreset.getLoopReturn(loopIndex));
       }
+
+      // Log MIDI messages
+      for (uint8_t midiIndex = 0; midiIndex < testPreset.getMidiMessagesCount(); midiIndex++) {
+        LOG_DEBUG("    MIDI Message %d:", midiIndex);
+        LOG_DEBUG("      Type: 0x%X", testPreset.getMidiMessageType(midiIndex));
+        LOG_DEBUG("      Channel: %d", testPreset.getMidiMessageChannel(midiIndex));
+        LOG_DEBUG("      Data Byte 1: %d", testPreset.getMidiMessageDataByte1(midiIndex));
+        LOG_DEBUG("      Data Byte 2: %d", testPreset.getMidiMessageDataByte2(midiIndex));
+      }
     }
   }
+
   uint8_t lastBank = 0;
   uint8_t lastPreset = 0;
   loadDeviceState(lastBank, lastPreset);
 
   LOG_DEBUG("Last bank: %d, Last preset: %d", lastBank, lastPreset);
 }
+

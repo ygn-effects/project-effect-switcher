@@ -5,11 +5,13 @@
 #include "logic/preset.h"
 
 constexpr uint16_t c_deviceStateAddress = 0x0;
-constexpr uint16_t c_banksStartAddress = 0x80;
+constexpr uint16_t c_banksStartAddress = 0x20;
 
 /*
  * Memory Map for Preset Storage in EEPROM
  * Total Size per Preset: 128 bytes
+ * This is the absolute max values, if there are only 8 loops for example the MIDI message storage
+ * will start right after the loops storage
  *
  * Byte Range       Field Name         Description                             Example Value
  * -----------------------------------------------------------------------------------------
