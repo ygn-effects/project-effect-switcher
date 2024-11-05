@@ -28,6 +28,8 @@ HomeMenu homeMenu(&display, nullptr);
 const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System", "Other1", "Othe2r", "Other3"};
 ListMenu settingsMenu(&display, settingsItems, 7);
 LoopOrderMenu loopsMenu(&display, nullptr);
+MidiMessageMenu midiMessagesMenu(&display, nullptr);
+
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -87,6 +89,12 @@ void Hardware::transitionToState(SystemState t_newState) {
     menuManager.setMenu(&loopsMenu);
     menuManager.reset();
     loopsMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+  else if (t_newState == SystemState::kMidiMessagesState) {
+    menuManager.setMenu(&midiMessagesMenu);
+    menuManager.reset();
+    midiMessagesMenu.setCurrentPreset(presetManager.getCurrentPreset());
     menuManager.update();
   }
 }
@@ -154,26 +162,26 @@ void Hardware::processSettingsState() {
   }
 
   if (settingsMenu.isItemSelected()) {
-    switch (settingsMenu.getSelectedIndex())
-    {
-    case 0:
-      transitionToState(kLoopsEditState);
-      break;
+    switch (settingsMenu.getSelectedIndex()) {
+      case 0:
+        transitionToState(kLoopsEditState);
+        break;
 
-    case 1:
-      break;
+      case 1:
+        transitionToState(kMidiMessagesState);
+        break;
 
-    case 2:
-      break;
+      case 2:
+        break;
 
-    case 3:
-      break;
+      case 3:
+        break;
 
-    case 4:
-      break;
+      case 4:
+        break;
 
-    default:
-      break;
+      default:
+        break;
     }
   }
 }
@@ -222,6 +230,12 @@ void Hardware::processLoopsEditState() {
   }
 }
 
+void Hardware::processMidiMessagesState() {
+  if (m_menuEditSwitchLongPress) {
+    transitionToState(kPresetState);
+  }
+}
+
 void Hardware::setup() {
   delay(500);
   display.setup();
@@ -261,23 +275,26 @@ void Hardware::startup() {
 }
 
 void Hardware::poll() {
-  switch (m_systemState)
-  {
+  switch (m_systemState) {
     case kPresetState:
       pollMenuEditSwitch();
       pollFootSwitches();
-
       break;
 
     case kSettingsState:
       pollMenuEditSwitch();
       pollMenuEncoder();
-
       break;
 
     case kLoopsEditState:
       pollMenuEditSwitch();
       pollMenuEncoder();
+      break;
+
+    case kMidiMessagesState:
+      pollMenuEditSwitch();
+      pollMenuEncoder();
+      break;
 
     default:
       break;
@@ -285,22 +302,25 @@ void Hardware::poll() {
 }
 
 void Hardware::process() {
-  switch (m_systemState)
-  {
-  case kPresetState:
-    processPresetState();
-    break;
+  switch (m_systemState) {
+    case kPresetState:
+      processPresetState();
+      break;
 
-  case kSettingsState:
-    processSettingsState();
-    break;
+    case kSettingsState:
+      processSettingsState();
+      break;
 
-  case kLoopsEditState:
-    processLoopsEditState();
-    break;
+    case kLoopsEditState:
+      processLoopsEditState();
+      break;
 
-  default:
-    break;
+    case kMidiMessagesState:
+      processMidiMessagesState();
+      break;
+
+    default:
+      break;
   }
 }
 

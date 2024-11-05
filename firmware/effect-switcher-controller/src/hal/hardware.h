@@ -8,6 +8,7 @@
 #include "logic/home_menu.h"
 #include "logic/list_menu.h"
 #include "logic/loop_menu.h"
+#include "logic/midi_menu.h"
 #include "logic/preset_manager.h"
 #include "peripherals/encoder.h"
 #include "peripherals/led.h"
@@ -15,16 +16,14 @@
 #include "peripherals/leddriver.h"
 #include "peripherals/switchmatrix.h"
 
-
-constexpr uint8_t c_firstPresetBank = 65; // A
-constexpr uint8_t c_firstPreset = 48; // 0
 constexpr uint8_t c_maxPresets = 4;
 constexpr uint8_t c_firstLoop = 0;
 
 enum SystemState {
   kPresetState,
   kSettingsState,
-  kLoopsEditState
+  kLoopsEditState,
+  kMidiMessagesState
 };
 
 class Hardware
@@ -60,6 +59,7 @@ class Hardware
     void processPresetState();
     void processSettingsState();
     void processLoopsEditState();
+    void processMidiMessagesState();
 
   public:
     void setup();
