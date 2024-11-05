@@ -95,5 +95,15 @@ class Display {
     /// @param selectedIndex Currently selected loop index
     /// @param swappingMode Flag indicating if in swap selection mode
     void renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loopOrders, const uint8_t* loopStates, uint8_t loopCount, uint8_t selectedIndex, bool swappingMode);
+
+    /// @brief Render the MIDI message list
+    /// @param types Array of MIDI message types
+    /// @param channels Array of MIDI message channels
+    /// @param dataByte1 Array of MIDI data bytes 1
+    /// @param dataByte2 Array of MIDI data bytes 2
+    /// @param messageCount Total number of MIDI messages
+    /// @param selectedIndex Index of the currently selected item
+    /// @param startIndex Index of the first visible item
+    void renderMidiMessages(const uint8_t* types, const uint8_t* channels, const uint8_t* dataByte1, const uint8_t* dataByte2, uint8_t messageCount, uint8_t selectedIndex, uint8_t startIndex);
 };
 

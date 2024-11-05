@@ -164,3 +164,105 @@ void Display::renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loo
 
   render();
 }
+
+void Display::renderMidiMessages(const uint8_t* types, const uint8_t* channels, const uint8_t* dataByte1, const uint8_t* dataByte2, uint8_t messageCount, uint8_t selectedIndex, uint8_t startIndex) {
+  resetCursor();
+
+  const uint8_t typeWidth = 46; // 7 chars width + some spacing
+  const uint8_t channelWidth = 18; // 2 characters space + some spacing
+  const uint8_t dataByteWidth = 24; // 3 characters + some spacing
+
+  // Calculate how many items fit on the screen
+  uint8_t maxVisibleItems = (m_height - m_newLine) / m_newLine;
+
+  // Header
+  m_ssd1306.fillRect(0, 0, m_width, m_newLine, WHITE); // White background
+  m_ssd1306.setTextColor(SSD1306_BLACK);  // Invert colors for the header
+  m_ssd1306.setFont(); // Reset to default font
+  m_ssd1306.setCursor(c_newTab, m_headerOffset);  // Center text
+  m_ssd1306.print("Type");
+  m_ssd1306.setCursor(typeWidth + 2, m_headerOffset);
+  m_ssd1306.print("Ch");
+  m_ssd1306.setCursor(typeWidth + channelWidth + 2, m_headerOffset);
+  m_ssd1306.print("B1");
+    m_ssd1306.setCursor(typeWidth + channelWidth + dataByteWidth + 2, m_headerOffset);
+  m_ssd1306.print("B2");
+  m_ssd1306.setTextColor(SSD1306_WHITE);  // Reset text color after the header
+
+  // Adjust startIndex to ensure selectedIndex is in view
+  if (selectedIndex >= startIndex + maxVisibleItems) {
+    startIndex = selectedIndex - maxVisibleItems + 1;
+  } else if (selectedIndex < startIndex) {
+    startIndex = selectedIndex;
+  }
+
+  for (uint8_t i = 0; i < maxVisibleItems && (startIndex + i) < messageCount; i++) {
+    uint8_t cursorY = m_headerOffset + m_newLine + (i * m_newLine);
+    uint8_t messageIndex = startIndex + i;
+
+    // Print the cursor in front of the selected item
+    if (messageIndex == selectedIndex) {
+      m_ssd1306.setCursor(0, cursorY);
+      m_ssd1306.write(c_menuCursor);
+    }
+
+    // Type
+    m_ssd1306.setCursor(c_newTab, cursorY);
+    switch (types[messageIndex]) {
+      case 0xB0:
+        m_ssd1306.print("CC");
+        break;
+
+      default:
+        break;
+    }
+
+    // Channel
+    m_ssd1306.setCursor(typeWidth + 2, cursorY);
+    m_ssd1306.print(channels[messageIndex]);
+
+    // Data byte 1
+    m_ssd1306.setCursor(typeWidth + channelWidth + 2, cursorY);
+    m_ssd1306.print(dataByte1[messageIndex]);
+
+    // Data byte 2
+    m_ssd1306.setCursor(typeWidth + channelWidth + dataByteWidth + 2, cursorY);
+    m_ssd1306.print(dataByte2[messageIndex]);
+  }
+
+  // Check if there's room for "Add New Message" below the existing messages
+  if (messageCount < maxVisibleItems) {
+    uint8_t cursorY = m_headerOffset + m_newLine + (messageCount * m_newLine);
+
+    // Display "Add New Message" with selection cursor if it’s selected
+    if (selectedIndex == messageCount) {
+      m_ssd1306.setCursor(0, cursorY);
+      m_ssd1306.write(c_menuCursor);
+    }
+    m_ssd1306.setCursor(c_newTab, cursorY);
+    m_ssd1306.print("Add");
+  }
+
+  // Check if there's room for "Back" below the existing messages
+  if (messageCount + 1 < maxVisibleItems) {
+    uint8_t cursorY = m_headerOffset + m_newLine + (messageCount * m_newLine + m_newLine);
+
+    // Display "Add New Message" with selection cursor if it’s selected
+    if (selectedIndex == messageCount + 1) {
+      m_ssd1306.setCursor(0, cursorY);
+      m_ssd1306.write(c_menuCursor);
+    }
+    m_ssd1306.setCursor(c_newTab, cursorY);
+    m_ssd1306.print("Back");
+  }
+
+  // Render scroll indicators if needed
+  if (startIndex > 0) {
+    renderScrollIndicator(true); // Up indicator
+  }
+  if (startIndex + maxVisibleItems < messageCount) {
+    renderScrollIndicator(false); // Down indicator
+  }
+
+  render();
+}
