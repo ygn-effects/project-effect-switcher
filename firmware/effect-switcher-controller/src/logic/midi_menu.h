@@ -10,6 +10,7 @@ class MidiMessageMenu : public MenuBase {
     uint8_t m_selectedIndex;
     uint8_t m_startIndex;
     bool m_editRequested;
+    bool m_addRequested;
     bool m_goBackRequested;
 
   public:
@@ -27,5 +28,8 @@ class MidiMessageMenu : public MenuBase {
 
     void setCurrentPreset(Preset* t_currentPreset);
     bool isEditRequested();
+    bool isAddRequested();
     bool isGoBackRequested();
+    uint8_t getSelectedIndex() const;
+    uint8_t getStartIndex() const;
 };
