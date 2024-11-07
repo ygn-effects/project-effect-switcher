@@ -105,5 +105,7 @@ class Display {
     /// @param selectedIndex Index of the currently selected item
     /// @param startIndex Index of the first visible item
     void renderMidiMessages(const uint8_t* types, const uint8_t* channels, const uint8_t* dataByte1, const uint8_t* dataByte2, uint8_t messageCount, uint8_t selectedIndex, uint8_t startIndex);
+
+    void renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_t fieldsCount, uint8_t selectedField, bool fieldEditMode, bool messageEditMode);
 };
 

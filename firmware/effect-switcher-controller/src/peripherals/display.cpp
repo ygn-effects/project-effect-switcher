@@ -266,3 +266,63 @@ void Display::renderMidiMessages(const uint8_t* types, const uint8_t* channels, 
 
   render();
 }
+
+void Display::renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_t fieldsCount, uint8_t selectedField, bool fieldEditMode, bool messageEditMode) {
+  const uint8_t fieldWidth = 60;
+
+  for (uint8_t i = 0; i < fieldsCount; i++) {
+    uint8_t cursorY = m_headerOffset + m_newLine + (i * m_newLine);
+
+    // Print the cursor in front of the selected item
+    if (selectedField == i) {
+      m_ssd1306.setCursor(0, cursorY);
+      m_ssd1306.write(c_menuCursor);
+    }
+
+    // Print the field
+    m_ssd1306.setCursor(c_newTab, cursorY);
+    m_ssd1306.print(fields[i]);
+
+    // Print the value
+    m_ssd1306.setCursor(fieldWidth, cursorY);
+
+    // Inverted color for field edit mode
+    if (selectedField == i && fieldEditMode) {
+      m_ssd1306.setTextColor(BLACK, WHITE);
+    }
+
+    // MIDI message type field
+    if (i == 0) {
+      switch (values[i])
+      {
+      case 0xB0:
+        m_ssd1306.print("CC");
+        break;
+
+      default:
+        break;
+      }
+    }
+    // Other fields
+    else {
+      m_ssd1306.print(values[i]);
+    }
+
+    m_ssd1306.setTextColor(SSD1306_WHITE); // Reset text color
+  }
+
+  // Print Cancel or Delete depending on the editMode
+  m_ssd1306.setCursor(c_newTab, m_headerOffset + m_newLine + (4 * m_newLine));
+  if (messageEditMode) {
+    m_ssd1306.print("Delete"); // Edit mode
+  }
+  else {
+    m_ssd1306.print("Cancel"); // Add mode
+  }
+
+  // Print the save button
+  m_ssd1306.setCursor(c_newTab, m_headerOffset + m_newLine + (5 * m_newLine));
+  m_ssd1306.print("Save");
+
+  render();
+}
