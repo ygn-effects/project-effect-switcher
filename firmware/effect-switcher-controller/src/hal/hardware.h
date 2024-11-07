@@ -19,11 +19,14 @@
 constexpr uint8_t c_maxPresets = 4;
 constexpr uint8_t c_firstLoop = 0;
 
+/// @brief Possible system states
 enum SystemState {
-  kPresetState,
-  kSettingsState,
-  kLoopsEditState,
-  kMidiMessagesState
+  kPresetState,           // Home screen displaying the active bank and preset
+  kSettingsState,         // Main preset settings menu
+  kLoopsEditState,        // Loops edit menu
+  kMidiMessagesState,     // MIDI messages list
+  kMidiMessageEditState,  // MIDI messages edit
+  kMidiMessageAddState    // MIDI Messages add
 };
 
 class Hardware
@@ -56,10 +59,12 @@ class Hardware
     void pollFootSwitches();
 
     void transitionToState(SystemState t_newState);
+    void processMenuInput();
     void processPresetState();
     void processSettingsState();
     void processLoopsEditState();
     void processMidiMessagesState();
+    void processMidiMessageEditState();
 
   public:
     void setup();

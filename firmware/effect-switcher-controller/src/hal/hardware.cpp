@@ -29,7 +29,7 @@ const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System", "O
 ListMenu settingsMenu(&display, settingsItems, 7);
 LoopOrderMenu loopsMenu(&display, nullptr);
 MidiMessageMenu midiMessagesMenu(&display, nullptr);
-
+MidiMessageEditMenu midiMessageEditMenu(&display, nullptr, 0);
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -76,7 +76,10 @@ void Hardware::transitionToState(SystemState t_newState) {
   m_systemState = t_newState;
 
   if (t_newState == SystemState::kPresetState) {
-    menuManager.reset();
+    settingsMenu.reset();
+    loopsMenu.reset();
+    midiMessagesMenu.reset();
+    midiMessageEditMenu.reset();
     menuManager.setMenu(&homeMenu);
     menuManager.update();
   }
@@ -95,6 +98,43 @@ void Hardware::transitionToState(SystemState t_newState) {
     menuManager.setMenu(&midiMessagesMenu);
     menuManager.reset();
     midiMessagesMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    menuManager.update();
+  }
+  else if (t_newState == SystemState::kMidiMessageEditState) {
+    menuManager.setMenu(&midiMessageEditMenu);
+    menuManager.reset();
+    midiMessageEditMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getStartIndex() + midiMessagesMenu.getSelectedIndex());
+    midiMessageEditMenu.setMessageEditMode(true);
+    menuManager.update();
+  }
+  else if (t_newState == SystemState::kMidiMessageAddState) {
+    menuManager.setMenu(&midiMessageEditMenu);
+    menuManager.reset();
+    midiMessageEditMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getStartIndex() + midiMessagesMenu.getSelectedIndex());
+    menuManager.update();
+  }
+}
+
+void Hardware::processMenuInput() {
+  if (m_menuEncoderMoveLeft) {
+    menuManager.handleInput(MenuInputAction::kUp);
+    menuManager.update();
+  }
+
+  if (m_menuEncoderMoveRight) {
+    menuManager.handleInput(MenuInputAction::kDown);
+    menuManager.update();
+  }
+
+  if (m_menuEncoderSwitchPress) {
+    menuManager.handleInput(MenuInputAction::kPress);
+    menuManager.update();
+  }
+
+  if (m_menuEncoderSwitchLongPress) {
+    menuManager.handleInput(MenuInputAction::kLongPress);
     menuManager.update();
   }
 }
@@ -142,20 +182,7 @@ void Hardware::processPresetState() {
 }
 
 void Hardware::processSettingsState() {
-  if (m_menuEncoderMoveLeft) {
-    menuManager.handleInput(MenuInputAction::kUp);
-    menuManager.update();
-  }
-
-  if (m_menuEncoderMoveRight) {
-    menuManager.handleInput(MenuInputAction::kDown);
-    menuManager.update();
-  }
-
-  if (m_menuEncoderSwitchPress) {
-    menuManager.handleInput(MenuInputAction::kPress);
-    menuManager.update();
-  }
+  processMenuInput();
 
   if (m_menuEditSwitchLongPress) {
     transitionToState(kPresetState);
@@ -187,25 +214,7 @@ void Hardware::processSettingsState() {
 }
 
 void Hardware::processLoopsEditState() {
-  if (m_menuEncoderMoveLeft) {
-    menuManager.handleInput(MenuInputAction::kUp);
-    menuManager.update();
-  }
-
-  if (m_menuEncoderMoveRight) {
-    menuManager.handleInput(MenuInputAction::kDown);
-    menuManager.update();
-  }
-
-  if (m_menuEncoderSwitchPress) {
-    menuManager.handleInput(MenuInputAction::kPress);
-    menuManager.update();
-  }
-
-  if (m_menuEncoderSwitchLongPress) {
-    menuManager.handleInput(MenuInputAction::kLongPress);
-    menuManager.update();
-  }
+  processMenuInput();
 
   if (loopsMenu.isToggleRequested()) {
     presetManager.toggleLoopState(presetManager.getLoopByOrder(loopsMenu.getSelectedLoop()));
@@ -231,6 +240,28 @@ void Hardware::processLoopsEditState() {
 }
 
 void Hardware::processMidiMessagesState() {
+  processMenuInput();
+
+  if (midiMessagesMenu.isEditRequested()) {
+    transitionToState(kMidiMessageEditState);
+  }
+
+  if (midiMessagesMenu.isAddRequested()) {
+    transitionToState(kMidiMessageAddState);
+  }
+
+  if (midiMessagesMenu.isGoBackRequested()) {
+    transitionToState(kSettingsState);
+  }
+
+  if (m_menuEditSwitchLongPress) {
+    transitionToState(kPresetState);
+  }
+}
+
+void Hardware::processMidiMessageEditState() {
+  processMenuInput();
+
   if (m_menuEditSwitchLongPress) {
     transitionToState(kPresetState);
   }
@@ -282,16 +313,10 @@ void Hardware::poll() {
       break;
 
     case kSettingsState:
-      pollMenuEditSwitch();
-      pollMenuEncoder();
-      break;
-
     case kLoopsEditState:
-      pollMenuEditSwitch();
-      pollMenuEncoder();
-      break;
-
     case kMidiMessagesState:
+    case kMidiMessageAddState:
+    case kMidiMessageEditState:
       pollMenuEditSwitch();
       pollMenuEncoder();
       break;
@@ -318,6 +343,10 @@ void Hardware::process() {
     case kMidiMessagesState:
       processMidiMessagesState();
       break;
+
+    case kMidiMessageAddState:
+    case kMidiMessageEditState:
+      processMidiMessageEditState();
 
     default:
       break;
