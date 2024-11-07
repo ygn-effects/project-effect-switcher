@@ -295,12 +295,12 @@ void Display::renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_
     if (i == 0) {
       switch (values[i])
       {
-      case 0xB0:
-        m_ssd1306.print("CC");
-        break;
+        case 0xB0:
+          m_ssd1306.print("CC");
+          break;
 
-      default:
-        break;
+        default:
+          break;
       }
     }
     // Other fields
@@ -311,6 +311,11 @@ void Display::renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_
     m_ssd1306.setTextColor(SSD1306_WHITE); // Reset text color
   }
 
+  if (selectedField == 4) {
+    m_ssd1306.setCursor(0, m_headerOffset + m_newLine + (4 * m_newLine));
+    m_ssd1306.write(c_menuCursor);
+  }
+
   // Print Cancel or Delete depending on the editMode
   m_ssd1306.setCursor(c_newTab, m_headerOffset + m_newLine + (4 * m_newLine));
   if (messageEditMode) {
@@ -318,6 +323,11 @@ void Display::renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_
   }
   else {
     m_ssd1306.print("Cancel"); // Add mode
+  }
+
+  if (selectedField == 5) {
+    m_ssd1306.setCursor(0, m_headerOffset + m_newLine + (5 * m_newLine));
+    m_ssd1306.write(c_menuCursor);
   }
 
   // Print the save button
