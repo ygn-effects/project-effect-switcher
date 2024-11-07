@@ -96,3 +96,135 @@ uint8_t MidiMessageMenu::getSelectedIndex() const {
 uint8_t MidiMessageMenu::getStartIndex() const {
   return m_startIndex;
 }
+
+void MidiMessageEditMenu::update() {
+  const char* messageFields[4] = {"Type:", "Channel:", "Byte1:", "Byte2:"};
+  uint8_t messageValues[4] = {0};
+
+  // Edit mode, retrieve data from the current message to the local members
+  if (m_messageEditMode) {
+    m_newMessageType = m_currentPreset->getMidiMessageType(m_midiMessageIndex);
+    m_newMessageChannel = m_currentPreset->getMidiMessageChannel(m_midiMessageIndex);
+    m_newMessageDataByte1 = m_currentPreset->getMidiMessageDataByte1(m_midiMessageIndex);
+    m_newMessageDataByte2 = m_currentPreset->getMidiMessageDataByte2(m_midiMessageIndex);
+  }
+
+  // Populate the value arrays with either the retrieved or default values
+  messageValues[0] = m_newMessageType;
+  messageValues[1] = m_newMessageChannel;
+  messageValues[2] = m_newMessageDataByte1;
+  messageValues[3] = m_newMessageDataByte2;
+
+  m_display->clear();
+
+  if (m_messageEditMode){
+    m_display->renderHeader("Edit MIDI message");
+  }
+  else {
+    m_display->renderHeader("Add MIDI message");
+  }
+
+  m_display->renderMidiMessageEdit(messageFields, messageValues, 4, m_selectedIndex, m_fieldEditMode, m_messageEditMode);
+}
+
+void MidiMessageEditMenu::reset() {
+  m_messageEditMode = false;
+  m_fieldEditMode = false;
+  m_cancelRequested = false;
+  m_saveRequested = false;
+  m_selectedIndex = 0;
+  m_newMessageType = 0xB0;
+  m_newMessageChannel = 0;
+  m_newMessageDataByte1 = 64;
+  m_newMessageDataByte2 = 64;
+}
+
+void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
+  switch (t_action)
+  {
+    case MenuInputAction::kUp:
+      if (m_fieldEditMode) {
+        // Adjust the value of the selected field when in field edit mode
+        switch (m_selectedIndex)
+        {
+          case 0: // Type
+            if (m_newMessageType < 0xE) {
+              m_newMessageType++;
+            }
+            break;
+
+          case 1: // Channel
+            m_newMessageChannel = (m_newMessageChannel + 1) % 16;
+            break;
+
+          case 2: // Data byte 1
+            m_newMessageDataByte1 = (m_newMessageDataByte1 + 1) % 128;
+            break;
+
+          case 3: // Data Byte 2
+            m_newMessageDataByte2 = (m_newMessageDataByte2 + 1) % 128;
+            break;
+
+          default:
+            break;
+        }
+      }
+      else {
+        // Navigate up through fields if not in edit mode
+        if (m_selectedIndex > 0) m_selectedIndex--;
+      }
+      break;
+
+    case MenuInputAction::kDown:
+      if (m_fieldEditMode) {
+        // Adjust the value of the selected field when in field edit mode
+        switch (m_selectedIndex)
+        {
+          case 0: // Type
+            if (m_newMessageType > 0x8) {
+              m_newMessageType--;
+            }
+            break;
+
+          case 1: // Channel
+            m_newMessageChannel = (m_newMessageChannel - 1) % 16;
+            break;
+
+          case 2: // Data byte 1
+            m_newMessageDataByte1 = (m_newMessageDataByte1 - 1) % 128;
+            break;
+
+          case 3: // Data Byte 2
+            m_newMessageDataByte2 = (m_newMessageDataByte2 - 1) % 128;
+            break;
+
+          default:
+            break;
+        }
+      }
+      else {
+        // Navigate up through fields if not in edit mode
+        if (m_selectedIndex < 5) m_selectedIndex++;
+      }
+      break;
+
+    case MenuInputAction::kPress:
+
+      break;
+
+    default:
+      break;
+  }
+}
+
+void MidiMessageEditMenu::setCurrentPreset(Preset* t_currentPreset) {
+  m_currentPreset = t_currentPreset;
+}
+
+void MidiMessageEditMenu::setMidiMessageIndex(uint8_t t_index) {
+  m_midiMessageIndex = t_index;
+}
+
+void MidiMessageEditMenu::setMessageEditMode(bool t_mode) {
+  m_messageEditMode = t_mode;
+}
