@@ -29,31 +29,31 @@ class Display {
     void newLine();
 
     /// @brief Calculates the width of the text
-    /// @param text The text to calculate width for
+    /// @param t_text The text to calculate width for
     /// @return The width in pixels
-    uint16_t calcTextWidth(const char* text);
+    uint16_t calcTextWidth(const char* t_text);
 
     /// @brief Calculates the height of the text
-    /// @param text The text to calculate height for
+    /// @param t_text The text to calculate height for
     /// @return The height in pixels
-    uint16_t calcTextHeight(const char* text);
+    uint16_t calcTextHeight(const char* t_text);
 
     /// @brief Render a scroll indicator
-    /// @param up True for up arrow, false for down arrow
-    void renderScrollIndicator(bool up);
+    /// @param t_up True for up arrow, false for down arrow
+    void renderScrollIndicator(bool t_up);
 
   public:
     /// @brief Construct a display object
-    /// @param width Width of the display
-    /// @param height Height of the display
-    /// @param newline Line height
-    /// @param headeroffset Offset for centering the header text vertically
-    Display(uint8_t width, uint8_t height, uint8_t newline, uint8_t headeroffset) :
-      m_ssd1306(width, height, &Wire, -1),
-      m_width(width),
-      m_height(height),
-      m_newLine(newline),
-      m_headerOffset(headeroffset) { };
+    /// @param t_width Width of the display
+    /// @param t_height Height of the display
+    /// @param t_newline Line height
+    /// @param t_headerOffset Offset for centering the header text vertically
+    Display(uint8_t t_width, uint8_t t_height, uint8_t t_newline, uint8_t t_headerOffset) :
+      m_ssd1306(t_width, t_height, &Wire, -1),
+      m_width(t_width),
+      m_height(t_height),
+      m_newLine(t_newline),
+      m_headerOffset(t_headerOffset) { };
 
     /// @brief Initialize the display (SSD1306 setup)
     void setup();
@@ -73,39 +73,46 @@ class Display {
     uint8_t getLineHeight();
 
     /// @brief Render a centered header at the top of the screen
-    /// @param text The header text to render
-    void renderHeader(const char* text);
+    /// @param t_text The header text to render
+    void renderHeader(const char* t_text);
 
     /// @brief Render two integers, centered in the middle of the screen, separated by '|'
-    /// @param bank The bank character
-    /// @param preset The preset number
-    void renderBankAndPreset(char bank, uint8_t preset);
+    /// @param t_bank The bank character
+    /// @param t_preset The preset number
+    void renderBankAndPreset(char t_bank, uint8_t t_preset);
 
     /// @brief Render a list of items
-    /// @param items Array of items to display
-    /// @param itemCount Number of items in the array
-    /// @param startIndex Index of the first visible item
-    /// @param selectedIndex Index of the currently selected item
-    void renderListMenu(const char* items[], uint8_t itemCount, uint8_t startIndex, uint8_t selectedIndex);
+    /// @param t_items Array of items to display
+    /// @param t_itemCount Number of items in the array
+    /// @param t_startIndex Index of the first visible item
+    /// @param t_selectedIndex Index of the currently selected item
+    void renderListMenu(const char* t_items[], uint8_t t_itemCount, uint8_t t_startIndex, uint8_t t_selectedIndex);
 
     /// @brief Render the loop order list
-    /// @param loopOrders Array of loop order numbers
-    /// @param loopStates Array of loop states (active/inactive)
-    /// @param loopCount Total number of loops
-    /// @param selectedIndex Currently selected loop index
-    /// @param swappingMode Flag indicating if in swap selection mode
-    void renderLoopOrderList(const uint8_t* loopIndexes, const uint8_t* loopOrders, const uint8_t* loopStates, uint8_t loopCount, uint8_t selectedIndex, bool swappingMode);
+    /// @param t_loopOrders Array of loop order numbers
+    /// @param t_loopStates Array of loop states (active/inactive)
+    /// @param t_loopCount Total number of loops
+    /// @param t_selectedIndex Currently selected loop index
+    /// @param t_swappingMode Flag indicating if in swap selection mode
+    void renderLoopOrderList(const uint8_t* t_loopIndexes, const uint8_t* t_loopOrders, const uint8_t* t_loopStates, uint8_t t_loopCount, uint8_t t_selectedIndex, bool t_swappingMode);
 
     /// @brief Render the MIDI message list
-    /// @param types Array of MIDI message types
-    /// @param channels Array of MIDI message channels
-    /// @param dataByte1 Array of MIDI data bytes 1
-    /// @param dataByte2 Array of MIDI data bytes 2
-    /// @param messageCount Total number of MIDI messages
-    /// @param selectedIndex Index of the currently selected item
-    /// @param startIndex Index of the first visible item
-    void renderMidiMessages(const uint8_t* types, const uint8_t* channels, const uint8_t* dataByte1, const uint8_t* dataByte2, uint8_t messageCount, uint8_t selectedIndex, uint8_t startIndex);
+    /// @param t_types Array of MIDI message types
+    /// @param t_channels Array of MIDI message channels
+    /// @param t_dataByte1 Array of MIDI data bytes 1
+    /// @param t_dataByte2 Array of MIDI data bytes 2
+    /// @param t_messageCount Total number of MIDI messages
+    /// @param t_selectedIndex Index of the currently selected item
+    /// @param t_startIndex Index of the first visible item
+    void renderMidiMessages(const uint8_t* t_types, const uint8_t* t_channels, const uint8_t* t_dataByte1, const uint8_t* t_dataByte2, uint8_t t_messageCount, uint8_t t_selectedIndex, uint8_t t_startIndex);
 
-    void renderMidiMessageEdit(const char** fields, uint8_t* values, uint8_t fieldsCount, uint8_t selectedField, bool fieldEditMode, bool messageEditMode);
+    /// @brief Render the
+    /// @param t_fields MIDI messages properties
+    /// @param t_values MIDI messages properties values
+    /// @param t_fieldsCount MIDI messages properties cont (should be 4)
+    /// @param t_selectedField Index of the current selected field
+    /// @param t_fieldEditMode Field edit mode
+    /// @param t_messageEditMode Message edit mode (true for edits and false for adds)
+    void renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, uint8_t t_fieldsCount, uint8_t t_selectedField, bool t_fieldEditMode, bool t_messageEditMode);
 };
 
