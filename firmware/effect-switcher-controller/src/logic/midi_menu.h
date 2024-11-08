@@ -43,10 +43,12 @@ class MidiMessageEditMenu : public MenuBase {
     bool m_fieldEditMode;
     bool m_cancelRequested;
     bool m_saveRequested;
+    uint8_t m_messagesCount = 4;
     uint8_t m_newMessageType = 0xB0; // Default value for new message
     uint8_t m_newMessageChannel = 0; // Default value for new message
     uint8_t m_newMessageDataByte1 = 64; // Default value for new message
     uint8_t m_newMessageDataByte2 = 64; // Default value for new message
+    bool m_NewMessageHasDataByte2 = true;
 
   public:
     MidiMessageEditMenu(Display* t_display, Preset* t_currentPreset, uint8_t t_midiMessageIndex) :
@@ -67,6 +69,7 @@ class MidiMessageEditMenu : public MenuBase {
     void setMidiMessageIndex(uint8_t t_index);
     void setMessageEditMode(bool t_mode);
     bool isCancelRequested();
+    bool isDeleteRequested();
     bool isSaveRequested();
     uint8_t getNewMessageType() const;
     uint8_t getNewMessageChannel() const;

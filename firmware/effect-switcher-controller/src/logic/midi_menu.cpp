@@ -101,14 +101,6 @@ void MidiMessageEditMenu::update() {
   const char* messageFields[4] = {"Type:", "Channel:", "Byte1:", "Byte2:"};
   uint8_t messageValues[4] = {0};
 
-  // Edit mode, retrieve data from the current message to the local members
-  if (m_messageEditMode) {
-    m_newMessageType = m_currentPreset->getMidiMessageType(m_midiMessageIndex);
-    m_newMessageChannel = m_currentPreset->getMidiMessageChannel(m_midiMessageIndex);
-    m_newMessageDataByte1 = m_currentPreset->getMidiMessageDataByte1(m_midiMessageIndex);
-    m_newMessageDataByte2 = m_currentPreset->getMidiMessageDataByte2(m_midiMessageIndex);
-  }
-
   // Populate the value arrays with either the retrieved or default values
   messageValues[0] = m_newMessageType;
   messageValues[1] = m_newMessageChannel;
@@ -124,7 +116,7 @@ void MidiMessageEditMenu::update() {
     m_display->renderHeader("Add MIDI message");
   }
 
-  m_display->renderMidiMessageEdit(messageFields, messageValues, 4, m_selectedIndex, m_fieldEditMode, m_messageEditMode);
+  m_display->renderMidiMessageEdit(messageFields, messageValues, 4, m_NewMessageHasDataByte2, m_selectedIndex, m_fieldEditMode, m_messageEditMode);
 }
 
 void MidiMessageEditMenu::reset() {
@@ -148,8 +140,13 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
         switch (m_selectedIndex)
         {
           case 0: // Type
-            if (m_newMessageType < 0xE) {
-              m_newMessageType++;
+            m_newMessageType = (m_newMessageType + 0x10) & 0xF0;
+            if (m_newMessageType > 0xC0) m_newMessageType = 0xB0;
+            if (m_newMessageType == 0xC0) {
+              m_NewMessageHasDataByte2 = false;
+            }
+            else {
+              m_NewMessageHasDataByte2 = true;
             }
             break;
 
@@ -172,6 +169,7 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
       else {
         // Navigate up through fields if not in edit mode
         if (m_selectedIndex > 0) m_selectedIndex--;
+        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) m_selectedIndex--;
       }
       break;
 
@@ -181,8 +179,13 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
         switch (m_selectedIndex)
         {
           case 0: // Type
-            if (m_newMessageType > 0x8) {
-              m_newMessageType--;
+            m_newMessageType = (m_newMessageType - 0x10) & 0xF0;
+            if (m_newMessageType < 0xB0) m_newMessageType = 0xC0;
+            if (m_newMessageType == 0xC0) {
+              m_NewMessageHasDataByte2 = false;
+            }
+            else {
+              m_NewMessageHasDataByte2 = true;
             }
             break;
 
@@ -205,11 +208,20 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
       else {
         // Navigate up through fields if not in edit mode
         if (m_selectedIndex < 5) m_selectedIndex++;
+        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) m_selectedIndex++;
       }
       break;
 
     case MenuInputAction::kPress:
-
+      if (m_selectedIndex < m_messagesCount) {
+        m_fieldEditMode = !m_fieldEditMode;
+      }
+      else if (m_selectedIndex == m_messagesCount) {
+        m_cancelRequested = true;
+      }
+      else if (m_selectedIndex > m_messagesCount) {
+        m_saveRequested = true;
+      }
       break;
 
     default:
@@ -227,4 +239,27 @@ void MidiMessageEditMenu::setMidiMessageIndex(uint8_t t_index) {
 
 void MidiMessageEditMenu::setMessageEditMode(bool t_mode) {
   m_messageEditMode = t_mode;
+
+  // Edit mode, retrieve data from the current message to the local members
+  if (m_messageEditMode) {
+    m_newMessageType = m_currentPreset->getMidiMessageType(m_midiMessageIndex);
+    m_newMessageChannel = m_currentPreset->getMidiMessageChannel(m_midiMessageIndex);
+    m_newMessageDataByte1 = m_currentPreset->getMidiMessageDataByte1(m_midiMessageIndex);
+    m_newMessageDataByte2 = m_currentPreset->getMidiMessageDataByte2(m_midiMessageIndex);
+    m_NewMessageHasDataByte2 = m_currentPreset->getMidiMessageHasDataByte2(m_midiMessageIndex);
+  }
+}
+
+bool MidiMessageEditMenu::isCancelRequested() {
+  bool requested = m_cancelRequested;
+  m_cancelRequested = false;
+
+  return requested;
+}
+
+bool MidiMessageEditMenu::isSaveRequested() {
+  bool requested = m_saveRequested;
+  m_saveRequested = false;
+
+  return requested;
 }
