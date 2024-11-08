@@ -300,7 +300,7 @@ void Display::renderMidiMessages(const uint8_t* t_types, const uint8_t* t_channe
   render();
 }
 
-void Display::renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, uint8_t t_fieldsCount, uint8_t t_selectedField, bool t_fieldEditMode, bool t_messageEditMode) {
+void Display::renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, uint8_t t_fieldsCount, bool t_hasDataByte2, uint8_t t_selectedField, bool t_fieldEditMode, bool t_messageEditMode) {
   const uint8_t fieldWidth = 60; // Set value for the fields column
 
   // Render the fields
@@ -313,9 +313,17 @@ void Display::renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, ui
       m_ssd1306.write(c_menuCursor);
     }
 
-    // Print the field
-    m_ssd1306.setCursor(c_newTab, cursorY);
-    m_ssd1306.print(t_fields[i]);
+    if (i == 3) {
+      if (t_hasDataByte2) {
+        m_ssd1306.setCursor(c_newTab, cursorY);
+        m_ssd1306.print(t_fields[i]);
+      }
+    }
+    else {
+      // Print the field
+      m_ssd1306.setCursor(c_newTab, cursorY);
+      m_ssd1306.print(t_fields[i]);
+    }
 
     // Print the value
     m_ssd1306.setCursor(fieldWidth, cursorY);
@@ -332,8 +340,17 @@ void Display::renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, ui
           m_ssd1306.print("CC");
           break;
 
+        case 0xC0:
+          m_ssd1306.print("PC");
+          break;
+
         default:
           break;
+      }
+    }
+    else if (i == 3) {
+      if (t_hasDataByte2) {
+        m_ssd1306.print(t_values[i]);
       }
     }
     // Other fields

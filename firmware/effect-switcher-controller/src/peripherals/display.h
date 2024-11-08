@@ -113,6 +113,6 @@ class Display {
     /// @param t_selectedField Index of the current selected field
     /// @param t_fieldEditMode Field edit mode
     /// @param t_messageEditMode Message edit mode (true for edits and false for adds)
-    void renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, uint8_t t_fieldsCount, uint8_t t_selectedField, bool t_fieldEditMode, bool t_messageEditMode);
+    void renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, uint8_t t_fieldsCount, bool t_hasDataByte2, uint8_t t_selectedField, bool t_fieldEditMode, bool t_messageEditMode);
 };
 
