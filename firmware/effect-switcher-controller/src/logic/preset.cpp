@@ -139,3 +139,7 @@ uint8_t Preset::getMidiMessageDataByte2(uint8_t t_message) const {
 void Preset::setMidiMessageDataByte2(uint8_t t_message, uint8_t t_byte) {
   m_midiMessages[t_message].setMessageDataByte2(t_byte);
 }
+
+bool Preset::getMidiMessageHasDataByte2(uint8_t t_message) const {
+  return m_midiMessages[t_message].hasDataByte2();
+}

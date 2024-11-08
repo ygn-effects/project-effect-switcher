@@ -163,4 +163,9 @@ class Preset {
     /// @param t_message MIDI message index
     /// @param t_byte Data byte 2
     void setMidiMessageDataByte2(uint8_t t_message, uint8_t t_byte);
+
+    /// @brief Check if the MIDI message has a second data byte
+    /// @param t_message MIDI message index
+    /// @return false if the message doesn't have a second data byte
+    bool getMidiMessageHasDataByte2(uint8_t t_message) const;
 };
