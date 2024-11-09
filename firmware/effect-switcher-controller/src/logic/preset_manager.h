@@ -73,4 +73,10 @@ class PresetManager {
     void swapLoops(uint8_t t_loop1, uint8_t t_loop2);
 
     uint8_t getLoopByOrder(uint8_t t_order);
+
+    void addMidiMessage(uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasDataByte2 = true);
+
+    void setMidiMessageValues(uint8_t t_message, uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasDataByte2 = true);
+
+    void removeMidiMessage(uint8_t t_message);
 };

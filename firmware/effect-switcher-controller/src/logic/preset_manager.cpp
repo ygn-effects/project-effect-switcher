@@ -91,3 +91,24 @@ void PresetManager::swapLoops(uint8_t t_loop1, uint8_t t_loop2) {
 uint8_t PresetManager::getLoopByOrder(uint8_t t_order) {
   return p_currentPreset->getLoopIndexByOrder(t_order);
 }
+
+void PresetManager::addMidiMessage(uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasDataByte2) {
+  p_currentPreset->AddMidiMessage(t_type, t_channel, t_byte1, t_byte2, t_hasDataByte2);
+}
+
+void PresetManager::setMidiMessageValues(uint8_t t_message, uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasDataByte2) {
+  p_currentPreset->setMidiMessageType(t_message, t_type);
+  p_currentPreset->setMidiMessageChannel(t_message, t_channel);
+  p_currentPreset->setMidiMessageDataByte1(t_message, t_byte1);
+
+  if (t_hasDataByte2) {
+    p_currentPreset->setMidiMessageDataByte2(t_message, t_byte2);
+  }
+  else {
+    p_currentPreset->setMidiMessageDataByte2(t_message, 255);
+  }
+}
+
+void PresetManager::removeMidiMessage(uint8_t t_message) {
+  p_currentPreset->removeMidiMessage(t_message);
+}
