@@ -113,6 +113,7 @@ void Hardware::transitionToState(SystemState t_newState) {
     menuManager.reset();
     midiMessageEditMenu.setCurrentPreset(presetManager.getCurrentPreset());
     midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getStartIndex() + midiMessagesMenu.getSelectedIndex());
+    midiMessageEditMenu.setMessageEditMode(false);
     menuManager.update();
   }
 }
@@ -261,6 +262,28 @@ void Hardware::processMidiMessagesState() {
 
 void Hardware::processMidiMessageEditState() {
   processMenuInput();
+
+  if (midiMessageEditMenu.isCancelRequested()) {
+    transitionToState(kMidiMessagesState);
+  }
+
+  if (midiMessageEditMenu.isDeleteRequested()) {
+    presetManager.removeMidiMessage(midiMessageEditMenu.getMidiMessageIndex());
+    presetManager.saveCurrentPreset();
+    transitionToState(kMidiMessagesState);
+  }
+
+  if(midiMessageEditMenu.isSaveRequested()) {
+    presetManager.setMidiMessageValues(midiMessageEditMenu.getMidiMessageIndex() ,midiMessageEditMenu.getNewMessageType(), midiMessageEditMenu.getNewMessageChannel(), midiMessageEditMenu.getNewMessageDataByte1(), midiMessageEditMenu.getNewMessageDataByte2(), midiMessageEditMenu.getNewMessageHasDataByte2());
+    presetManager.saveCurrentPreset();
+    transitionToState(kMidiMessagesState);
+  }
+
+  if (midiMessagesMenu.isAddRequested()) {
+    presetManager.addMidiMessage(midiMessageEditMenu.getNewMessageType(), midiMessageEditMenu.getNewMessageChannel(), midiMessageEditMenu.getNewMessageDataByte1(), midiMessageEditMenu.getNewMessageDataByte2(), midiMessageEditMenu.getNewMessageHasDataByte2());
+    presetManager.saveCurrentPreset();
+    transitionToState(kMidiMessagesState);
+  }
 
   if (m_menuEditSwitchLongPress) {
     transitionToState(kPresetState);
