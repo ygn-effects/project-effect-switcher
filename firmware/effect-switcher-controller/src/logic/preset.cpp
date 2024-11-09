@@ -104,15 +104,15 @@ void Preset::setMidiMessagesCount(uint8_t t_count) {
 }
 
 uint8_t Preset::getMidiMessageStatusByte(uint8_t t_message) const {
-  return m_midiMessages[t_message].getMessageStatusByte();
+  return m_midiMessages[t_message].getStatusByte();
 }
 
 void Preset::setMidiMessageStatusByte(uint8_t t_message, uint8_t t_byte) {
-  m_midiMessages[t_message].setMessageStatusByte(t_byte);
+  m_midiMessages[t_message].setStatusByte(t_byte);
 }
 
 uint8_t Preset::getMidiMessageType(uint8_t t_message) const {
-  return m_midiMessages[t_message].getMessageType();
+  return m_midiMessages[t_message].getType();
 }
 
 uint8_t Preset::getMidiMessageChannel(uint8_t t_message) const {
@@ -124,7 +124,7 @@ uint8_t Preset::getMidiMessageDataByte1(uint8_t t_message) const {
 }
 
 void Preset::setMidiMessageDataByte1(uint8_t t_message, uint8_t t_byte) {
-  m_midiMessages[t_message].setMessageDataByte1(t_byte);
+  m_midiMessages[t_message].setDataByte1(t_byte);
 }
 
 uint8_t Preset::getMidiMessageDataByte2(uint8_t t_message) const {
@@ -136,10 +136,44 @@ uint8_t Preset::getMidiMessageDataByte2(uint8_t t_message) const {
   }
 }
 
+void Preset::setMidiMessageType(uint8_t t_message, uint8_t t_type) {
+  m_midiMessages[t_message].setType(t_type);
+}
+
+void Preset::setMidiMessageChannel(uint8_t t_message, uint8_t t_channel) {
+  m_midiMessages[t_message].setChannel(t_channel);
+}
+
 void Preset::setMidiMessageDataByte2(uint8_t t_message, uint8_t t_byte) {
-  m_midiMessages[t_message].setMessageDataByte2(t_byte);
+  m_midiMessages[t_message].setDataByte2(t_byte);
 }
 
 bool Preset::getMidiMessageHasDataByte2(uint8_t t_message) const {
   return m_midiMessages[t_message].hasDataByte2();
+}
+
+void Preset::AddMidiMessage(uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasByte2) {
+  if (m_midiMessagesCount < c_maxMidiMessages) {
+    setMidiMessageType(m_midiMessagesCount, t_type);
+    setMidiMessageChannel(m_midiMessagesCount, t_channel);
+    setMidiMessageDataByte1(m_midiMessagesCount, t_byte1);
+    if (t_hasByte2) {
+      setMidiMessageDataByte2(m_midiMessagesCount, t_byte2);
+    }
+    else {
+      setMidiMessageDataByte2(m_midiMessagesCount, 255);
+    }
+
+    m_midiMessagesCount++;
+  }
+}
+
+void Preset::removeMidiMessage(uint8_t t_message) {
+  if (t_message < m_midiMessagesCount) {
+    for (uint8_t i = t_message; i < m_midiMessagesCount - 1; i++) {
+      m_midiMessages[i] = m_midiMessages[i + 1];
+    }
+
+    m_midiMessagesCount--;
+  }
 }

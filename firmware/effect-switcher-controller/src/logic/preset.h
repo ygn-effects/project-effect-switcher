@@ -142,9 +142,19 @@ class Preset {
     /// @param t_message MIDI message index
     uint8_t getMidiMessageType(uint8_t t_message) const;
 
+    /// @brief Set the type of a MIDI message
+    /// @param t_message MIDI message index
+    /// @param t_type MIDI message type
+    void setMidiMessageType(uint8_t t_message, uint8_t t_type);
+
     /// @brief Get the channel of a MIDI message
     /// @param t_message MIDI message index
     uint8_t getMidiMessageChannel(uint8_t t_message) const;
+
+    /// @brief Set the channel of a MIDI message
+    /// @param t_message MIDI message index
+    /// @param t_channel MIDI message channel
+    void setMidiMessageChannel(uint8_t t_message, uint8_t t_channel);
 
     /// @brief Get the first data byte of a MIDI message
     /// @param t_message MIDI message index
@@ -168,4 +178,16 @@ class Preset {
     /// @param t_message MIDI message index
     /// @return false if the message doesn't have a second data byte
     bool getMidiMessageHasDataByte2(uint8_t t_message) const;
+
+    /// @brief Add a new message to the MIDI messages array
+    /// @param t_type MIDI message type
+    /// @param t_channel MIDI message channel
+    /// @param t_byte1 MIDI message first byte
+    /// @param t_byte2 MIDI message second byte
+    /// @param t_hasByte2 Specify if the MIDI message has two data bytes
+    void AddMidiMessage(uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool hasByte2 = true);
+
+    /// @brief Delete the MIDI message at the index
+    /// @param t_message MIDI message to delete index
+    void removeMidiMessage(uint8_t t_message);
 };
