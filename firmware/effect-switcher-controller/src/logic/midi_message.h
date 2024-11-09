@@ -36,26 +36,38 @@ class MidiMessage {
 
     /// @brief Get the MIDI message status byte
     /// @return uint8_t
-    uint8_t getMessageStatusByte() const {
+    uint8_t getStatusByte() const {
       return m_statusByte;
     }
 
     /// @brief Set the MIDI message status byte
     /// @param t_byte Status byte
-    void setMessageStatusByte(uint8_t t_byte) {
+    void setStatusByte(uint8_t t_byte) {
       m_statusByte = t_byte;
     }
 
     /// @brief Get the type of the MIDI message
     /// @return uint8_t first 4 bits of the status byte
-    uint8_t getMessageType() const {
+    uint8_t getType() const {
       return m_statusByte & 0xF0;
+    }
+
+    /// @brief Set the type of the MIDI message
+    /// @param t_type MIDI message type
+    void setType(uint8_t t_type) {
+      m_statusByte = (m_statusByte & 0x0F) | (t_type & 0xF0);
     }
 
     /// @brief Get the channel of the MIDI message
     /// @return uint8_t last 4 bits of the status byte
     uint8_t getChannel() const {
       return m_statusByte & 0x0F;
+    }
+
+    /// @brief Set the channel of the MIDI message
+    /// @param t_channel MIDI channel
+    void setChannel(uint8_t t_channel) {
+      m_statusByte = (m_statusByte & 0xF0) | (t_channel & 0x0F);
     }
 
     /// @brief Get the first data byte
@@ -66,7 +78,7 @@ class MidiMessage {
 
     /// @brief Set the MIDI message first data byte
     /// @param t_byte Data byte 1
-    void setMessageDataByte1(uint8_t t_byte) {
+    void setDataByte1(uint8_t t_byte) {
       m_dataByte1 = t_byte;
     }
 
@@ -78,7 +90,7 @@ class MidiMessage {
 
     /// @brief Set the MIDI message second data byte
     /// @param t_byte Data byte 2
-    void setMessageDataByte2(uint8_t t_byte) {
+    void setDataByte2(uint8_t t_byte) {
       m_dataByte2 = t_byte;
     }
 
