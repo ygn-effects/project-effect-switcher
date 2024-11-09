@@ -42,7 +42,9 @@ class MidiMessageEditMenu : public MenuBase {
     bool m_messageEditMode;
     bool m_fieldEditMode;
     bool m_cancelRequested;
+    bool m_deleteRequested;
     bool m_saveRequested;
+    bool m_addRequested;
     uint8_t m_messagesCount = 4;
     uint8_t m_newMessageType = 0xB0; // Default value for new message
     uint8_t m_newMessageChannel = 0; // Default value for new message
@@ -64,15 +66,17 @@ class MidiMessageEditMenu : public MenuBase {
     void update() override;
     void reset() override;
     void handleInput(MenuInputAction t_action) override;
-
     void setCurrentPreset(Preset* t_currentPreset);
+    uint8_t getMidiMessageIndex();
     void setMidiMessageIndex(uint8_t t_index);
     void setMessageEditMode(bool t_mode);
     bool isCancelRequested();
     bool isDeleteRequested();
     bool isSaveRequested();
+    bool isAddRequested();
     uint8_t getNewMessageType() const;
     uint8_t getNewMessageChannel() const;
     uint8_t getNewMessageDataByte1() const;
     uint8_t getNewMessageDataByte2() const;
+    bool getNewMessageHasDataByte2() const;
 };

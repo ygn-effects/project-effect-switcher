@@ -120,15 +120,19 @@ void MidiMessageEditMenu::update() {
 }
 
 void MidiMessageEditMenu::reset() {
+  m_midiMessageIndex = 0;
   m_messageEditMode = false;
   m_fieldEditMode = false;
   m_cancelRequested = false;
+  m_deleteRequested = false;
   m_saveRequested = false;
+  m_addRequested = false;
   m_selectedIndex = 0;
   m_newMessageType = 0xB0;
   m_newMessageChannel = 0;
   m_newMessageDataByte1 = 64;
   m_newMessageDataByte2 = 64;
+  m_NewMessageHasDataByte2 = true;
 }
 
 void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
@@ -217,16 +221,30 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
         m_fieldEditMode = !m_fieldEditMode;
       }
       else if (m_selectedIndex == m_messagesCount) {
-        m_cancelRequested = true;
+        if (m_messageEditMode) {
+          m_deleteRequested = true;
+        }
+        else {
+          m_cancelRequested = true;
+        }
       }
       else if (m_selectedIndex > m_messagesCount) {
-        m_saveRequested = true;
+        if (m_messageEditMode) {
+          m_saveRequested = true;
+        }
+        else {
+          m_addRequested = true;
+        }
       }
       break;
 
     default:
       break;
   }
+}
+
+uint8_t MidiMessageEditMenu::getMidiMessageIndex() {
+  return m_midiMessageIndex;
 }
 
 void MidiMessageEditMenu::setCurrentPreset(Preset* t_currentPreset) {
@@ -257,9 +275,43 @@ bool MidiMessageEditMenu::isCancelRequested() {
   return requested;
 }
 
+bool MidiMessageEditMenu::isDeleteRequested(){
+  bool requested = m_deleteRequested;
+  m_deleteRequested = false;
+
+  return requested;
+}
+
 bool MidiMessageEditMenu::isSaveRequested() {
   bool requested = m_saveRequested;
   m_saveRequested = false;
 
   return requested;
+}
+
+bool MidiMessageEditMenu::isAddRequested() {
+  bool requested = m_addRequested;
+  m_addRequested = false;
+
+  return requested;
+}
+
+uint8_t MidiMessageEditMenu::getNewMessageType() const {
+  return m_newMessageType;
+}
+
+uint8_t MidiMessageEditMenu::getNewMessageChannel() const {
+  return m_newMessageChannel;
+}
+
+uint8_t MidiMessageEditMenu::getNewMessageDataByte1() const {
+  return m_newMessageDataByte1;
+}
+
+uint8_t MidiMessageEditMenu::getNewMessageDataByte2() const {
+  return m_newMessageDataByte2;
+}
+
+bool MidiMessageEditMenu::getNewMessageHasDataByte2() const {
+  return m_NewMessageHasDataByte2;
 }
