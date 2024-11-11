@@ -72,6 +72,11 @@ class Display {
     /// @return uint8_t Height of a new line
     uint8_t getLineHeight();
 
+    /// @brief Returns the max number of visible lines on the display
+    /// @param t_includeHeader Specify if the header should be included
+    /// @return uin8t_t Max visible lines
+    uint8_t getMaxVisibleLines(bool t_includeHeader = false);
+
     /// @brief Render a centered header at the top of the screen
     /// @param t_text The header text to render
     void renderHeader(const char* t_text);

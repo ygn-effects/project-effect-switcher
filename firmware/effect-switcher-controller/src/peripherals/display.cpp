@@ -61,6 +61,15 @@ uint8_t Display::getLineHeight() {
   return m_newLine;
 }
 
+uint8_t Display::getMaxVisibleLines(bool t_includeHeader) {
+  if (t_includeHeader) {
+    return (m_height - m_newLine - m_headerOffset) / m_newLine;
+  }
+  else {
+    return m_height / m_newLine;
+  }
+}
+
 void Display::renderHeader(const char* t_text) {
   clear();
   resetCursor();
