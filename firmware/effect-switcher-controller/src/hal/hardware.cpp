@@ -25,8 +25,8 @@ Preset presetBank[c_maxPresets];
 Display display(128, 64, 9, 1);
 MenuManager menuManager;
 HomeMenu homeMenu(&display, nullptr);
-const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System", "Other1", "Othe2r", "Other3"};
-ListMenu settingsMenu(&display, settingsItems, 7);
+const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System"};
+ListMenu settingsMenu(&display, settingsItems, 4);
 LoopOrderMenu loopsMenu(&display, nullptr);
 MidiMessageMenu midiMessagesMenu(&display, nullptr);
 MidiMessageEditMenu midiMessageEditMenu(&display, nullptr, 0);
@@ -279,7 +279,7 @@ void Hardware::processMidiMessageEditState() {
     transitionToState(kMidiMessagesState);
   }
 
-  if (midiMessagesMenu.isAddRequested()) {
+  if (midiMessageEditMenu.isAddRequested()) {
     presetManager.addMidiMessage(midiMessageEditMenu.getNewMessageType(), midiMessageEditMenu.getNewMessageChannel(), midiMessageEditMenu.getNewMessageDataByte1(), midiMessageEditMenu.getNewMessageDataByte2(), midiMessageEditMenu.getNewMessageHasDataByte2());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
@@ -306,7 +306,11 @@ void Hardware::setup() {
   // presetLed.setup();
   // matrix.switchMatrixSetup();
   menuManager.setMenu(&homeMenu);
-  // memoryManager.initializeTestData();
+
+  // Careful
+  //  memoryManager.initializeTestData();
+  // Careful
+
   delay(100);
 }
 
@@ -320,7 +324,11 @@ void Hardware::startup() {
   preset1Fsw.poll();
   preset2Fsw.poll();
   preset3Fsw.poll();
-  // memoryManager.readTestData();
+
+  // Careful
+  //  memoryManager.readTestData();
+  //Careful
+
   presetManager.initialize();
   delay(200);
   homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
