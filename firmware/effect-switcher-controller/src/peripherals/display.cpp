@@ -253,6 +253,10 @@ void Display::renderMidiMessages(const uint8_t* t_types, const uint8_t* t_channe
         m_ssd1306.print("CC");
         break;
 
+      case 0xC0:
+        m_ssd1306.print("PC");
+        break;
+
       default:
         break;
     }
@@ -265,9 +269,11 @@ void Display::renderMidiMessages(const uint8_t* t_types, const uint8_t* t_channe
     m_ssd1306.setCursor(typeWidth + channelWidth + 2, cursorY);
     m_ssd1306.print(t_dataByte1[messageIndex]);
 
-    // Data byte 2
+    // Data byte 2, don't display if the value in invalid as the message don't have a second data byte
     m_ssd1306.setCursor(typeWidth + channelWidth + dataByteWidth + 2, cursorY);
-    m_ssd1306.print(t_dataByte2[messageIndex]);
+    if (t_dataByte2[messageIndex] < 128){
+      m_ssd1306.print(t_dataByte2[messageIndex]);
+    }
   }
 
   // Check if there's room for "Add New Message" below the existing messages
