@@ -18,28 +18,15 @@ class HomeMenu : public MenuBase {
       m_currentPreset(t_currentPreset) { };
 
     /// @brief Update the home menu (render the current bank and preset)
-    void update() override {
-      m_display->clear();
-      m_display->renderHeader("Current Preset");
-
-      char bankLetter = 'A' + m_currentPreset->getBank();
-      uint8_t presetNumber = m_currentPreset->getPreset();
-      m_display->renderBankAndPreset(bankLetter, presetNumber);
-    }
+    void update() override;
 
     /// @brief Update the current preset pointer
     /// @param currentPreset Pointer to the new current preset
-    void setCurrentPreset(const Preset* t_currentPreset) {
-      m_currentPreset = t_currentPreset;
-    }
+    void setCurrentPreset(const Preset* t_currentPreset);
 
     /// @brief Reset the menu to its initial state
-    void reset() override {
-
-    }
+    void reset() override;
 
     /// @brief Handle input (home menu doesn't need input handling)
-    void handleInput(MenuInputAction t_action) override {
-
-    }
+    void handleInput(MenuInputAction t_action) override;
 };
