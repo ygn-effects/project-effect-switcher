@@ -34,15 +34,18 @@ void MidiMessageMenu::handleInput(MenuInputAction t_action) {
     case MenuInputAction::kUp:
       if (m_selectedIndex > 0) {
         m_selectedIndex--;
-        if (m_selectedIndex < m_startIndex) m_startIndex--;
+        if (m_selectedIndex < m_startIndex) {
+          m_startIndex--;
+        }
       }
       break;
 
     case MenuInputAction::kDown:
       if (m_selectedIndex < maxIndex) {
         m_selectedIndex++;
-        if (m_selectedIndex >= m_startIndex + (m_display->getHeight() / m_display->getLineHeight()))
+        if (m_selectedIndex >= m_startIndex + m_display->getMaxVisibleLines()) {
           m_startIndex++;
+        }
       }
       break;
 
@@ -144,8 +147,12 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
         switch (m_selectedIndex)
         {
           case 0: // Type
+            // Increment by 0x10 and wrap around
             m_newMessageType = (m_newMessageType + 0x10) & 0xF0;
-            if (m_newMessageType > 0xC0) m_newMessageType = 0xB0;
+            if (m_newMessageType > 0xC0) {
+              m_newMessageType = 0xB0;
+            }
+            // No second data byte for message type PC
             if (m_newMessageType == 0xC0) {
               m_NewMessageHasDataByte2 = false;
             }
@@ -155,14 +162,17 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
             break;
 
           case 1: // Channel
+            // Wrap around 0-15
             m_newMessageChannel = (m_newMessageChannel + 1) % 16;
             break;
 
           case 2: // Data byte 1
+            // Wrap around 0-127
             m_newMessageDataByte1 = (m_newMessageDataByte1 + 1) % 128;
             break;
 
           case 3: // Data Byte 2
+            // Wrap around 0-127
             m_newMessageDataByte2 = (m_newMessageDataByte2 + 1) % 128;
             break;
 
@@ -172,8 +182,14 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
       }
       else {
         // Navigate up through fields if not in edit mode
-        if (m_selectedIndex > 0) m_selectedIndex--;
-        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) m_selectedIndex--;
+        if (m_selectedIndex > 0) {
+          m_selectedIndex--;
+        }
+
+        // Skip second data byte line if the message doesn't have one
+        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) {
+          m_selectedIndex--;
+        }
       }
       break;
 
@@ -183,8 +199,12 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
         switch (m_selectedIndex)
         {
           case 0: // Type
+            // Decrement by 0x10 and wrap around
             m_newMessageType = (m_newMessageType - 0x10) & 0xF0;
-            if (m_newMessageType < 0xB0) m_newMessageType = 0xC0;
+            if (m_newMessageType < 0xB0) {
+              m_newMessageType = 0xC0;
+            }
+            // No second data byte for message type PC
             if (m_newMessageType == 0xC0) {
               m_NewMessageHasDataByte2 = false;
             }
@@ -194,14 +214,17 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
             break;
 
           case 1: // Channel
+            // Wrap around 0-15
             m_newMessageChannel = (m_newMessageChannel - 1) % 16;
             break;
 
           case 2: // Data byte 1
+            // Wrap around 0-127
             m_newMessageDataByte1 = (m_newMessageDataByte1 - 1) % 128;
             break;
 
           case 3: // Data Byte 2
+            // Wrap around 0-127
             m_newMessageDataByte2 = (m_newMessageDataByte2 - 1) % 128;
             break;
 
@@ -211,15 +234,23 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
       }
       else {
         // Navigate up through fields if not in edit mode
-        if (m_selectedIndex < 5) m_selectedIndex++;
-        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) m_selectedIndex++;
+        if (m_selectedIndex < 5) {
+          m_selectedIndex++;
+        }
+
+        // Skip second data byte line if the message doesn't have one
+        if (m_selectedIndex == 3 && !m_NewMessageHasDataByte2) {
+          m_selectedIndex++;
+        }
       }
       break;
 
     case MenuInputAction::kPress:
+      // Toggle field edit mode when working with messages
       if (m_selectedIndex < m_messagesCount) {
         m_fieldEditMode = !m_fieldEditMode;
       }
+      // Cancel of delete if adding or editing a message
       else if (m_selectedIndex == m_messagesCount) {
         if (m_messageEditMode) {
           m_deleteRequested = true;
@@ -228,6 +259,7 @@ void MidiMessageEditMenu::handleInput(MenuInputAction t_action) {
           m_cancelRequested = true;
         }
       }
+      // Add or save if adding or editing a message
       else if (m_selectedIndex > m_messagesCount) {
         if (m_messageEditMode) {
           m_saveRequested = true;
