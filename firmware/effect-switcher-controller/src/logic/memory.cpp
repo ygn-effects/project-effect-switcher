@@ -4,6 +4,10 @@ uint16_t MemoryManager::calculatePresetAddress(uint8_t t_bank, uint8_t t_presetI
   return c_banksStartAddress + (t_bank * c_presetsPerBank + t_presetIndex) * c_presetSize;
 }
 
+uint16_t MemoryManager::calculateFootSwitchConfigAddress(uint8_t t_bank, uint8_t t_footSwitchIndex) const {
+  return c_footSwitchConfigStartAddress + (t_bank * c_footSwitchConfigPerBank + t_footSwitchIndex) * c_footSwitchConfigSize;
+}
+
 void MemoryManager::serializePreset(const Preset& t_preset, uint8_t* t_buffer) const {
   // Basic preset data
   t_buffer[0] = t_preset.getBank();
@@ -60,6 +64,34 @@ void MemoryManager::deserializePreset(const uint8_t* t_buffer, Preset& t_preset)
   }
 }
 
+void MemoryManager::serializeFootSwitchConfig(const FootSwitchConfig& t_config, uint8_t* t_buffer) const {
+  t_buffer[0] = uint8_t(t_config.getMode());
+  t_buffer[1] = t_config.getLatching();
+  t_buffer[2] = t_config.getLoopIndex();
+  t_buffer[3] = t_config.getTargetBank();
+  t_buffer[4] = t_config.getTargetPreset();
+
+  for (uint8_t i = 0 ; i < 2; i++) {
+    uint8_t baseIndex = 5 + i * 3;
+    t_buffer[baseIndex] = t_config.getMidiMessageType(i);
+    t_buffer[baseIndex + 1] = t_config.getMidiMessageDataByte1(i);
+    t_buffer[baseIndex + 2] = t_config.getMidiMessageDataByte2(i);
+  }
+}
+
+void MemoryManager::deserializeFootSwitchConfig(const uint8_t* t_buffer, FootSwitchConfig& t_config) const {
+  t_config.setMode(static_cast<FootSwitchMode>(t_buffer[0]));
+  t_config.setLatching(t_buffer[1]);
+  t_config.setLoopIndex(t_buffer[2]);
+  t_config.setTargetBank(t_buffer[3]);
+  t_config.setTargetPreset(t_buffer[4]);
+
+  for (uint8_t i = 0; i < 2; i++) {
+    uint8_t baseIndex = 5 + i * 3;
+    t_config.setMidiMessage(i, t_buffer[baseIndex], t_buffer[baseIndex + 1], t_buffer[baseIndex + 2]);
+  }
+}
+
 void MemoryManager::saveDeviceState(uint8_t t_bank, uint8_t t_preset) {
   eeprom.writeInt8(c_deviceStateAddress, t_bank);
   eeprom.writeInt8(c_deviceStateAddress + 1, t_preset);
@@ -92,10 +124,32 @@ uint16_t address = calculatePresetAddress(t_bank, t_presetIndex);
   deserializePreset(buffer, t_preset);
 }
 
+void MemoryManager::saveFootSwitchConfig(uint8_t t_bank, uint8_t t_footSwitchIndex, const FootSwitchConfig& t_config) {
+  uint16_t address = calculateFootSwitchConfigAddress(t_bank, t_footSwitchIndex);
+  uint8_t buffer[c_footSwitchConfigSize];
+
+  serializeFootSwitchConfig(t_config, buffer);
+
+  for (uint8_t i = 0; i < c_footSwitchConfigSize; i++) {
+    eeprom.writeInt8(address + i, buffer[i]);
+  }
+}
+
+void MemoryManager::loadFootSwitchConfig(uint8_t t_bank, uint8_t t_footSwitchIndex, FootSwitchConfig& t_config) {
+  uint16_t address = calculateFootSwitchConfigAddress(t_bank, t_footSwitchIndex);
+  uint8_t buffer[c_footSwitchConfigSize];
+
+  for (uint8_t i = 0; i < c_footSwitchConfigSize; i++) {
+    buffer[i] = eeprom.readInt8(address + i);
+  }
+
+  deserializeFootSwitchConfig(buffer, t_config);
+}
+
 /// Test functions
 
 void MemoryManager::initializeTestData() {
-  // Loop through 16 banks
+  // Loop through 4 banks
   for (uint8_t bank = 0; bank < 4; bank++) {
     // Loop through 4 presets per bank
     for (uint8_t presetIndex = 0; presetIndex < 4; presetIndex++) {
@@ -109,22 +163,62 @@ void MemoryManager::initializeTestData() {
         testPreset.setLoopReturn(loopIndex, loopIndex * 3);   // Example return values
       }
 
-      for (uint8_t midiIndex = 0; midiIndex < 1; midiIndex ++){
-        testPreset.setMidiMessageStatusByte(midiIndex, 0xB0 | 0x1); // CC message channel 1
-        testPreset.setMidiMessageDataByte1(midiIndex, 32);
-        testPreset.setMidiMessageDataByte2(midiIndex, 64);
-      }
+      // Set a test MIDI message
+      testPreset.setMidiMessageStatusByte(0, 0xB0 | 0x1); // CC message channel 1
+      testPreset.setMidiMessageDataByte1(0, 32);
+      testPreset.setMidiMessageDataByte2(0, 64);
 
       // Save initialized preset to EEPROM
       savePreset(bank, presetIndex, testPreset);
     }
+
+    // Configure 6 footswitches per bank
+    for (uint8_t footSwitchIndex = 0; footSwitchIndex < 6; footSwitchIndex++) {
+      FootSwitchConfig footSwitchConfig(FootSwitchMode::kNone);
+
+      switch (footSwitchIndex) {
+        case 0: // Bank select 0
+          footSwitchConfig.setMode(FootSwitchMode::kBankSelect);
+          footSwitchConfig.setTargetBank(0);
+          break;
+
+        case 1: // Bank select 1
+          footSwitchConfig.setMode(FootSwitchMode::kBankSelect);
+          footSwitchConfig.setTargetBank(1);
+          break;
+
+        case 2: // Preset select 0
+          footSwitchConfig.setMode(FootSwitchMode::kPresetSelect);
+          footSwitchConfig.setTargetPreset(0);
+          break;
+
+        case 3: // Preset select 1
+          footSwitchConfig.setMode(FootSwitchMode::kPresetSelect);
+          footSwitchConfig.setTargetPreset(1);
+          break;
+
+        case 4: // Preset select 2
+          footSwitchConfig.setMode(FootSwitchMode::kPresetSelect);
+          footSwitchConfig.setTargetPreset(2);
+          break;
+
+        case 5: // Preset select 3
+          footSwitchConfig.setMode(FootSwitchMode::kPresetSelect);
+          footSwitchConfig.setTargetPreset(3);
+          break;
+      }
+
+      // Save footswitch configuration to EEPROM
+      saveFootSwitchConfig(bank, footSwitchIndex, footSwitchConfig);
+    }
   }
 
-  saveDeviceState(1, 0);
+  saveDeviceState(1, 0); // Set initial device state
 }
 
+
 void MemoryManager::readTestData() {
-  // Loop through 16 banks
+  // Loop through 4 banks
   for (uint8_t bank = 0; bank < 4; bank++) {
     LOG_DEBUG("Reading Bank %d:", bank);
 
@@ -156,6 +250,29 @@ void MemoryManager::readTestData() {
         LOG_DEBUG("      Data Byte 2: %d", testPreset.getMidiMessageDataByte2(midiIndex));
       }
     }
+
+    // Log footswitch configurations for each bank
+    for (uint8_t footSwitchIndex = 0; footSwitchIndex < 6; footSwitchIndex++) {
+      FootSwitchConfig footSwitchConfig(FootSwitchMode::kNone);
+
+      // Load footswitch configuration from EEPROM
+      loadFootSwitchConfig(bank, footSwitchIndex, footSwitchConfig);
+
+      LOG_DEBUG("  Footswitch %d:", footSwitchIndex);
+      LOG_DEBUG("    Mode: %d", static_cast<uint8_t>(footSwitchConfig.getMode()));
+      LOG_DEBUG("    Latching: %d", footSwitchConfig.getLatching());
+      LOG_DEBUG("    Loop Index: %d", footSwitchConfig.getLoopIndex());
+      LOG_DEBUG("    Target Bank: %d", footSwitchConfig.getTargetBank());
+      LOG_DEBUG("    Target Preset: %d", footSwitchConfig.getTargetPreset());
+
+      for (uint8_t i = 0; i < 2; i++) {
+        LOG_DEBUG("    MIDI Message %d:", i);
+        LOG_DEBUG("      Type: 0x%X", footSwitchConfig.getMidiMessageType(i));
+        LOG_DEBUG("      Channel: %d", footSwitchConfig.getMidiMessageChannel(i));
+        LOG_DEBUG("      Data Byte 1: %d", footSwitchConfig.getMidiMessageDataByte1(i));
+        LOG_DEBUG("      Data Byte 2: %d", footSwitchConfig.getMidiMessageDataByte2(i));
+      }
+    }
   }
 
   uint8_t lastBank = 0;
@@ -164,4 +281,3 @@ void MemoryManager::readTestData() {
 
   LOG_DEBUG("Last bank: %d, Last preset: %d", lastBank, lastPreset);
 }
-
