@@ -393,7 +393,12 @@ void Display::renderMidiMessageEdit(const char** t_fields, uint8_t* t_values, ui
 
   // Print the save button underneath the cancel button
   m_ssd1306.setCursor(c_newTab, m_headerOffset + m_newLine + (5 * m_newLine));
-  m_ssd1306.print("Save");
+  if (t_messageEditMode) {
+    m_ssd1306.print("Save"); // Edit mode
+  }
+  else {
+    m_ssd1306.print("Add"); // Add mode
+  }
 
   // Print the cursor in front of the button if it is selected
   if (t_selectedField == 5) {
