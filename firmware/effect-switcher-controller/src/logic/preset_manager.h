@@ -3,9 +3,11 @@
 #include <Arduino.h>
 #include "logic/preset.h"
 #include "logic/memory.h"
+#include "logic/footswitch.h"
 
-constexpr uint8_t c_maxPresetBanks = 16;
+constexpr uint8_t c_maxPresetBanks = 4;
 constexpr uint8_t c_maxPresetsPerBank = 4;
+constexpr uint8_t c_maxFootSwitchesConfigPerBank = 6;
 
 /// @brief Interface between the HAL and the presets to
 /// securely handle banks and presets switching operations
@@ -19,6 +21,8 @@ class PresetManager {
 
     Preset m_presetBanks[c_maxPresetsPerBank];
     Preset* p_currentPreset;
+
+    FootSwitchConfig m_footSwitches[c_maxFootSwitchesConfigPerBank];
 
     void loadPresetBank(uint8_t t_bank);
 
@@ -79,4 +83,10 @@ class PresetManager {
     void setMidiMessageValues(uint8_t t_message, uint8_t t_type, uint8_t t_channel, uint8_t t_byte1, uint8_t t_byte2, bool t_hasDataByte2 = true);
 
     void removeMidiMessage(uint8_t t_message);
+
+    FootSwitchMode getFootSwitchMode(uint8_t t_footSwitch) const;
+
+    uint8_t getFootSwitchTargetBank(uint8_t t_footSwitch) const;
+
+    uint8_t getFootSwitchTargetPreset(uint8_t t_footSwitch) const;
 };

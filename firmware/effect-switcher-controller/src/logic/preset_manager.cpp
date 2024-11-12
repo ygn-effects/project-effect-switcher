@@ -1,8 +1,13 @@
 #include "logic/preset_manager.h"
 
 void PresetManager::loadPresetBank(uint8_t t_bank) {
+  // Load presets
   for (uint8_t i = 0; i < c_maxPresetsPerBank; i++) {
     m_memoryManager.loadPreset(t_bank, i, m_presetBanks[i]);
+  }
+  // Load footswitches
+  for (uint8_t i = 0; i < c_maxFootSwitchesConfigPerBank; i++) {
+    m_memoryManager.loadFootSwitchConfig(t_bank, i, m_footSwitches[i]);
   }
 }
 
@@ -111,4 +116,16 @@ void PresetManager::setMidiMessageValues(uint8_t t_message, uint8_t t_type, uint
 
 void PresetManager::removeMidiMessage(uint8_t t_message) {
   p_currentPreset->removeMidiMessage(t_message);
+}
+
+FootSwitchMode PresetManager::getFootSwitchMode(uint8_t t_footSwitch) const {
+  return m_footSwitches[t_footSwitch].getMode();
+}
+
+uint8_t PresetManager::getFootSwitchTargetBank(uint8_t t_footSwitch) const {
+  return m_footSwitches[t_footSwitch].getTargetBank();
+}
+
+uint8_t PresetManager::getFootSwitchTargetPreset(uint8_t t_footSwitch) const {
+  return m_footSwitches[t_footSwitch].getTargetPreset();
 }
