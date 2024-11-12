@@ -9,12 +9,12 @@ MomentarySwitch menuEncoderSwitch(14, 1000);
 MomentarySwitch menuEditSwitch(11, 1000);
 Led menuEditSwitchLed(10);
 
-MomentarySwitch presetBankDownFsw(24, 1000);
-MomentarySwitch presetBankUpFsw(25, 1000);
-MomentarySwitch preset0Fsw(26);
-MomentarySwitch preset1Fsw(27);
-MomentarySwitch preset2Fsw(28);
-MomentarySwitch preset3Fsw(29);
+MomentarySwitch footSwitch0(24, 1000);
+MomentarySwitch footSwitch1(25, 1000);
+MomentarySwitch footSwitch2(26);
+MomentarySwitch footSwitch3(27);
+MomentarySwitch footSwitch4(28);
+MomentarySwitch footSwitch5(29);
 
 // LedDriver16 presetLed(1);
 
@@ -64,12 +64,58 @@ void Hardware::pollMenuEditSwitch() {
 }
 
 void Hardware::pollFootSwitches() {
-  pollSwitch(presetBankUpFsw, m_presetBankUpFswPress, m_presetBankDownFswLongPress);
-  pollSwitch(presetBankDownFsw, m_presetBankDownFswPress, m_presetBankDownFswLongPress);
-  pollSwitch(preset0Fsw, m_preset0FswPress);
-  pollSwitch(preset1Fsw, m_preset1FswPress);
-  pollSwitch(preset2Fsw, m_preset2FswPress);
-  pollSwitch(preset3Fsw, m_preset3FswPress);
+  pollSwitch(footSwitch0, m_footSwitch0Press, m_footSwitch0LongPress);
+  pollSwitch(footSwitch1, m_footSwitch1Press, m_footSwitch1LongPress);
+  pollSwitch(footSwitch2, m_footSwitch2Press, m_footSwitch2LongPress);
+  pollSwitch(footSwitch3, m_footSwitch3Press, m_footSwitch3LongPress);
+  pollSwitch(footSwitch4, m_footSwitch4Press, m_footSwitch4LongPress);
+  pollSwitch(footSwitch5, m_footSwitch5Press, m_footSwitch5LongPress);
+}
+
+void Hardware::processFootSwitchAction(uint8_t t_footSwitch, bool t_longPress) {
+  if (t_longPress) {
+
+  }
+  else {
+    switch (presetManager.getFootSwitchMode(t_footSwitch))
+    {
+      case FootSwitchMode::kNone:
+        break;
+
+      case FootSwitchMode::kToggleLoop:
+        break;
+
+      case FootSwitchMode::kSendMidiMessage:
+        break;
+
+      case FootSwitchMode::kBankSelect:
+        if (presetManager.getFootSwitchTargetBank(t_footSwitch) == 1) {
+          // Up
+          presetManager.setPresetBankUp();
+          homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+          menuManager.update();
+        }
+        else {
+          // Down
+          presetManager.setPresetBankDown();
+          homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+          menuManager.update();
+        }
+        break;
+
+      case FootSwitchMode::kPresetSelect:
+        presetManager.setCurrentPreset(presetManager.getFootSwitchTargetPreset(t_footSwitch));
+        homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
+        menuManager.update();
+        break;
+
+      case FootSwitchMode::kMute:
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 void Hardware::transitionToState(SystemState t_newState) {
@@ -141,40 +187,28 @@ void Hardware::processMenuInput() {
 }
 
 void Hardware::processPresetState() {
-  if (m_presetBankUpFswPress) {
-    presetManager.setPresetBankUp();
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch0Press) {
+    processFootSwitchAction(0);
   }
 
-  if (m_presetBankDownFswPress) {
-    presetManager.setPresetBankDown();
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch1Press) {
+    processFootSwitchAction(1);
   }
 
-  if (m_preset0FswPress) {
-    presetManager.setCurrentPreset(0);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch2Press) {
+    processFootSwitchAction(2);
   }
 
-  if (m_preset1FswPress) {
-    presetManager.setCurrentPreset(1);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch3Press) {
+    processFootSwitchAction(3);
   }
 
-  if (m_preset2FswPress) {
-    presetManager.setCurrentPreset(2);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch4Press) {
+    processFootSwitchAction(4);
   }
 
-  if (m_preset3FswPress) {
-    presetManager.setCurrentPreset(3);
-    homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    menuManager.update();
+  if (m_footSwitch5Press) {
+    processFootSwitchAction(5);
   }
 
   if (m_menuEditSwitchPress) {
@@ -297,12 +331,12 @@ void Hardware::setup() {
   menuEncoderSwitch.setup();
   menuEditSwitch.setup();
   menuEditSwitchLed.setup();
-  presetBankUpFsw.setup();
-  presetBankDownFsw.setup();
-  preset0Fsw.setup();
-  preset1Fsw.setup();
-  preset2Fsw.setup();
-  preset3Fsw.setup();
+  footSwitch0.setup();
+  footSwitch1.setup();
+  footSwitch2.setup();
+  footSwitch3.setup();
+  footSwitch4.setup();
+  footSwitch5.setup();
   // presetLed.setup();
   // matrix.switchMatrixSetup();
   menuManager.setMenu(&homeMenu);
@@ -318,12 +352,12 @@ void Hardware::startup() {
   menuEncoderSwitch.poll();
   menuEncoder.poll();
   menuEditSwitch.poll();
-  presetBankUpFsw.poll();
-  presetBankDownFsw.poll();
-  preset0Fsw.poll();
-  preset1Fsw.poll();
-  preset2Fsw.poll();
-  preset3Fsw.poll();
+  footSwitch0.poll();
+  footSwitch1.poll();
+  footSwitch2.poll();
+  footSwitch3.poll();
+  footSwitch4.poll();
+  footSwitch5.poll();
 
   // Careful
   //  memoryManager.readTestData();
@@ -393,23 +427,27 @@ void Hardware::resetTriggers()
   m_menuEncoderSwitchLongPress = false;
   m_menuEditSwitchPress = false;
   m_menuEncoderSwitchLongPress = false;
-  m_presetBankUpFswPress = false;
-  m_presetBankUpFswLongPress = false;
-  m_presetBankDownFswPress = false;
-  m_presetBankDownFswLongPress = false;
-  m_preset0FswPress = false;
-  m_preset1FswPress = false;
-  m_preset2FswPress = false;
-  m_preset3FswPress = false;
+  m_footSwitch0Press = false;
+  m_footSwitch0LongPress = false;
+  m_footSwitch1Press = false;
+  m_footSwitch1LongPress = false;
+  m_footSwitch2Press = false;
+  m_footSwitch2LongPress = false;
+  m_footSwitch3Press = false;
+  m_footSwitch3LongPress = false;
+  m_footSwitch4Press = false;
+  m_footSwitch4LongPress = false;
+  m_footSwitch5Press = false;
+  m_footSwitch5LongPress = false;
 
   // Reset the internal state flags of the switches
   menuEncoderSwitch.reset();
   menuEditSwitch.reset();
-  presetBankUpFsw.reset();
-  presetBankDownFsw.reset();
-  preset0Fsw.reset();
-  preset1Fsw.reset();
-  preset2Fsw.reset();
-  preset3Fsw.reset();
+  footSwitch0.reset();
+  footSwitch1.reset();
+  footSwitch2.reset();
+  footSwitch3.reset();
+  footSwitch4.reset();
+  footSwitch5.reset();
 }
 
