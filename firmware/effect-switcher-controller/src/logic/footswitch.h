@@ -22,6 +22,9 @@ class FootSwitchConfig {
     MidiMessage m_midiMessages[2];
 
   public:
+    FootSwitchConfig() :
+      m_mode(FootSwitchMode::kNone) { };
+
     FootSwitchConfig(FootSwitchMode t_mode) :
       m_mode(t_mode) { };
 
