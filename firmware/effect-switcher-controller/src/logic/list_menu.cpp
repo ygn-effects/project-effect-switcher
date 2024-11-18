@@ -4,6 +4,13 @@
 void ListMenu::update() {
   m_layoutManager->clear();
 
+  // Set header
+  m_layoutManager->setHeader("Settings");
+
+  // Set footer
+  const char* footItems[] = {"Back"};
+  m_layoutManager->setFooter(footItems, 1);
+
   // Visible Content Rows
   uint8_t endIndex = m_startIndex + m_visibleRowCount;
   if (endIndex > m_itemCount) {

@@ -32,7 +32,7 @@ class ListMenu : public MenuBase {
       m_selectedRow(0),
       m_selectedColumn(0),
       m_startIndex(0) {
-        m_visibleRowCount = m_displayManager->getMaxVisibleLines() - 2; // Head + Footer
+        m_visibleRowCount = m_displayManager->getMaxVisibleLines() - 2; // Account for the header
       };
 
     /// @brief Updates the display to render the menu, including the header and list of items.
