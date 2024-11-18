@@ -3,16 +3,14 @@
 
 Hardware hardware;
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
-  delay(500);
+  delay(1000);
   hardware.setup();
   hardware.startup();
 }
 
-void loop()
-{
+void loop() {
   hardware.poll();
   hardware.process();
   hardware.resetTriggers();
