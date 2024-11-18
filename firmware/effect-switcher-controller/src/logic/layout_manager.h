@@ -109,6 +109,11 @@ class DisplayManager {
       m_ssd1306.setCursor(t_x, t_y);
       m_ssd1306.write(t_text);
     }
+
+    void drawHeaderBackground() {
+      m_ssd1306.fillRect(0, 0, m_width, m_newLine, SSD1306_WHITE);
+      m_ssd1306.setTextColor(SSD1306_WHITE);
+    }
 };
 
 class LayoutManager {
@@ -134,6 +139,18 @@ class LayoutManager {
       for (uint8_t i = 0; i < c_maxRowsPerLayout; i++) {
         m_rows[i] = {};  // Reset to default values
       }
+    }
+
+    void renderHeader() {
+      if (m_header.columnsCount > 0) {
+        m_display->drawHeaderBackground();
+        uint8_t xPosition = (m_screenWidth - m_display->calcTextWidth(m_header.columns[0].text)) / 2;
+        m_display->printItem(m_header.columns[0].text, xPosition, 0);
+      }
+    }
+
+    void renderFooter() {
+
     }
 
   public:
@@ -162,9 +179,20 @@ class LayoutManager {
       m_activeColumn = t_column;
     }
 
-    void addHeader(Row& t_header);
+    void setHeader(const char* t_title) {
+      m_header.alignment = Row::kCenter;
+      m_header.columnsCount = 1;
+      m_header.columns[0] = { Column::kLabel, Column::kNormal, t_title, 0, 0 };
+    }
 
-    void addFooter(Row& t_footer);
+    void setFooter(const char* t_items[], uint8_t t_itemsCount) {
+      m_footer.alignment = Row::kCenter;
+      m_footer.columnsCount = t_itemsCount;
+
+      for (uint8_t i = 0; i < t_itemsCount; i++) {
+        m_footer.columns[i] = { Column::kLabel, Column::kNormal, t_items[i], 0, 0 };
+      }
+    }
 
     void addRow(Row& t_row) {
       m_rows[m_rowsCount] = t_row;
@@ -175,6 +203,8 @@ class LayoutManager {
       // Get formatting values
       uint8_t newLine = m_display->getNewLine();
       uint8_t newTab = m_display->getNewTab();
+
+      renderHeader();
 
       // Determine the number of visible rows
       uint8_t endIndex = m_contentStartIndex + m_visibleRowsCount;
