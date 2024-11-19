@@ -47,8 +47,9 @@ class LayoutManager {
     uint8_t m_visibleRowsCount;
     uint8_t m_contentStartIndex;
 
-    uint8_t m_activeRow;
-    uint8_t m_activeColumn;
+    uint8_t m_activeRow = 0;
+    uint8_t m_activeColumn = 0;
+    bool isFooterActive = false;
 
     Row m_rows[c_maxRowsPerLayout];
     Row m_header;

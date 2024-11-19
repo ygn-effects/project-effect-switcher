@@ -64,7 +64,20 @@ void LayoutManager::renderHeader() {
 }
 
 void LayoutManager::renderFooter() {
+  uint8_t totalRawWidth = calculateTotalRowWidth(m_footer);
+  uint8_t xPosition = calculateStartingX(m_footer, totalRawWidth, 0);
+  uint8_t yPosition = m_display->getHeight() - m_display->getNewLine();
 
+  for (uint8_t i = 0; i < m_footer.columnsCount; i++) {
+    Column& column = m_footer.columns[i];
+
+    if (isFooterActive && m_activeColumn == i) {
+      m_display->printItem(">", xPosition - m_display->getNewTab(), yPosition);
+    }
+
+    m_display->printItem(column.text, xPosition, yPosition);
+    xPosition += m_display->calcTextWidth(column.text) + m_display->getNewTab();
+  }
 }
 
 uint8_t LayoutManager::getVisibleRowsCount() {
