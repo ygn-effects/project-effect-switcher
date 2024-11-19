@@ -34,6 +34,10 @@ uint8_t DisplayManager::getWidth() {
   return m_width;
 }
 
+uint8_t DisplayManager::getHeight() {
+  return m_height;
+}
+
 uint8_t DisplayManager::getNewLine() {
   return m_newLine;
 }

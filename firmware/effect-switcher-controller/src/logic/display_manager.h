@@ -35,6 +35,8 @@ class DisplayManager {
 
     uint8_t getWidth();
 
+    uint8_t getHeight();
+
     uint8_t getNewLine();
 
     uint8_t getNewTab();
