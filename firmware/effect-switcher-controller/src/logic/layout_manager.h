@@ -56,6 +56,12 @@ class LayoutManager {
 
     void clearRows();
 
+    uint8_t calculateTotalRowWidth(Row& t_row);
+
+    uint8_t calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap);
+
+    void renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap = 0);
+
     void renderHeader();
 
     void renderFooter();

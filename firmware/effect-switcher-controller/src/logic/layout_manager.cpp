@@ -8,6 +8,53 @@ void LayoutManager::clearRows() {
   }
 }
 
+uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
+  uint8_t totalRowWidth = 0;
+  for (uint8_t j = 0; j < row.columnsCount; j++) {
+    totalRowWidth += m_display->calcTextWidth(row.columns[j].text) + m_display->getNewTab();
+  }
+
+  return totalRowWidth;
+}
+
+uint8_t LayoutManager::calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap) {
+  switch (row.alignment) {
+    case Row::kCenter:
+      return (m_screenWidth - totalRowWidth) / 2;
+    case Row::kRight:
+      return m_screenWidth - totalRowWidth;
+    case Row::kLeft:
+      return m_display->getNewTab();
+    case Row::kJustify:
+      // Justify alignment will have gaps calculated separately
+      return m_display->getNewTab();
+    default:
+      return 0;
+  }
+}
+
+void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap) {
+  for (uint8_t j = 0; j < row.columnsCount; j++) {
+    Column& column = row.columns[j];
+
+    // Print the cursor if this is the active row and column
+    if (rowIndex == m_activeRow && j == m_activeColumn) {
+      m_display->printItem(">", xPosition - newTab, yPosition);
+    }
+
+    // Print the column text
+    m_display->printItem(column.text, xPosition, yPosition);
+
+    // Update X position for the next column
+    xPosition += m_display->calcTextWidth(column.text) + newTab;
+
+    // Add gap for justify alignment
+    if (row.alignment == Row::kJustify && j < row.columnsCount - 1) {
+      xPosition += gap;
+    }
+  }
+}
+
 void LayoutManager::renderHeader() {
   if (m_header.columnsCount > 0) {
     m_display->drawInvertedLine(0);
@@ -57,76 +104,42 @@ void LayoutManager::addRow(Row& t_row) {
   m_rowsCount++;
 }
 
-void LayoutManager::render()  {
+void LayoutManager::render() {
   // Get formatting values
   uint8_t newLine = m_display->getNewLine();
   uint8_t newTab = m_display->getNewTab();
 
   renderHeader();
+  renderFooter();
 
-  // Determine the number of visible rows
+  // Determine visible rows
   uint8_t endIndex = m_contentStartIndex + m_visibleRowsCount;
   if (endIndex > m_rowsCount) {
-    endIndex = m_rowsCount;  // Avoid overflow
+    endIndex = m_rowsCount;
   }
 
-  // Render visible rows
+  // Render rows
   for (uint8_t i = m_contentStartIndex; i < endIndex; i++) {
-    // Get the current row
     Row& row = m_rows[i];
 
-    // Calculate Y position for the row and account for the header
+    // Calculate Y position
     uint8_t yPosition = (i - m_contentStartIndex) * newLine + newLine;
 
-    // Calculate total row width
-    uint8_t totalRowWidth = 0;
-    for (uint8_t j = 0; j < row.columnsCount; j++) {
-      totalRowWidth += m_display->calcTextWidth(row.columns[j].text) + newTab;
-    }
-
-    // Calculate spacing between columns for justify alignment
+    // Total row width and gap for justify alignment
+    uint8_t totalRowWidth = calculateTotalRowWidth(row);
     uint8_t gap = 0;
+
     if (row.alignment == Row::kJustify && row.columnsCount > 1) {
       uint8_t remainingSpace = m_screenWidth - totalRowWidth;
-      gap = remainingSpace / (row.columnsCount - 1);  // Distribute space evenly
+      gap = remainingSpace / (row.columnsCount - 1);
     }
 
-    // Set starting X position based on alignment
-    uint8_t xPosition = 0;
-    if (row.alignment == Row::kCenter) {
-      xPosition = (m_screenWidth - totalRowWidth) / 2;
-    }
-    else if (row.alignment == Row::kRight) {
-      xPosition = m_screenWidth - totalRowWidth;
-    }
-    else if (row.alignment == Row::kLeft || row.alignment == Row::kJustify) {
-      xPosition = newTab;
-    }
+    // Starting X position
+    uint8_t xPosition = calculateStartingX(row, totalRowWidth, gap);
 
-    // Render each column
-    for (uint8_t j = 0; j < row.columnsCount; j++) {
-      Column& column = row.columns[j];
-
-      // If this is the active row and column, print the cursor
-      if (i == m_activeRow && j == m_activeColumn) {
-        m_display->printItem(">", xPosition - newTab, yPosition); // Print cursor at the start of the row
-      }
-
-      // Print the column text
-      m_display->printItem(column.text, xPosition, yPosition);
-
-      // Update X position for the next column
-      xPosition += m_display->calcTextWidth(column.text) + newTab;
-
-      // Add gap if justified
-      if (row.alignment == Row::kJustify && j < row.columnsCount - 1) {
-        xPosition += gap;
-      } else {
-        xPosition += newTab;  // Default tab spacing
-      }
-    }
+    // Render the columns
+    renderColumns(row, xPosition, yPosition, newTab, gap);
   }
 
-  // Render the display
   m_display->render();
 }
