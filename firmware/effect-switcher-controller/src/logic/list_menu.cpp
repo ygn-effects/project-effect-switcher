@@ -30,8 +30,6 @@ void ListMenu::update() {
 
     m_rowCounts[rowIndex] = i;
     m_rowColumnCounts[rowIndex] = row.columnsCount;
-    LOG_DEBUG("Row index %d:", rowIndex);
-    LOG_DEBUG("Column count %d:", row.columnsCount);
     rowIndex++;
   }
 
@@ -56,6 +54,7 @@ void ListMenu::handleInput(MenuInputAction t_action) {
       if (!m_isFooterActive && m_selectedRow == m_itemCount - 1) {
         // Activate footer navigation when fully scrolled down
         m_isFooterActive = true;
+        m_layoutManager->setIsFooterActive(true);
         m_selectedColumn = 0; // Start at the first column of the footer
       } else if (m_isFooterActive) {
         // Handle footer navigation
@@ -89,6 +88,7 @@ void ListMenu::handleInput(MenuInputAction t_action) {
         } else {
           // Exit footer navigation and resume normal navigation
           m_isFooterActive = false;
+          m_layoutManager->setIsFooterActive(false);
           // Last row
           m_selectedRow = m_itemCount - 1;
           // Last column of the last row
