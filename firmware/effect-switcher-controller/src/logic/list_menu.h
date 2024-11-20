@@ -19,6 +19,8 @@ class ListMenu : public MenuBase {
     uint8_t m_rowCounts[c_maxRowsPerLayout];        // Array to track rows.
     uint8_t m_rowColumnCounts[c_maxRowsPerLayout];  // Array to track columns per row.
 
+    bool m_isFooterActive = false;
+    uint8_t m_footerColumnCount = 0;
 
   public:
     /// @brief Constructor to initialize ListMenu with display, items, and item count.

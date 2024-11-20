@@ -21,8 +21,9 @@ void ListMenu::update() {
   for (uint8_t i = m_startIndex; i < endIndex; i++) {
 
     Row row;
+    uint8_t m_footerColumnCount = 1;
     row.alignment = Row::kLeft;
-    row.columnsCount = 1;
+    row.columnsCount = m_footerColumnCount;
     row.columns[0] = { Column::kLabel, Column::kNormal, m_menuItems[i], 0, 0 };
 
     m_layoutManager->addRow(row);
@@ -52,20 +53,27 @@ void ListMenu::reset() {
 void ListMenu::handleInput(MenuInputAction t_action) {
   switch (t_action) {
     case MenuInputAction::kUp: {
-      LOG_DEBUG("UP");
-      if (m_selectedRow > 0) { // Check if we're not at the topmost row
-        if (m_selectedColumn == 0) {
-          // Move to the last column of the previous row
-          m_selectedRow--;
-          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1; // Last column of the new row
+      if (!m_isFooterActive && m_selectedRow == m_itemCount - 1) {
+        // Activate footer navigation when fully scrolled down
+        m_isFooterActive = true;
+        m_selectedColumn = 0; // Start at the first column of the footer
+      } else if (m_isFooterActive) {
+        // Handle footer navigation
+        if (m_selectedColumn < m_footerColumnCount - 1) {
+          m_selectedColumn++;
+        }
+      } else if (m_selectedRow < m_itemCount - 1) {
+        // Normal navigation (not in the footer)
+        if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
+          m_selectedRow++;
+          m_selectedColumn = 0;
         } else {
-          // Move left within the same row
-          m_selectedColumn--;
+          m_selectedColumn++;
         }
 
         // Scroll up if necessary
-        if (m_selectedRow < m_startIndex) {
-          m_startIndex--;
+        if (m_selectedRow >= m_startIndex + m_visibleRowCount) {
+          m_startIndex++;
         }
       }
       break;
@@ -73,20 +81,31 @@ void ListMenu::handleInput(MenuInputAction t_action) {
 
     case MenuInputAction::kDown: {
       LOG_DEBUG("DOWN");
-      if (m_selectedRow + m_startIndex < m_itemCount - 1) { // Check if we're not at the bottommost row
-        if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
-          // Move to the first column of the next row
-          m_selectedRow++;
-          m_selectedColumn = 0; // First column of the new row
+      if (m_isFooterActive) {
+        // Handle navigation in the footer
+        if (m_selectedColumn > 0) {
+          // Scroll down the available columns
+          m_selectedColumn--;
         } else {
-          // Move right within the same row
-          m_selectedColumn++;
+          // Exit footer navigation and resume normal navigation
+          m_isFooterActive = false;
+          // Last row
+          m_selectedRow = m_itemCount - 1;
+          // Last column of the last row
+          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+        }
+      } else if (m_selectedRow > 0) {
+        // Normal navigation (not in the footer)
+        if (m_selectedColumn == 0) {
+          m_selectedRow--;
+          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+        } else {
+          m_selectedColumn--;
         }
 
         // Scroll down if necessary
-        if (m_selectedRow >= m_startIndex + m_visibleRowCount) {
-          m_startIndex++;
-          m_selectedRow = m_visibleRowCount - 1;
+        if (m_selectedRow < m_startIndex) {
+          m_startIndex--;
         }
       }
       break;
