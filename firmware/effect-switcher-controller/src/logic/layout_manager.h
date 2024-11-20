@@ -88,6 +88,8 @@ class LayoutManager {
 
     void setActiveColumn(uint8_t t_column);
 
+    void setIsFooterActive(bool t_active);
+
     void setHeader(const char* t_title);
 
     void setFooter(const char* t_items[], uint8_t t_itemsCount);

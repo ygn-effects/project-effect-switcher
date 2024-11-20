@@ -38,7 +38,7 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
     Column& column = row.columns[j];
 
     // Print the cursor if this is the active row and column
-    if (rowIndex == m_activeRow && j == m_activeColumn) {
+    if (rowIndex == m_activeRow && j == m_activeColumn && !m_isFooterActive) {
       m_display->printItem(">", xPosition - newTab, yPosition);
     }
 
@@ -95,6 +95,10 @@ void LayoutManager::setActiveRow(uint8_t t_row) {
 
 void LayoutManager::setActiveColumn(uint8_t t_column) {
   m_activeColumn = t_column;
+}
+
+void LayoutManager::setIsFooterActive(bool t_active) {
+  m_isFooterActive = t_active;
 }
 
 void LayoutManager::setHeader(const char* t_title) {
