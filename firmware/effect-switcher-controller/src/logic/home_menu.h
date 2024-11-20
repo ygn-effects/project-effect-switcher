@@ -13,8 +13,8 @@ class HomeMenu : public MenuBase {
     /// @brief Constructor for HomeMenu
     /// @param t_display Pointer to the display driver
     /// @param t_currentPreset Pointer to the current preset
-    HomeMenu(Display* t_display, const Preset* t_currentPreset) :
-      MenuBase(t_display),
+    HomeMenu(DisplayManager* t_display, LayoutManager* t_layout, const Preset* t_currentPreset) :
+      MenuBase(t_display, t_layout),
       m_currentPreset(t_currentPreset) { };
 
     /// @brief Update the home menu (render the current bank and preset)
