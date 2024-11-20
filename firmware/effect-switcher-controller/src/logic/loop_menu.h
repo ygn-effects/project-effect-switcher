@@ -16,8 +16,8 @@ class LoopOrderMenu : public MenuBase {
     bool m_goBackRequested;
 
   public:
-    LoopOrderMenu(Display* t_display, Preset* t_currentPreset) :
-      MenuBase(t_display),
+    LoopOrderMenu(DisplayManager* t_display, LayoutManager* t_layout, Preset* t_currentPreset) :
+      MenuBase(t_display, t_layout),
       m_currentPreset(t_currentPreset),
       m_selectedLoop(0),
       m_targetLoop(0),
