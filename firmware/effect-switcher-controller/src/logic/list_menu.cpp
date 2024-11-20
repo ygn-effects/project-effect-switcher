@@ -17,8 +17,8 @@ void ListMenu::update() {
     endIndex = m_itemCount;
   }
 
+  uint8_t rowIndex = 0;
   for (uint8_t i = m_startIndex; i < endIndex; i++) {
-    uint8_t rowIndex = 0;
 
     Row row;
     row.alignment = Row::kLeft;
@@ -29,6 +29,8 @@ void ListMenu::update() {
 
     m_rowCounts[rowIndex] = i;
     m_rowColumnCounts[rowIndex] = row.columnsCount;
+    LOG_DEBUG("Row index %d:", rowIndex);
+    LOG_DEBUG("Column count %d:", row.columnsCount);
     rowIndex++;
   }
 
@@ -50,40 +52,41 @@ void ListMenu::reset() {
 void ListMenu::handleInput(MenuInputAction t_action) {
   switch (t_action) {
     case MenuInputAction::kUp: {
-      if (m_selectedRow > 0) {
-        if (m_selectedRow == m_startIndex) {
-          // Scroll up when the selected row is at the top of the visible area
-          m_startIndex--;
-        } else {
-          // Move the selection up within the visible rows
+      LOG_DEBUG("UP");
+      if (m_selectedRow > 0) { // Check if we're not at the topmost row
+        if (m_selectedColumn == 0) {
+          // Move to the last column of the previous row
           m_selectedRow--;
+          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1; // Last column of the new row
+        } else {
+          // Move left within the same row
+          m_selectedColumn--;
         }
 
-        // Ensure the selected column is within bounds for the new row
-        if (m_rowColumnCounts[m_selectedRow] == 0) {
-          m_selectedColumn = 0;
-        } else if (m_selectedColumn >= m_rowColumnCounts[m_selectedRow]) {
-          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+        // Scroll up if necessary
+        if (m_selectedRow < m_startIndex) {
+          m_startIndex--;
         }
       }
       break;
     }
 
     case MenuInputAction::kDown: {
-      if (m_selectedRow < m_itemCount - 1) {
-        if (m_selectedRow == m_startIndex + m_visibleRowCount - 1) {
-          // Scroll down when the selected row is at the bottom of the visible area
-          m_startIndex++;
-        } else if (m_selectedRow + m_startIndex < m_itemCount - 1) {
-          // Move the selection down within the visible rows
+      LOG_DEBUG("DOWN");
+      if (m_selectedRow + m_startIndex < m_itemCount - 1) { // Check if we're not at the bottommost row
+        if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
+          // Move to the first column of the next row
           m_selectedRow++;
+          m_selectedColumn = 0; // First column of the new row
+        } else {
+          // Move right within the same row
+          m_selectedColumn++;
         }
 
-        // Ensure the selected column is within bounds for the new row
-        if (m_rowColumnCounts[m_selectedRow] == 0) {
-          m_selectedColumn = 0;
-        } else if (m_selectedColumn >= m_rowColumnCounts[m_selectedRow]) {
-          m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+        // Scroll down if necessary
+        if (m_selectedRow >= m_startIndex + m_visibleRowCount) {
+          m_startIndex++;
+          m_selectedRow = m_visibleRowCount - 1;
         }
       }
       break;
@@ -97,6 +100,7 @@ void ListMenu::handleInput(MenuInputAction t_action) {
       break;
   }
 }
+
 
 uint8_t ListMenu::getSelectedIndex() {
   return m_startIndex + m_selectedRow;
