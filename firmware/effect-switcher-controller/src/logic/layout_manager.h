@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "display_manager.h"
+#include "utils/logging.h"
 
 constexpr uint8_t c_maxRowsPerLayout = 20;
 constexpr uint8_t c_maxColumnsPerLine = 4;
@@ -49,7 +50,7 @@ class LayoutManager {
 
     uint8_t m_activeRow = 0;
     uint8_t m_activeColumn = 0;
-    bool isFooterActive = false;
+    bool m_isFooterActive = false;
 
     Row m_rows[c_maxRowsPerLayout];
     Row m_header;

@@ -71,7 +71,7 @@ void LayoutManager::renderFooter() {
   for (uint8_t i = 0; i < m_footer.columnsCount; i++) {
     Column& column = m_footer.columns[i];
 
-    if (isFooterActive && m_activeColumn == i) {
+    if (m_isFooterActive && m_activeColumn == i) {
       m_display->printItem(">", xPosition - m_display->getNewTab(), yPosition);
     }
 
@@ -151,7 +151,7 @@ void LayoutManager::render() {
     uint8_t xPosition = calculateStartingX(row, totalRowWidth, gap);
 
     // Render the columns
-    renderColumns(row, xPosition, yPosition, newTab, gap);
+    renderColumns(row, i, xPosition, yPosition, newTab, gap);
   }
 
   m_display->render();
