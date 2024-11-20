@@ -21,8 +21,8 @@ class MidiMessageMenu : public MenuBase {
     /// @brief Constructor to initialize the MIDI message menu with a display and preset.
     /// @param t_display Pointer to the Display object for rendering.
     /// @param t_currentPreset Pointer to the current Preset containing MIDI messages.
-    MidiMessageMenu(Display* t_display, Preset* t_currentPreset) :
-      MenuBase(t_display),
+    MidiMessageMenu(DisplayManager* t_display, LayoutManager* t_layout, Preset* t_currentPreset) :
+      MenuBase(t_display, t_layout),
       m_currentPreset(t_currentPreset),
       m_selectedIndex(0),
       m_startIndex(0),
@@ -91,8 +91,8 @@ class MidiMessageEditMenu : public MenuBase {
     /// @param t_display Pointer to the Display object.
     /// @param t_currentPreset Pointer to the current Preset.
     /// @param t_midiMessageIndex Index of the MIDI message to edit.
-    MidiMessageEditMenu(Display* t_display, Preset* t_currentPreset, uint8_t t_midiMessageIndex) :
-      MenuBase(t_display),
+    MidiMessageEditMenu(DisplayManager* t_display, LayoutManager* t_layout, Preset* t_currentPreset, uint8_t t_midiMessageIndex) :
+      MenuBase(t_display, t_layout),
       m_currentPreset(t_currentPreset),
       m_midiMessageIndex(t_midiMessageIndex),
       m_selectedIndex(0),
