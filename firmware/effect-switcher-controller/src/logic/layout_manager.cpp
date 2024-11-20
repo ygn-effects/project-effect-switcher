@@ -150,8 +150,24 @@ void LayoutManager::render() {
     // Starting X position
     uint8_t xPosition = calculateStartingX(row, totalRowWidth, gap);
 
-    // Render the columns
-    renderColumns(row, i, xPosition, yPosition, newTab, gap);
+    switch (row.alignment)
+    {
+      // Full screen will only have one column
+      case Row::kFullScreen:
+        m_display->printFullScreenItem(row.columns[0].text, m_screenHeight, m_screenWidth);
+        break;
+
+      case Row::kLeft:
+      case Row::kCenter:
+      case Row::kRight:
+      case Row::kJustify:
+        // Render the columns
+        renderColumns(row, i, xPosition, yPosition, newTab, gap);
+        break;
+
+      default:
+        break;
+    }
   }
 
   m_display->render();

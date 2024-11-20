@@ -32,7 +32,8 @@ struct Row {
     kRight,
     kCenter,
     kLeft,
-    kJustify
+    kJustify,
+    kFullScreen
   };
 
   Column columns[c_maxColumnsPerLine];
@@ -44,6 +45,7 @@ class LayoutManager {
   private:
     DisplayManager* m_display;
     uint8_t m_screenWidth;
+    uint8_t m_screenHeight;
     uint8_t m_rowsCount;
     uint8_t m_visibleRowsCount;
     uint8_t m_contentStartIndex;
@@ -74,6 +76,7 @@ class LayoutManager {
       m_rowsCount(0),
       m_contentStartIndex(0) {
         m_screenWidth = m_display->getWidth();
+        m_screenHeight = m_display->getHeight();
         m_visibleRowsCount = m_display->getMaxVisibleLines();
       };
 
