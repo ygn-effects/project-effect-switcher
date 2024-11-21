@@ -67,8 +67,12 @@ void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHei
       uint8_t yPosition = (m_width - textWidth) / 2;
 
       printItem(t_text, xPosition, yPosition);
+      m_ssd1306.setTextSize(0);
       return;
     }
+    // If no font size fits, render the smallest size
+    m_ssd1306.setTextSize(0);  // Fall back to the smallest font
+    printItem(t_text, 0, 0); // Print at the top-left corner as a fallback
   }
 }
 
