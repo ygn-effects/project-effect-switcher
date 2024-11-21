@@ -70,10 +70,13 @@ void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHei
       m_ssd1306.setTextSize(0);
       return;
     }
-    // If no font size fits, render the smallest size
-    m_ssd1306.setTextSize(0);  // Fall back to the smallest font
-    printItem(t_text, 0, 0); // Print at the top-left corner as a fallback
   }
+}
+
+void DisplayManager::printHighlightedItem(const char* t_text, uint8_t t_x, uint8_t t_y) {
+  m_ssd1306.setTextColor(SSD1306_BLACK, SSD1306_WHITE);
+  printItem(t_text, t_x, t_y);
+  m_ssd1306.setTextColor(SSD1306_WHITE, SSD1306_BLACK);
 }
 
 void DisplayManager::drawInvertedLine(uint8_t t_y) {
