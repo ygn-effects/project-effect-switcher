@@ -55,6 +55,23 @@ void DisplayManager::printItem(const char* t_text, uint8_t t_x, uint8_t t_y) {
   m_ssd1306.write(t_text);
 }
 
+void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHeight, uint8_t t_usableWidth) {
+  for (uint8_t fontSize = 16; fontSize >= 0; fontSize -= 2) {
+    m_ssd1306.setTextSize(fontSize);
+
+    uint16_t textHeight = calcTextHeight(t_text);
+    uint16_t textWidth = calcTextWidth(t_text);
+
+    if (textHeight <= t_usableHeight && textWidth <= t_usableWidth) {
+      uint8_t xPosition = (m_height - textHeight) / 2;
+      uint8_t yPosition = (m_width - textWidth) / 2;
+
+      printItem(t_text, xPosition, yPosition);
+      return;
+    }
+  }
+}
+
 void DisplayManager::drawInvertedLine(uint8_t t_y) {
   m_ssd1306.fillRect(0, 0, m_width, m_newLine, SSD1306_WHITE);
   m_ssd1306.setTextColor(SSD1306_WHITE);

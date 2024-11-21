@@ -45,6 +45,8 @@ class DisplayManager {
 
     void printItem(const char* t_text, uint8_t t_x, uint8_t t_y);
 
+    void printFullScreenItem(const char* t_text, uint8_t t_usableHeight, uint8_t t_usableWidth);
+
     void drawInvertedLine(uint8_t t_y);
 };
 
