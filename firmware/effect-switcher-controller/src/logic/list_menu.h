@@ -15,6 +15,7 @@ class ListMenu : public MenuBase {
     uint8_t m_startIndex;          // Index of the first visible item in the menu list.
     uint8_t m_visibleRowCount;     // Number of rows visible on the screen.
     bool m_itemSelected = false;   // Flag indicating if an item has been selected.
+    bool m_backrequested = false;
 
     uint8_t m_rowCounts[c_maxRowsPerLayout];        // Array to track rows.
     uint8_t m_rowColumnCounts[c_maxRowsPerLayout];  // Array to track columns per row.
@@ -52,4 +53,6 @@ class ListMenu : public MenuBase {
     /// @brief Checks if an item has been selected.
     /// @return true if an item is selected, false otherwise.
     bool isItemSelected();
+
+    bool isBackRequested();
 };

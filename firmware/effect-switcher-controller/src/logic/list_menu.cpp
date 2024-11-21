@@ -45,7 +45,8 @@ void ListMenu::reset() {
   m_selectedRow = 0;
   m_selectedColumn = 0;
   m_startIndex = 0;
-  m_itemSelected = false;
+  m_isFooterActive = false;
+  m_layoutManager->setIsFooterActive(false);
 }
 
 void ListMenu::handleInput(MenuInputAction t_action) {
@@ -112,7 +113,14 @@ void ListMenu::handleInput(MenuInputAction t_action) {
     }
 
     case MenuInputAction::kPress:
-      m_itemSelected = true;
+      if (m_isFooterActive) {
+        if (m_selectedColumn == 0) {
+          m_backrequested = true;
+        }
+        else {
+          m_itemSelected = true;
+        }
+      }
       break;
 
     default:
@@ -126,5 +134,15 @@ uint8_t ListMenu::getSelectedIndex() {
 }
 
 bool ListMenu::isItemSelected() {
-  return m_itemSelected;
+  bool selected = m_itemSelected;
+  m_itemSelected = false;
+
+  return selected;
+}
+
+bool ListMenu::isBackRequested() {
+  bool requested = m_backrequested;
+  m_backrequested = false;
+
+  return requested;
 }
