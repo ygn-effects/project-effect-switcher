@@ -8,7 +8,7 @@ void HomeMenu::update() {
   char text[4];
   text[0] = 'A' + m_currentPreset->getBank();
   text[1] = '-';
-  text[2] = m_currentPreset->getPreset();
+  text[2] = '0' + m_currentPreset->getPreset();
   text[3] = '\0';
 
   Row row;
