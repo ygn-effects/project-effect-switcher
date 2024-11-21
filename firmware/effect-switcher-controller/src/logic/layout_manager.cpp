@@ -71,7 +71,7 @@ void LayoutManager::renderHeader() {
   if (m_header.columnsCount > 0) {
     m_display->drawInvertedLine(0);
     uint8_t xPosition = (m_screenWidth - m_display->calcTextWidth(m_header.columns[0].text)) / 2;
-    m_display->printItem(m_header.columns[0].text, xPosition, 0);
+    m_display->printHighlightedItem(m_header.columns[0].text, xPosition, 0);
   }
 }
 
