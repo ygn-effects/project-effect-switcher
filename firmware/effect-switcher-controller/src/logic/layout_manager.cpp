@@ -6,6 +6,18 @@ void LayoutManager::clearRows() {
   for (uint8_t i = 0; i < c_maxRowsPerLayout; i++) {
     m_rows[i] = {};
   }
+
+  m_footer.columnsCount = 0;
+  m_footer.alignment = Row::kLeft;
+  for (uint8_t i = 0; i < c_maxColumnsPerLine; i++) {
+      m_footer.columns[i] = {};
+  }
+
+  m_header.columnsCount = 0;
+  m_header.alignment = Row::kLeft;
+  for (uint8_t i = 0; i < c_maxColumnsPerLine; i++) {
+      m_header.columns[i] = {};
+  }
 }
 
 uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
@@ -126,8 +138,13 @@ void LayoutManager::render() {
   uint8_t newLine = m_display->getNewLine();
   uint8_t newTab = m_display->getNewTab();
 
-  renderHeader();
-  renderFooter();
+  if (m_header.columnsCount > 0) {
+    renderHeader();
+  }
+
+  if (m_footer.columnsCount > 0) {
+    renderFooter();
+  }
 
   // Determine visible rows
   uint8_t endIndex = m_contentStartIndex + m_visibleRowsCount;
