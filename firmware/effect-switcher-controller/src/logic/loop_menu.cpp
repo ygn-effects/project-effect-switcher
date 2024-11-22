@@ -1,7 +1,35 @@
 #include "loop_menu.h"
 
 void LoopOrderMenu::update() {
+  m_layoutManager->clear();
 
+  // Set header
+  m_layoutManager->setHeader("Loops Order");
+
+  // Set footer
+  const char* footItems[] = {"Cancel", "Save"};
+  m_layoutManager->setFooter(footItems, 2);
+
+  // Gather data from the preset
+  const uint8_t loopsCount = m_currentPreset->getLoopsCount();
+  uint8_t loopIndexes[loopsCount];
+  uint8_t loopOrders[loopsCount];
+  uint8_t loopStates[loopsCount];
+
+  // Construct the arrays by loops order to send ordered data to the display
+  for (uint8_t i = 0; i < loopsCount; i++) {
+    const uint8_t loopIndex = m_currentPreset->getLoopIndexByOrder(i);
+
+    if (loopIndex < loopsCount) {
+      loopIndexes[i] = loopIndex;
+      loopOrders[i] = i;
+      loopStates[i] = m_currentPreset->getLoopState(loopIndex);
+    }
+  }
+
+  m_layoutManager->setActiveRow(m_selectedRow);
+  m_layoutManager->setActiveColumn(m_selectedColumn);
+  m_layoutManager->render();
 }
 
 void LoopOrderMenu::reset() {
