@@ -247,6 +247,10 @@ void Hardware::processSettingsState() {
         break;
     }
   }
+
+  if (settingsMenu.isBackRequested()) {
+    transitionToState(kPresetState);
+  }
 }
 
 void Hardware::processLoopsEditState() {
@@ -341,7 +345,7 @@ void Hardware::setup() {
   footSwitch5.setup();
   // presetLed.setup();
   // matrix.switchMatrixSetup();
-  menuManager.setMenu(&settingsMenu);
+  menuManager.setMenu(&homeMenu);
 
   // Careful
   //  memoryManager.initializeTestData();
@@ -367,6 +371,7 @@ void Hardware::startup() {
 
   presetManager.initialize();
   delay(200);
+  homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
   menuManager.update();
   delay(100);
 }
