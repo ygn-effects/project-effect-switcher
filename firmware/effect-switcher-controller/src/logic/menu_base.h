@@ -17,14 +17,13 @@ class MenuBase {
     DisplayManager* m_displayManager;               // Display manager instance
     LayoutManager* m_layoutManager;                 // Layout manager instance
 
-    uint8_t m_itemCount = 0;                        // Number of items in the menu.
     uint8_t m_visibleRowCount = 0;                  // Number of rows visible on the screen.
     uint8_t m_selectedRow = 0;                      // Currently selected row index.
     uint8_t m_selectedColumn = 0;                   // Currently selected column index.
     uint8_t m_startIndex = 0;                       // Index of the first visible item in the menu list.
 
-    uint8_t m_rowCounts[c_maxRowsPerLayout];        // Array to track rows.
-    uint8_t m_rowColumnCounts[c_maxRowsPerLayout];  // Array to track columns per row.
+    uint8_t m_rowCounts[LayoutConstants::c_maxRowsPerLayout];        // Array to track rows.
+    uint8_t m_rowColumnCounts[LayoutConstants::c_maxColumnsPerRow];  // Array to track columns per row.
     uint8_t m_footerColumnCount = 0;
 
     bool m_isFooterActive = false;

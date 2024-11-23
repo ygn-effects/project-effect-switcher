@@ -27,6 +27,21 @@ void LoopOrderMenu::update() {
     }
   }
 
+  for (uint8_t i = 0; i < loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
+    Row row;
+    row.alignment = Row::kJustify;  // Align to left
+    row.columnsCount = LayoutConstants::c_maxColumnsPerRow;
+
+    for (uint8_t j = 0; j < LayoutConstants::c_maxColumnsPerRow; j++) {
+      uint8_t loopIndex = i + j;
+
+      if (loopIndex < loopsCount) {
+        row.columns[j] = { };
+      }
+    }
+    m_layoutManager->addRow(row);
+  }
+
   m_layoutManager->setActiveRow(m_selectedRow);
   m_layoutManager->setActiveColumn(m_selectedColumn);
   m_layoutManager->render();
