@@ -4,8 +4,10 @@
 #include "display_manager.h"
 #include "utils/logging.h"
 
-constexpr uint8_t c_maxRowsPerLayout = 20;
-constexpr uint8_t c_maxColumnsPerLine = 4;
+namespace LayoutConstants {
+  constexpr uint8_t c_maxRowsPerLayout = 20;
+  constexpr uint8_t c_maxColumnsPerRow = 4;
+}
 
 struct Column {
   enum ColumnType {
@@ -36,7 +38,7 @@ struct Row {
     kFullScreen
   };
 
-  Column columns[c_maxColumnsPerLine];
+  Column columns[LayoutConstants::c_maxColumnsPerRow];
   uint8_t columnsCount;
   Alignment alignment;
 };
@@ -54,7 +56,7 @@ class LayoutManager {
     uint8_t m_activeColumn = 0;
     bool m_isFooterActive = false;
 
-    Row m_rows[c_maxRowsPerLayout];
+    Row m_rows[LayoutConstants::c_maxRowsPerLayout];
     Row m_header;
     Row m_footer;
 

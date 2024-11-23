@@ -3,19 +3,19 @@
 void LayoutManager::clearRows() {
   m_rowsCount = 0;
 
-  for (uint8_t i = 0; i < c_maxRowsPerLayout; i++) {
+  for (uint8_t i = 0; i < LayoutConstants::c_maxRowsPerLayout; i++) {
     m_rows[i] = {};
   }
 
   m_footer.columnsCount = 0;
   m_footer.alignment = Row::kLeft;
-  for (uint8_t i = 0; i < c_maxColumnsPerLine; i++) {
+  for (uint8_t i = 0; i < LayoutConstants::c_maxColumnsPerRow; i++) {
       m_footer.columns[i] = {};
   }
 
   m_header.columnsCount = 0;
   m_header.alignment = Row::kLeft;
-  for (uint8_t i = 0; i < c_maxColumnsPerLine; i++) {
+  for (uint8_t i = 0; i < LayoutConstants::c_maxColumnsPerRow; i++) {
       m_header.columns[i] = {};
   }
 }
