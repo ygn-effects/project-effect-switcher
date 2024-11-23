@@ -13,8 +13,8 @@ void ListMenu::update() {
 
   // Visible Content Rows
   uint8_t endIndex = m_startIndex + m_visibleRowCount;
-  if (endIndex > m_itemCount) {
-    endIndex = m_itemCount;
+  if (endIndex > m_itemsCount) {
+    endIndex = m_itemsCount;
   }
 
   uint8_t rowIndex = 0;
@@ -52,7 +52,7 @@ void ListMenu::reset() {
 void ListMenu::handleInput(MenuInputAction t_action) {
   switch (t_action) {
     case MenuInputAction::kUp: {
-      if (!m_isFooterActive && m_selectedRow == m_itemCount - 1) {
+      if (!m_isFooterActive && m_selectedRow == m_itemsCount - 1) {
         // Activate footer navigation when fully scrolled down
         m_isFooterActive = true;
         m_layoutManager->setIsFooterActive(true);
@@ -62,7 +62,7 @@ void ListMenu::handleInput(MenuInputAction t_action) {
         if (m_selectedColumn < m_footerColumnCount - 1) {
           m_selectedColumn++;
         }
-      } else if (m_selectedRow < m_itemCount - 1) {
+      } else if (m_selectedRow < m_itemsCount - 1) {
         // Normal navigation (not in the footer)
         if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
           m_selectedRow++;
@@ -91,7 +91,7 @@ void ListMenu::handleInput(MenuInputAction t_action) {
           m_isFooterActive = false;
           m_layoutManager->setIsFooterActive(false);
           // Last row
-          m_selectedRow = m_itemCount - 1;
+          m_selectedRow = m_itemsCount - 1;
           // Last column of the last row
           m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
         }

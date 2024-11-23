@@ -9,6 +9,7 @@
 class ListMenu : public MenuBase {
   private:
     const char** m_menuItems;      // Pointer to an array of menu item strings.
+    uint8_t m_itemsCount;
     bool m_backrequested = false;
 
   public:
@@ -17,7 +18,9 @@ class ListMenu : public MenuBase {
     /// @param t_items Pointer to an array of item strings for the menu.
     /// @param t_count The number of items in the menu.
     ListMenu(DisplayManager* t_display, LayoutManager* t_layout, const char** t_items, uint8_t t_count) :
-      MenuBase(t_display, t_layout) { };
+      MenuBase(t_display, t_layout),
+      m_menuItems(t_items),
+      m_itemsCount(t_count) { };
 
     /// @brief Updates the display to render the menu, including the header and list of items.
     void update() override;
