@@ -24,22 +24,36 @@ void LoopOrderMenu::update() {
       loopIndexes[i] = loopIndex;
       loopOrders[i] = i;
       loopStates[i] = m_currentPreset->getLoopState(loopIndex);
+      LOG_DEBUG("Index %d:", loopIndexes[i]);
+      LOG_DEBUG("Order %d:", loopOrders[i]);
+      LOG_DEBUG("State %d:", loopStates[i]);
     }
   }
 
+  char loopNumbers[loopsCount][2] = {0};
+
+  uint8_t rowIndex = 0;
   for (uint8_t i = 0; i < loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
+    uint8_t columnIndex = 0;
     Row row;
-    row.alignment = Row::kJustify;  // Align to left
-    row.columnsCount = LayoutConstants::c_maxColumnsPerRow;
+    row.alignment = Row::kJustify;
 
     for (uint8_t j = 0; j < LayoutConstants::c_maxColumnsPerRow; j++) {
       uint8_t loopIndex = i + j;
 
       if (loopIndex < loopsCount) {
-        row.columns[j] = { };
+        loopNumbers[loopIndex][0] = '0' + loopIndex;
+        loopNumbers[loopIndex][1] = '\0';
+        row.columns[j] = { Column::kLabel, Column::kNormal, loopNumbers[loopIndex], 0, 0 };
+      } else {
+        row.columns[j] = { Column::kLabel, Column::kNormal, "", 0, 0 };
       }
     }
+
     m_layoutManager->addRow(row);
+    m_rowCounts[rowIndex] = rowIndex;
+    m_rowColumnCounts[rowIndex] = columnIndex;
+    rowIndex++;
   }
 
   m_layoutManager->setActiveRow(m_selectedRow);
