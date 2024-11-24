@@ -8,8 +8,9 @@ void ListMenu::update() {
   m_layoutManager->setHeader("Settings");
 
   // Set footer
+  m_footerColumnCount = 1;
   const char* footItems[] = {"Back"};
-  m_layoutManager->setFooter(footItems, 1);
+  m_layoutManager->setFooter(footItems, m_footerColumnCount);
 
   // Visible Content Rows
   uint8_t endIndex = m_startIndex + m_visibleRowCount;
@@ -21,9 +22,8 @@ void ListMenu::update() {
   for (uint8_t i = m_startIndex; i < endIndex; i++) {
 
     Row row;
-    uint8_t m_footerColumnCount = 1;
     row.alignment = Row::kLeft;
-    row.columnsCount = m_footerColumnCount;
+    row.columnsCount = 1;
     row.columns[0] = { Column::kLabel, Column::kNormal, m_menuItems[i], 0, 0 };
 
     m_layoutManager->addRow(row);
@@ -117,9 +117,9 @@ void ListMenu::handleInput(MenuInputAction t_action) {
         if (m_selectedColumn == 0) {
           m_backrequested = true;
         }
-        else {
-          m_itemSelected = true;
-        }
+      }
+      else {
+        m_itemSelected = true;
       }
       break;
 
