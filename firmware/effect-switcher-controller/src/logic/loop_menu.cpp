@@ -30,30 +30,53 @@ void LoopOrderMenu::update() {
     }
   }
 
-  char loopNumbers[loopsCount][2] = {0};
+  char loopNumbers[LayoutConstants::c_maxRowsPerLayout][5];
 
   uint8_t rowIndex = 0;
   for (uint8_t i = 0; i < loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
     uint8_t columnIndex = 0;
     Row row;
     row.alignment = Row::kJustify;
+    row.columnsCount = LayoutConstants::c_maxColumnsPerRow;
 
     for (uint8_t j = 0; j < LayoutConstants::c_maxColumnsPerRow; j++) {
       uint8_t loopIndex = i + j;
 
       if (loopIndex < loopsCount) {
-        loopNumbers[loopIndex][0] = '0' + loopIndex;
-        loopNumbers[loopIndex][1] = '\0';
-        row.columns[j] = { Column::kLabel, Column::kNormal, loopNumbers[loopIndex], 0, 0 };
-      } else {
+        uint8_t number = loopIndexes[loopIndex];
+        char* buffer = loopNumbers[rowIndex * LayoutConstants::c_maxColumnsPerRow + j];
+        uint8_t index = 0;
+
+        if (number >= 10) {
+          buffer[index++] = '0' + (number / 10);
+        }
+        buffer[index++] = '0' + (number % 10);
+
+        buffer[index++] = ' ';
+        buffer[index++] = 0x10;
+        buffer[index] = '\0';
+
+        if (loopStates[loopIndex]) {
+          row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, 0, 0 };
+        }
+        else {
+          row.columns[j] = { Column::kLabel, Column::kNormal, buffer, 0, 0 };
+        }
+
+        columnIndex++;
+      }
+      else {
         row.columns[j] = { Column::kLabel, Column::kNormal, "", 0, 0 };
       }
+
+      m_rowColumnCounts[rowIndex] = columnIndex;
     }
 
     m_layoutManager->addRow(row);
-    m_rowCounts[rowIndex] = rowIndex;
-    m_rowColumnCounts[rowIndex] = columnIndex;
+    m_rowCounts[rowIndex] = i;
     rowIndex++;
+
+    m_itemsCount = rowIndex;
   }
 
   m_layoutManager->setActiveRow(m_selectedRow);
