@@ -54,8 +54,20 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
       m_display->printItem(">", xPosition - newTab, yPosition);
     }
 
-    // Print the column text
-    m_display->printItem(column.text, xPosition, yPosition);
+    switch (column.style)
+    {
+      case Column::kHighlighted:
+        m_display->printHighlightedItem(column.text, xPosition, yPosition);
+        break;
+
+      case Column::kNormal:
+      case Column::kBold:
+      case Column::kValueHighLighted:
+        m_display->printItem(column.text, xPosition, yPosition);
+
+      default:
+        break;
+    }
 
     // Update X position for the next column
     xPosition += m_display->calcTextWidth(column.text) + newTab;
