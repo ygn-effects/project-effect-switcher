@@ -7,6 +7,7 @@ void LoopOrderMenu::update() {
   m_layoutManager->setHeader("Loops Order");
 
   // Set footer
+  m_footerColumnCount = 2;
   const char* footItems[] = {"Cancel", "Save"};
   m_layoutManager->setFooter(footItems, 2);
 
@@ -24,9 +25,6 @@ void LoopOrderMenu::update() {
       loopIndexes[i] = loopIndex;
       loopOrders[i] = i;
       loopStates[i] = m_currentPreset->getLoopState(loopIndex);
-      LOG_DEBUG("Index %d:", loopIndexes[i]);
-      LOG_DEBUG("Order %d:", loopOrders[i]);
-      LOG_DEBUG("State %d:", loopStates[i]);
     }
   }
 
@@ -85,6 +83,10 @@ void LoopOrderMenu::update() {
 }
 
 void LoopOrderMenu::reset() {
+  m_selectedRow = 0;
+  m_selectedColumn = 0;
+  m_startIndex = 0;
+  m_isFooterActive = false;
   m_swappingMode = false;
   m_toggleRequested = false;
   m_swapRequested = false;
@@ -95,7 +97,79 @@ void LoopOrderMenu::reset() {
 }
 
 void LoopOrderMenu::handleInput(MenuInputAction t_action) {
+    switch (t_action)
+    {
+      case MenuInputAction::kUp:
+        if (!m_isFooterActive && m_selectedRow == m_itemsCount - 1 && m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
+          // Activate footer navigation when fully scrolled down
+          m_isFooterActive = true;
+          m_layoutManager->setIsFooterActive(true);
+          // Start at the first column of the footer
+          m_selectedColumn = 0;
+        }
+        else if (m_isFooterActive) {
+          // Handle footer navigation
+          if (m_selectedColumn < m_footerColumnCount - 1) {
+            m_selectedColumn++;
+          }
+        }
+        else if (m_selectedRow < m_itemsCount) {
+          // Normal navigation (not in the footer)
+          if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
+            m_selectedRow++;
+            m_selectedColumn = 0;
+          } else {
+            m_selectedColumn++;
+          }
 
+          // Scroll up if necessary
+          if (m_selectedRow >= m_startIndex + m_visibleRowCount) {
+            m_startIndex++;
+          }
+        }
+        break;
+
+      case MenuInputAction::kDown:
+        if (m_isFooterActive) {
+          // Handle navigation in the footer
+          if (m_selectedColumn > 0) {
+            // Scroll down the available columns
+            m_selectedColumn--;
+          } else {
+            // Exit footer navigation and resume normal navigation
+            m_isFooterActive = false;
+            m_layoutManager->setIsFooterActive(false);
+            // Last row
+            m_selectedRow = m_itemsCount - 1;
+            // Last column of the last row
+            m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+          }
+        }
+        else if (m_selectedRow > 0) {
+          // Normal navigation (not in the footer)
+          if (m_selectedColumn == 0) {
+            m_selectedRow--;
+            m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
+          }
+          else {
+            m_selectedColumn--;
+          }
+
+          // Scroll down if necessary
+          if (m_selectedRow < m_startIndex) {
+            m_startIndex--;
+          }
+        }
+        else if (m_selectedRow == 0) {
+          if (m_selectedColumn > 0 ) {
+            m_selectedColumn--;
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 
 void LoopOrderMenu::setCurrentPreset(Preset* t_currentPreset) {
