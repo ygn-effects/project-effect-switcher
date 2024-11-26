@@ -33,9 +33,6 @@ void ListMenu::update() {
     rowIndex++;
   }
 
-  LOG_DEBUG("Selected row %d:", m_selectedRow);
-  LOG_DEBUG("Selected column %d:", m_selectedColumn);
-
   m_layoutManager->setActiveRow(m_selectedRow);
   m_layoutManager->setActiveColumn(m_selectedColumn);
   m_layoutManager->render();
@@ -57,12 +54,14 @@ void ListMenu::handleInput(MenuInputAction t_action) {
         m_isFooterActive = true;
         m_layoutManager->setIsFooterActive(true);
         m_selectedColumn = 0; // Start at the first column of the footer
-      } else if (m_isFooterActive) {
+      }
+      else if (m_isFooterActive) {
         // Handle footer navigation
         if (m_selectedColumn < m_footerColumnCount - 1) {
           m_selectedColumn++;
         }
-      } else if (m_selectedRow < m_itemsCount - 1) {
+      }
+      else if (m_selectedRow < m_itemsCount - 1) {
         // Normal navigation (not in the footer)
         if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
           m_selectedRow++;
@@ -95,7 +94,8 @@ void ListMenu::handleInput(MenuInputAction t_action) {
           // Last column of the last row
           m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
         }
-      } else if (m_selectedRow > 0) {
+      }
+      else if (m_selectedRow > 0) {
         // Normal navigation (not in the footer)
         if (m_selectedColumn == 0) {
           m_selectedRow--;
