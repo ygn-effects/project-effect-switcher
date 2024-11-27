@@ -11,27 +11,10 @@ void LoopOrderMenu::update() {
   const char* footItems[] = {"Cancel", "Save"};
   m_layoutManager->setFooter(footItems, 2);
 
-  // Gather data from the preset
-  const uint8_t loopsCount = m_currentPreset->getLoopsCount();
-  uint8_t loopIndexes[loopsCount];
-  uint8_t loopOrders[loopsCount];
-  uint8_t loopStates[loopsCount];
-
-  // Construct the arrays by loops order to send ordered data to the display
-  for (uint8_t i = 0; i < loopsCount; i++) {
-    const uint8_t loopIndex = m_currentPreset->getLoopIndexByOrder(i);
-
-    if (loopIndex < loopsCount) {
-      loopIndexes[i] = loopIndex;
-      loopOrders[i] = i;
-      loopStates[i] = m_currentPreset->getLoopState(loopIndex);
-    }
-  }
-
   char loopNumbers[LayoutConstants::c_maxRowsPerLayout][5];
 
   uint8_t rowIndex = 0;
-  for (uint8_t i = 0; i < loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
+  for (uint8_t i = 0; i < m_presetView->loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
     uint8_t columnIndex = 0;
     Row row;
     row.alignment = Row::kJustify;
@@ -40,8 +23,8 @@ void LoopOrderMenu::update() {
     for (uint8_t j = 0; j < LayoutConstants::c_maxColumnsPerRow; j++) {
       uint8_t loopIndex = i + j;
 
-      if (loopIndex < loopsCount) {
-        uint8_t number = loopIndexes[loopIndex];
+      if (loopIndex < m_presetView->loopsCount) {
+        uint8_t number = m_presetView->loops[loopIndex].index;
         char* buffer = loopNumbers[rowIndex * LayoutConstants::c_maxColumnsPerRow + j];
         uint8_t index = 0;
 
@@ -54,7 +37,7 @@ void LoopOrderMenu::update() {
         buffer[index++] = 0x10;
         buffer[index] = '\0';
 
-        if (loopStates[loopIndex]) {
+        if (m_presetView->loops[loopIndex].isActive) {
           row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, 0, 0 };
         }
         else {
@@ -172,8 +155,8 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
     }
   }
 
-void LoopOrderMenu::setCurrentPreset(Preset* t_currentPreset) {
-  m_currentPreset = t_currentPreset;
+void LoopOrderMenu::setPresetView(PresetView* t_view) {
+  m_presetView = t_view;
 }
 
 bool LoopOrderMenu::isToggleRequested() {
