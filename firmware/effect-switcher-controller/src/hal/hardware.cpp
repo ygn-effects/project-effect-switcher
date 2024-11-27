@@ -138,7 +138,8 @@ void Hardware::transitionToState(SystemState t_newState) {
   else if (t_newState == SystemState::kLoopsEditState) {
     menuManager.setMenu(&loopsMenu);
     menuManager.reset();
-    loopsMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    m_presetView = createPresetView(presetManager.getCurrentPreset());
+    loopsMenu.setPresetView(&m_presetView);
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessagesState) {
@@ -256,21 +257,11 @@ void Hardware::processSettingsState() {
 void Hardware::processLoopsEditState() {
   processMenuInput();
 
-  if (loopsMenu.isToggleRequested()) {
-    presetManager.toggleLoopState(presetManager.getLoopByOrder(loopsMenu.getSelectedLoop()));
-    presetManager.saveCurrentPreset();
+  if (loopsMenu.isSaveRequested()) {
 
-    menuManager.update();
   }
 
-  if (loopsMenu.isSwapRequested()) {
-    presetManager.swapLoops(presetManager.getLoopByOrder(loopsMenu.getSourceLoop()), presetManager.getLoopByOrder(loopsMenu.getTargetLoop()));
-    presetManager.saveCurrentPreset();
-
-    menuManager.update();
-  }
-
-  if (loopsMenu.isGoBackRequested()) {
+  if (loopsMenu.isBackRequested()) {
     transitionToState(kSettingsState);
   }
 
@@ -329,6 +320,28 @@ void Hardware::processMidiMessageEditState() {
   }
 }
 
+PresetView Hardware::createPresetView(const Preset* t_preset) {
+  PresetView view;
+
+  view.loopsCount = t_preset->getLoopsCount();
+  for (uint8_t i = 0; i < view.loopsCount; i++) {
+    uint8_t index = t_preset->getLoopOrder(i);
+    view.loops[index].index = i;
+    view.loops[index].order = index;
+    view.loops[index].isActive = t_preset->getLoopState(i);
+  }
+
+  view.midiMessagesCount = t_preset->getMidiMessagesCount();
+  for (uint8_t i = 0; i < view.midiMessagesCount; i++) {
+    view.midiMessages[i].type = t_preset->getMidiMessageType(i);
+    view.midiMessages[i].channel = t_preset->getMidiMessageChannel(i);
+    view.midiMessages[i].byte1 = t_preset->getMidiMessageDataByte1(i);
+    view.midiMessages[i].byte2 = t_preset->getMidiMessageDataByte2(i);
+    view.midiMessages[i].hasDataByte2 = t_preset->getMidiMessageHasDataByte2(i);
+  }
+
+  return view;
+}
 
 void Hardware::setup() {
   delay(500);

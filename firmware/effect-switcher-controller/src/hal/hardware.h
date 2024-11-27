@@ -10,6 +10,7 @@
 #include "logic/loop_menu.h"
 #include "logic/midi_menu.h"
 #include "logic/preset_manager.h"
+#include "logic/preset_view.h"
 #include "peripherals/encoder.h"
 #include "peripherals/led.h"
 #include "peripherals/switch.h"
@@ -33,6 +34,8 @@ class Hardware
 {
   private:
     SystemState m_systemState = kPresetState;
+
+    PresetView m_presetView;
 
     // Hardware Triggers
     bool m_menuEncoderMove = false;
@@ -70,6 +73,9 @@ class Hardware
     void processLoopsEditState();
     void processMidiMessagesState();
     void processMidiMessageEditState();
+
+    PresetView createPresetView(const Preset* t_preset);
+    void applyPresetView(Preset* t_preset);
 
   public:
     void setup();
