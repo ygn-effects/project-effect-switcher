@@ -8,7 +8,7 @@ void LoopOrderMenu::update() {
 
   // Set footer
   m_footerColumnCount = 2;
-  const char* footItems[] = {"Cancel", "Save"};
+  const char* footItems[] = {"Back", "Save"};
   m_layoutManager->setFooter(footItems, 2);
 
   char loopNumbers[LayoutConstants::c_maxRowsPerLayout][5];
@@ -71,9 +71,8 @@ void LoopOrderMenu::reset() {
   m_startIndex = 0;
   m_isFooterActive = false;
   m_swappingMode = false;
-  m_toggleRequested = false;
-  m_swapRequested = false;
-  m_goBackRequested = false;
+  m_saveRequested = false;
+  m_backRequested = false;
   m_sourceLoop = 0;
   m_targetLoop = 0;
   m_selectedLoop = 0;
@@ -150,6 +149,31 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
         }
         break;
 
+      case MenuInputAction::kPress:
+        if (!m_swappingMode) {
+          if (!m_isFooterActive) {
+            m_presetView->loops[m_selectedRow + m_selectedColumn].isActive = !m_presetView->loops[m_selectedRow + m_selectedColumn].isActive;
+          }
+          else {
+            if (m_selectedColumn == 0) {
+              m_backRequested = true;
+            }
+            if (m_selectedColumn == 1) {
+              m_saveRequested = true;
+            }
+          }
+        }
+        else {
+
+        }
+
+      case MenuInputAction::kLongPress:
+        if (!m_swappingMode) {
+          m_swappingMode = true;
+          m_sourceLoop = m_selectedRow + m_selectedColumn;
+        }
+        break;
+
       default:
         break;
     }
@@ -159,35 +183,16 @@ void LoopOrderMenu::setPresetView(PresetView* t_view) {
   m_presetView = t_view;
 }
 
-bool LoopOrderMenu::isToggleRequested() {
-  bool requested = m_toggleRequested;
-  m_toggleRequested = false; // Reset after checking
+bool LoopOrderMenu::isSaveRequested() {
+  bool requested = m_saveRequested;
+  m_saveRequested = false;
 
   return requested;
 }
 
-bool LoopOrderMenu::isSwapRequested() {
-  bool requested = m_swapRequested;
-  m_swapRequested = false; // Reset after checking
+bool LoopOrderMenu::isBackRequested() {
+  bool requested = m_backRequested;
+  m_backRequested = false;
 
   return requested;
-}
-
-bool LoopOrderMenu::isGoBackRequested() {
-  bool requested = m_goBackRequested;
-  m_goBackRequested = false;
-
-  return requested;
-}
-
-uint8_t LoopOrderMenu::getSelectedLoop() const {
-  return m_selectedLoop;
-}
-
-uint8_t LoopOrderMenu::getSourceLoop() const {
-  return m_sourceLoop;
-}
-
-uint8_t LoopOrderMenu::getTargetLoop() const {
-  return m_targetLoop;
 }
