@@ -437,15 +437,14 @@ void Hardware::process() {
   }
 }
 
-void Hardware::resetTriggers()
-{
+void Hardware::resetTriggers() {
   m_menuEncoderMove = false;
   m_menuEncoderMoveRight = false;
   m_menuEncoderMoveLeft = false;
   m_menuEncoderSwitchPress = false;
   m_menuEncoderSwitchLongPress = false;
   m_menuEditSwitchPress = false;
-  m_menuEncoderSwitchLongPress = false;
+  m_menuEditSwitchLongPress = false;
   m_footSwitch0Press = false;
   m_footSwitch0LongPress = false;
   m_footSwitch1Press = false;
