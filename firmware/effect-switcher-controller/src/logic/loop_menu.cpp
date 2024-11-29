@@ -164,13 +164,28 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
           }
         }
         else {
+          m_targetLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
 
+          if (m_sourceLoop < m_presetView->loopsCount && m_targetLoop < m_presetView->loopsCount) {
+            uint8_t sourceLoopIndex = m_presetView->loops[m_sourceLoop].index;
+            uint8_t sourceLoopActive = m_presetView->loops[m_sourceLoop].isActive;
+            uint8_t targetLoopIndex = m_presetView->loops[m_targetLoop].index;
+            uint8_t targetLoopActive = m_presetView->loops[m_targetLoop].isActive;
+
+            m_presetView->loops[m_sourceLoop].index = targetLoopIndex;
+            m_presetView->loops[m_sourceLoop].isActive = targetLoopActive;
+            m_presetView->loops[m_targetLoop].index = sourceLoopIndex;
+            m_presetView->loops[m_targetLoop].isActive = sourceLoopActive;
+          }
+
+          m_swappingMode = false;
         }
+        break;
 
       case MenuInputAction::kLongPress:
         if (!m_swappingMode) {
           m_swappingMode = true;
-          m_sourceLoop = m_selectedRow + m_selectedColumn;
+          m_sourceLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
         }
         break;
 
