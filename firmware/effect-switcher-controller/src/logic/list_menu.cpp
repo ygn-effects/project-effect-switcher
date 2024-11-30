@@ -44,6 +44,8 @@ void ListMenu::reset() {
   m_startIndex = 0;
   m_isFooterActive = false;
   m_layoutManager->setIsFooterActive(false);
+  m_layoutManager->setActiveRow(m_selectedRow);
+  m_layoutManager->setActiveColumn(m_selectedColumn);
 }
 
 void ListMenu::handleInput(MenuInputAction t_action) {

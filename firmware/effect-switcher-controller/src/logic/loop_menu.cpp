@@ -76,6 +76,9 @@ void LoopOrderMenu::reset() {
   m_sourceLoop = 0;
   m_targetLoop = 0;
   m_selectedLoop = 0;
+  m_layoutManager->setIsFooterActive(false);
+  m_layoutManager->setActiveRow(m_selectedRow);
+  m_layoutManager->setActiveColumn(m_selectedColumn);
 }
 
 void LoopOrderMenu::handleInput(MenuInputAction t_action) {
@@ -152,7 +155,7 @@ void LoopOrderMenu::handleInput(MenuInputAction t_action) {
       case MenuInputAction::kPress:
         if (!m_swappingMode) {
           if (!m_isFooterActive) {
-            m_presetView->loops[m_selectedRow + m_selectedColumn].isActive = !m_presetView->loops[m_selectedRow + m_selectedColumn].isActive;
+            m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive = !m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive;
           }
           else {
             if (m_selectedColumn == 0) {
