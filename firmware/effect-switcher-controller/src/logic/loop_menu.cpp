@@ -38,10 +38,20 @@ void LoopOrderMenu::update() {
         buffer[index] = '\0';
 
         if (m_presetView->loops[loopIndex].isActive) {
-          row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, 0, 0 };
+          if (loopIndex == m_sourceLoop && m_swappingMode) {
+            row.columns[j] = { Column::kLabel, Column::kHighlightedAndAnnotated, buffer, 0, 0 };
+          }
+          else {
+            row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, 0, 0 };
+          }
         }
         else {
-          row.columns[j] = { Column::kLabel, Column::kNormal, buffer, 0, 0 };
+          if (loopIndex == m_sourceLoop && m_swappingMode) {
+            row.columns[j] = { Column::kLabel, Column::kAnnotated, buffer, 0, 0 };
+          }
+          else {
+            row.columns[j] = { Column::kLabel, Column::kNormal, buffer, 0, 0 };
+          }
         }
 
         columnIndex++;
@@ -58,6 +68,13 @@ void LoopOrderMenu::update() {
     rowIndex++;
 
     m_itemsCount = rowIndex;
+  }
+
+  if (m_swappingMode && !m_isFooterActive) {
+    m_layoutManager->setCursor(Cursor::kAsterisk);
+  }
+  else {
+    m_layoutManager->setCursor(Cursor::kArrow);
   }
 
   m_layoutManager->setActiveRow(m_selectedRow);
@@ -78,6 +95,7 @@ void LoopOrderMenu::reset() {
   m_layoutManager->setIsFooterActive(false);
   m_layoutManager->setActiveRow(m_selectedRow);
   m_layoutManager->setActiveColumn(m_selectedColumn);
+  m_layoutManager->setCursor(Cursor::kArrow);
 }
 
 void LoopOrderMenu::handleInput(MenuInputAction t_action) {
