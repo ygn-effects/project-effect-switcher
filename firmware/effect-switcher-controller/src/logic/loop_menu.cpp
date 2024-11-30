@@ -75,7 +75,6 @@ void LoopOrderMenu::reset() {
   m_backRequested = false;
   m_sourceLoop = 0;
   m_targetLoop = 0;
-  m_selectedLoop = 0;
   m_layoutManager->setIsFooterActive(false);
   m_layoutManager->setActiveRow(m_selectedRow);
   m_layoutManager->setActiveColumn(m_selectedColumn);

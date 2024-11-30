@@ -8,8 +8,6 @@ class LoopOrderMenu : public MenuBase {
   private:
     PresetView* m_presetView;
     uint8_t m_itemsCount;
-    uint8_t m_loopsCount;
-    uint8_t m_selectedLoop;
     uint8_t m_sourceLoop;
     uint8_t m_targetLoop;
 
@@ -22,8 +20,6 @@ class LoopOrderMenu : public MenuBase {
       MenuBase(t_display, t_layout),
       m_presetView(t_view),
       m_itemsCount(0),
-      m_loopsCount(0),
-      m_selectedLoop(0),
       m_targetLoop(0),
       m_swappingMode(false),
       m_saveRequested(false),
