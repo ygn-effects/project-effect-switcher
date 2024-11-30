@@ -258,7 +258,9 @@ void Hardware::processLoopsEditState() {
   processMenuInput();
 
   if (loopsMenu.isSaveRequested()) {
-
+    applyPresetView(presetManager.getCurrentPreset());
+    presetManager.saveCurrentPreset();
+    transitionToState(kSettingsState);
   }
 
   if (loopsMenu.isBackRequested()) {
@@ -341,6 +343,26 @@ PresetView Hardware::createPresetView(const Preset* t_preset) {
   }
 
   return view;
+}
+
+void Hardware::applyPresetView(Preset* t_preset) {
+  for (uint8_t i = 0; i < m_presetView.loopsCount; i++) {
+    const LoopView& loop = m_presetView.loops[i];
+
+    t_preset->setLoopOrder(loop.index, loop.order);
+    t_preset->setLoopState(loop.index, loop.isActive);
+  }
+
+  for (uint8_t i = 0; i < m_presetView.midiMessagesCount; i++) {
+    const MidiMessageView& message = m_presetView.midiMessages[i];
+
+    t_preset->setMidiMessageType(i, message.type);
+    t_preset->setMidiMessageChannel(i, message.channel);
+    t_preset->setMidiMessageDataByte1(i, message.byte1);
+    t_preset->setMidiMessageDataByte2(i, message.byte2);
+  }
+
+  t_preset->setMidiMessagesCount(m_presetView.midiMessagesCount);
 }
 
 void Hardware::setup() {
