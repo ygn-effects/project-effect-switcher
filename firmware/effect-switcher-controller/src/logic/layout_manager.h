@@ -43,6 +43,11 @@ struct Row {
   Alignment alignment;
 };
 
+enum Cursor {
+  kArrow,
+  kAsterisk
+};
+
 class LayoutManager {
   private:
     DisplayManager* m_display;
@@ -55,6 +60,7 @@ class LayoutManager {
     uint8_t m_activeRow = 0;
     uint8_t m_activeColumn = 0;
     bool m_isFooterActive = false;
+    Cursor m_cursor = Cursor::kArrow;
 
     Row m_rows[LayoutConstants::c_maxRowsPerLayout];
     Row m_header;
@@ -91,6 +97,8 @@ class LayoutManager {
     void setActiveColumn(uint8_t t_column);
 
     void setIsFooterActive(bool t_active);
+
+    void setCursor(Cursor t_cursor);
 
     void setHeader(const char* t_title);
 

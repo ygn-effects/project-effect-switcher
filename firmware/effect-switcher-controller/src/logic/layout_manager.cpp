@@ -51,7 +51,23 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
 
     // Print the cursor if this is the active row and column
     if (rowIndex == m_activeRow && j == m_activeColumn && !m_isFooterActive) {
-      m_display->printItem(">", xPosition - newTab, yPosition);
+      const char* cursor;
+
+      switch (m_cursor) {
+        case Cursor::kArrow:
+          cursor = ">";
+          break;
+
+        case Cursor::kAsterisk:
+          cursor = "*";
+          break;
+
+        default:
+          cursor = "a";
+          break;
+      }
+
+      m_display->printItem(cursor, xPosition - newTab, yPosition);
     }
 
     switch (column.style)
@@ -123,6 +139,10 @@ void LayoutManager::setActiveColumn(uint8_t t_column) {
 
 void LayoutManager::setIsFooterActive(bool t_active) {
   m_isFooterActive = t_active;
+}
+
+void LayoutManager::setCursor(Cursor t_cursor) {
+  m_cursor = t_cursor;
 }
 
 void LayoutManager::setHeader(const char* t_title) {
