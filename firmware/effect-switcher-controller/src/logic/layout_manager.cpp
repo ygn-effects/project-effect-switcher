@@ -63,15 +63,23 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
           break;
 
         default:
-          cursor = "a";
+          cursor = ">";
           break;
       }
 
       m_display->printItem(cursor, xPosition - newTab, yPosition);
     }
 
-    switch (column.style)
-    {
+    switch (column.style) {
+      case Column::kAnnotated:
+        m_display->printItem("*", xPosition - newTab, yPosition);
+        m_display->printItem(column.text, xPosition, yPosition);
+
+        break;
+
+      case Column::kHighlightedAndAnnotated:
+        m_display->printItem("*", xPosition - newTab, yPosition);
+
       case Column::kHighlighted:
         m_display->printHighlightedItem(column.text, xPosition, yPosition);
         break;

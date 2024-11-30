@@ -18,7 +18,9 @@ struct Column {
   enum Style {
     kNormal,
     kBold,
+    kAnnotated,
     kHighlighted,
+    kHighlightedAndAnnotated,
     kValueHighLighted
   };
 
