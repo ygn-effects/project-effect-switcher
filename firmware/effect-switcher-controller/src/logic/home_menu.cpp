@@ -28,6 +28,6 @@ void HomeMenu::reset() {
 
 }
 
-void HomeMenu::handleInput(MenuInputAction t_action) {
+void HomeMenu::handleAction(MenuInputAction t_action) {
 
 }

@@ -27,6 +27,6 @@ class HomeMenu : public MenuBase {
     /// @brief Reset the menu to its initial state
     void reset() override;
 
-    /// @brief Handle input (home menu doesn't need input handling)
-    void handleInput(MenuInputAction t_action) override;
+    void handleAction(MenuInputAction t_action) override;
+
 };
