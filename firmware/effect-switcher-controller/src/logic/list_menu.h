@@ -9,7 +9,6 @@
 class ListMenu : public MenuBase {
   private:
     const char** m_menuItems;      // Pointer to an array of menu item strings.
-    uint8_t m_itemsCount;
     bool m_backrequested = false;
 
   public:
@@ -18,9 +17,8 @@ class ListMenu : public MenuBase {
     /// @param t_items Pointer to an array of item strings for the menu.
     /// @param t_count The number of items in the menu.
     ListMenu(DisplayManager* t_display, LayoutManager* t_layout, const char** t_items, uint8_t t_count) :
-      MenuBase(t_display, t_layout),
-      m_menuItems(t_items),
-      m_itemsCount(t_count) { };
+      MenuBase(t_display, t_layout, t_count),
+      m_menuItems(t_items) { };
 
     /// @brief Updates the display to render the menu, including the header and list of items.
     void update() override;
@@ -28,9 +26,7 @@ class ListMenu : public MenuBase {
     /// @brief Resets the menu's state, clearing selection and returning to the start of the list.
     void reset() override;
 
-    /// @brief Handles user input actions to navigate and select items within the menu.
-    /// @param t_action The input action, such as moving up, down, or selecting an item.
-    void handleInput(MenuInputAction t_action) override;
+    void handleAction(MenuInputAction t_action) override;
 
     uint8_t getSelectedIndex();
 
