@@ -13,6 +13,7 @@ void LoopOrderMenu::update() {
 
   char loopNumbers[LayoutConstants::c_maxRowsPerLayout][5];
 
+  m_itemsCount = m_presetView->loopsCount / LayoutConstants::c_maxColumnsPerRow;
   uint8_t rowIndex = 0;
   for (uint8_t i = 0; i < m_presetView->loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
     uint8_t columnIndex = 0;
@@ -66,8 +67,6 @@ void LoopOrderMenu::update() {
     m_layoutManager->addRow(row);
     m_rowCounts[rowIndex] = i;
     rowIndex++;
-
-    m_itemsCount = rowIndex;
   }
 
   if (m_swappingMode && !m_isFooterActive) {
@@ -98,121 +97,54 @@ void LoopOrderMenu::reset() {
   m_layoutManager->setCursor(Cursor::kArrow);
 }
 
-void LoopOrderMenu::handleInput(MenuInputAction t_action) {
-    switch (t_action)
-    {
-      case MenuInputAction::kUp:
-        if (!m_isFooterActive && m_selectedRow == m_itemsCount - 1 && m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
-          // Activate footer navigation when fully scrolled down
-          m_isFooterActive = true;
-          m_layoutManager->setIsFooterActive(true);
-          // Start at the first column of the footer
-          m_selectedColumn = 0;
-        }
-        else if (m_isFooterActive) {
-          // Handle footer navigation
-          if (m_selectedColumn < m_footerColumnCount - 1) {
-            m_selectedColumn++;
-          }
-        }
-        else if (m_selectedRow < m_itemsCount) {
-          // Normal navigation (not in the footer)
-          if (m_selectedColumn == m_rowColumnCounts[m_selectedRow] - 1) {
-            m_selectedRow++;
-            m_selectedColumn = 0;
-          } else {
-            m_selectedColumn++;
-          }
-
-          // Scroll up if necessary
-          if (m_selectedRow >= m_startIndex + m_visibleRowCount) {
-            m_startIndex++;
-          }
-        }
-        break;
-
-      case MenuInputAction::kDown:
-        if (m_isFooterActive) {
-          // Handle navigation in the footer
-          if (m_selectedColumn > 0) {
-            // Scroll down the available columns
-            m_selectedColumn--;
-          } else {
-            // Exit footer navigation and resume normal navigation
-            m_isFooterActive = false;
-            m_layoutManager->setIsFooterActive(false);
-            // Last row
-            m_selectedRow = m_itemsCount - 1;
-            // Last column of the last row
-            m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
-          }
-        }
-        else if (m_selectedRow > 0) {
-          // Normal navigation (not in the footer)
-          if (m_selectedColumn == 0) {
-            m_selectedRow--;
-            m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;
-          }
-          else {
-            m_selectedColumn--;
-          }
-
-          // Scroll down if necessary
-          if (m_selectedRow < m_startIndex) {
-            m_startIndex--;
-          }
-        }
-        else if (m_selectedRow == 0) {
-          if (m_selectedColumn > 0 ) {
-            m_selectedColumn--;
-          }
-        }
-        break;
-
-      case MenuInputAction::kPress:
-        if (!m_swappingMode) {
-          if (!m_isFooterActive) {
-            m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive = !m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive;
-          }
-          else {
-            if (m_selectedColumn == 0) {
-              m_backRequested = true;
-            }
-            if (m_selectedColumn == 1) {
-              m_saveRequested = true;
-            }
-          }
+void LoopOrderMenu::handleAction(MenuInputAction t_action) {
+  switch (t_action) {
+    case MenuInputAction::kPress:
+      if (!m_swappingMode) {
+        if (!m_isFooterActive) {
+          m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive = !m_presetView->loops[m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn].isActive;
         }
         else {
-          m_targetLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
-
-          if (m_sourceLoop < m_presetView->loopsCount && m_targetLoop < m_presetView->loopsCount) {
-            uint8_t sourceLoopIndex = m_presetView->loops[m_sourceLoop].index;
-            uint8_t sourceLoopActive = m_presetView->loops[m_sourceLoop].isActive;
-            uint8_t targetLoopIndex = m_presetView->loops[m_targetLoop].index;
-            uint8_t targetLoopActive = m_presetView->loops[m_targetLoop].isActive;
-
-            m_presetView->loops[m_sourceLoop].index = targetLoopIndex;
-            m_presetView->loops[m_sourceLoop].isActive = targetLoopActive;
-            m_presetView->loops[m_targetLoop].index = sourceLoopIndex;
-            m_presetView->loops[m_targetLoop].isActive = sourceLoopActive;
+          if (m_selectedColumn == 0) {
+            m_backRequested = true;
           }
-
-          m_swappingMode = false;
+          if (m_selectedColumn == 1) {
+            m_saveRequested = true;
+          }
         }
-        break;
+      }
+      else {
+        m_targetLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
 
-      case MenuInputAction::kLongPress:
-        if (!m_swappingMode) {
-          m_swappingMode = true;
-          m_sourceLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
+        if (m_sourceLoop < m_presetView->loopsCount && m_targetLoop < m_presetView->loopsCount) {
+          uint8_t sourceLoopIndex = m_presetView->loops[m_sourceLoop].index;
+          uint8_t sourceLoopActive = m_presetView->loops[m_sourceLoop].isActive;
+          uint8_t targetLoopIndex = m_presetView->loops[m_targetLoop].index;
+          uint8_t targetLoopActive = m_presetView->loops[m_targetLoop].isActive;
+
+          m_presetView->loops[m_sourceLoop].index = targetLoopIndex;
+          m_presetView->loops[m_sourceLoop].isActive = targetLoopActive;
+          m_presetView->loops[m_targetLoop].index = sourceLoopIndex;
+          m_presetView->loops[m_targetLoop].isActive = sourceLoopActive;
         }
-        break;
 
-      default:
-        break;
-    }
+        m_swappingMode = false;
+      }
+      break;
+
+    case MenuInputAction::kLongPress:
+      if (!m_swappingMode) {
+        m_swappingMode = true;
+        m_sourceLoop = m_selectedRow * LayoutConstants::c_maxColumnsPerRow + m_selectedColumn;
+      }
+      break;
+
+    case MenuInputAction::kUp:
+    case MenuInputAction::kDown:
+    default:
+      break;
   }
+}
 
 void LoopOrderMenu::setPresetView(PresetView* t_view) {
   m_presetView = t_view;
