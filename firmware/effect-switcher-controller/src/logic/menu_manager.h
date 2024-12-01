@@ -31,11 +31,11 @@ class MenuManager {
       }
     }
 
-    /// @brief Handle input for the current menu
-    /// @param input The input event (e.g., button press, encoder turn)
-    void handleInput(MenuInputAction t_action) {
-      if (m_currentMenu) {
-        m_currentMenu->handleInput(t_action);   // Delegate input handling to the current menu
-      }
+    void handleNavigation(MenuInputAction t_action) {
+      m_currentMenu->handleNavigation(t_action);
+    }
+
+    void handleAction(MenuInputAction t_action) {
+      m_currentMenu->handleAction(t_action);
     }
 };
