@@ -70,7 +70,4 @@ class MenuBase {
     void handleNavigation(MenuInputAction t_action);
 
     virtual void handleAction(MenuInputAction t_action) = 0;
-
-    /// @brief Handle user input (e.g., button press, encoder turn)
-    virtual void handleInput(MenuInputAction t_action) = 0;
 };
