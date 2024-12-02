@@ -40,25 +40,25 @@ void LoopOrderMenu::update() {
 
         if (m_presetView->loops[loopIndex].isActive) {
           if (loopIndex == m_sourceLoop && m_swappingMode) {
-            row.columns[j] = { Column::kLabel, Column::kHighlightedAndAnnotated, buffer, 0, 0 };
+            row.columns[j] = { Column::kLabel, Column::kHighlightedAndAnnotated, buffer, nullptr, 0 };
           }
           else {
-            row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, 0, 0 };
+            row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, nullptr, 0 };
           }
         }
         else {
           if (loopIndex == m_sourceLoop && m_swappingMode) {
-            row.columns[j] = { Column::kLabel, Column::kAnnotated, buffer, 0, 0 };
+            row.columns[j] = { Column::kLabel, Column::kAnnotated, buffer, nullptr, 0 };
           }
           else {
-            row.columns[j] = { Column::kLabel, Column::kNormal, buffer, 0, 0 };
+            row.columns[j] = { Column::kLabel, Column::kNormal, buffer, nullptr, 0 };
           }
         }
 
         columnIndex++;
       }
       else {
-        row.columns[j] = { Column::kLabel, Column::kNormal, "", 0, 0 };
+        row.columns[j] = { Column::kLabel, Column::kNormal, "", nullptr, 0 };
       }
 
       m_rowColumnCounts[rowIndex] = columnIndex;

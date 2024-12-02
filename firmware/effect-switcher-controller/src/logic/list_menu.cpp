@@ -24,7 +24,7 @@ void ListMenu::update() {
     Row row;
     row.alignment = Row::kLeft;
     row.columnsCount = 1;
-    row.columns[0] = { Column::kLabel, Column::kNormal, m_menuItems[i], 0, 0 };
+    row.columns[0] = { Column::kLabel, Column::kNormal, m_menuItems[i], nullptr, 0 };
 
     m_layoutManager->addRow(row);
 
@@ -67,10 +67,6 @@ void ListMenu::handleAction(MenuInputAction t_action) {
   default:
     break;
   }
-}
-
-uint8_t ListMenu::getSelectedIndex() {
-  return m_startIndex + m_selectedRow;
 }
 
 bool ListMenu::isItemSelected() {

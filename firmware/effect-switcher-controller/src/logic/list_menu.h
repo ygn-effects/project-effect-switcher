@@ -28,8 +28,6 @@ class ListMenu : public MenuBase {
 
     void handleAction(MenuInputAction t_action) override;
 
-    uint8_t getSelectedIndex();
-
     /// @brief Checks if an item has been selected.
     /// @return true if an item is selected, false otherwise.
     bool isItemSelected();
