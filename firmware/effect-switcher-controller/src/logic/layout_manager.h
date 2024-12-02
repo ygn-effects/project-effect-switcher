@@ -27,7 +27,7 @@ struct Column {
   ColumnType type;
   Style style;
   const char* text;
-  int value;
+  const char* value;
   uint8_t width;
 };
 

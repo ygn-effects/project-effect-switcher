@@ -24,6 +24,10 @@ uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
   uint8_t totalRowWidth = 0;
   for (uint8_t j = 0; j < row.columnsCount; j++) {
     totalRowWidth += m_display->calcTextWidth(row.columns[j].text) + m_display->getNewTab();
+
+    if (row.columns[j].value != nullptr) {
+      totalRowWidth += m_display->calcTextWidth(row.columns[j].value);
+    }
   }
 
   return totalRowWidth;
@@ -93,8 +97,26 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
         break;
     }
 
-    // Update X position for the next column
-    xPosition += m_display->calcTextWidth(column.text) + newTab;
+    // Render the value if present
+    if (column.value != nullptr) {
+      // Update X position for the next column
+      xPosition += m_display->calcTextWidth(column.text);
+
+      // Use a specific style for highlighted values
+      if (column.style == Column::kValueHighLighted) {
+        m_display->printHighlightedItem(column.value, xPosition, yPosition);
+      }
+      else {
+        m_display->printItem(column.value, xPosition, yPosition);
+      }
+
+      // Update X position for the value
+      xPosition += m_display->calcTextWidth(column.value) + newTab;
+    }
+    else {
+      // Update X position for the next column
+      xPosition += m_display->calcTextWidth(column.text) + newTab;
+    }
 
     // Add gap for justify alignment
     if (row.alignment == Row::kJustify && j < row.columnsCount - 1) {
