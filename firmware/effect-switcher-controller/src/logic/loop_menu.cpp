@@ -146,10 +146,6 @@ void LoopOrderMenu::handleAction(MenuInputAction t_action) {
   }
 }
 
-void LoopOrderMenu::setPresetView(PresetView* t_view) {
-  m_presetView = t_view;
-}
-
 bool LoopOrderMenu::isSaveRequested() {
   bool requested = m_saveRequested;
   m_saveRequested = false;

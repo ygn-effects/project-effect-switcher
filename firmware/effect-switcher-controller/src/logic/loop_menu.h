@@ -6,7 +6,6 @@
 
 class LoopOrderMenu : public MenuBase {
   private:
-    PresetView* m_presetView;
     uint8_t m_sourceLoop;
     uint8_t m_targetLoop;
 
@@ -15,9 +14,8 @@ class LoopOrderMenu : public MenuBase {
     bool m_backRequested;
 
   public:
-    LoopOrderMenu(DisplayManager* t_display, LayoutManager* t_layout, PresetView* t_view) :
+    LoopOrderMenu(DisplayManager* t_display, LayoutManager* t_layout) :
       MenuBase(t_display, t_layout),
-      m_presetView(t_view),
       m_targetLoop(0),
       m_swappingMode(false),
       m_saveRequested(false),
@@ -28,7 +26,6 @@ class LoopOrderMenu : public MenuBase {
 
     void handleAction(MenuInputAction t_action) override;
 
-    void setPresetView(PresetView* t_view);
     bool isSaveRequested();
     bool isBackRequested();
 };
