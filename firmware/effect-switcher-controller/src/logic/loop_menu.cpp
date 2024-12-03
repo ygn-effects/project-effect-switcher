@@ -11,9 +11,10 @@ void LoopOrderMenu::update() {
   const char* footItems[] = {"Back", "Save"};
   m_layoutManager->setFooter(footItems, 2);
 
-  char loopNumbers[LayoutConstants::c_maxRowsPerLayout][5];
-
   m_itemsCount = m_presetView->loopsCount / LayoutConstants::c_maxColumnsPerRow;
+
+  StaticString loopBuffers[m_itemsCount * LayoutConstants::c_maxColumnsPerRow];
+
   uint8_t rowIndex = 0;
   for (uint8_t i = 0; i < m_presetView->loopsCount; i += LayoutConstants::c_maxColumnsPerRow) {
     uint8_t columnIndex = 0;
@@ -25,33 +26,27 @@ void LoopOrderMenu::update() {
       uint8_t loopIndex = i + j;
 
       if (loopIndex < m_presetView->loopsCount) {
-        uint8_t number = m_presetView->loops[loopIndex].index;
-        char* buffer = loopNumbers[rowIndex * LayoutConstants::c_maxColumnsPerRow + j];
-        uint8_t index = 0;
+        LoopView& loop = m_presetView->loops[loopIndex];
 
-        if (number >= 10) {
-          buffer[index++] = '0' + (number / 10);
-        }
-        buffer[index++] = '0' + (number % 10);
-
-        buffer[index++] = ' ';
-        buffer[index++] = 0x10;
-        buffer[index] = '\0';
+        StaticString& number = loopBuffers[loopIndex];
+        number.append(loop.index);
+        number.append(' ');
+        number.append(static_cast<char>(0x10));
 
         if (m_presetView->loops[loopIndex].isActive) {
           if (loopIndex == m_sourceLoop && m_swappingMode) {
-            row.columns[j] = { Column::kLabel, Column::kHighlightedAndAnnotated, buffer, nullptr, 0 };
+            row.columns[j] = { Column::kLabel, Column::kHighlightedAndAnnotated, number.c_str(), nullptr, 0 };
           }
           else {
-            row.columns[j] = { Column::kLabel, Column::kHighlighted, buffer, nullptr, 0 };
+            row.columns[j] = { Column::kLabel, Column::kHighlighted, number.c_str(), nullptr, 0 };
           }
         }
         else {
           if (loopIndex == m_sourceLoop && m_swappingMode) {
-            row.columns[j] = { Column::kLabel, Column::kAnnotated, buffer, nullptr, 0 };
+            row.columns[j] = { Column::kLabel, Column::kAnnotated, number.c_str(), nullptr, 0 };
           }
           else {
-            row.columns[j] = { Column::kLabel, Column::kNormal, buffer, nullptr, 0 };
+            row.columns[j] = { Column::kLabel, Column::kNormal, number.c_str(), nullptr, 0 };
           }
         }
 

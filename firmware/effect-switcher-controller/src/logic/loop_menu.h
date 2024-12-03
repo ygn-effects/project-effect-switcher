@@ -2,7 +2,7 @@
 
 #include "menu_base.h"
 #include "peripherals/display.h"
-#include "logic/preset_view.h"
+#include "utils/static_string.h"
 
 class LoopOrderMenu : public MenuBase {
   private:
