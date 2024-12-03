@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "logic/layout_manager.h"
+#include "logic/preset_view.h"
 
 enum class MenuInputAction {
   kNone,
@@ -16,6 +17,7 @@ class MenuBase {
   protected:
     DisplayManager* m_displayManager;               // Display manager instance
     LayoutManager* m_layoutManager;                 // Layout manager instance
+    PresetView* m_presetView;                       // Pointer to the currently selected Preset.
 
     uint8_t m_visibleRowCount;                  // Number of rows visible on the screen.
     uint8_t m_selectedRow;                      // Currently selected row index.
@@ -27,6 +29,7 @@ class MenuBase {
     uint8_t m_rowColumnCounts[LayoutConstants::c_maxColumnsPerRow];  // Array to track columns per row.
     uint8_t m_footerColumnCount = 0;
 
+    bool m_isNavigationActive = true;
     bool m_isFooterActive = false;
     bool m_itemSelected = false;                    // Flag indicating if an item has been selected.
 
@@ -44,6 +47,7 @@ class MenuBase {
     MenuBase(DisplayManager* t_display, LayoutManager* t_layout) :
       m_displayManager(t_display),
       m_layoutManager(t_layout),
+      m_presetView(nullptr),
       m_selectedRow(0),
       m_selectedColumn(0),
       m_startIndex(0),
@@ -66,6 +70,10 @@ class MenuBase {
 
     /// @brief Reset the menu to its initial state
     virtual void reset() = 0;
+
+    void setPresetView(PresetView* t_view);
+
+    virtual uint8_t getSelectedItem();
 
     void handleNavigation(MenuInputAction t_action);
 

@@ -65,6 +65,14 @@ void MenuBase::exitFooterNavigation() {
   m_selectedColumn = m_rowColumnCounts[m_selectedRow] - 1;  // Last column of the last row
 }
 
+void MenuBase::setPresetView(PresetView* t_view) {
+  m_presetView = t_view;
+}
+
+uint8_t MenuBase::getSelectedItem() {
+  return m_startIndex + m_selectedRow;
+}
+
 void MenuBase::handleNavigation(MenuInputAction t_action) {
   switch (t_action) {
     case MenuInputAction::kUp:
