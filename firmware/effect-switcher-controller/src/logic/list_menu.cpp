@@ -61,11 +61,17 @@ void ListMenu::handleAction(MenuInputAction t_action) {
       }
       break;
 
-  case MenuInputAction::kUp:
-  case MenuInputAction::kDown:
-  case MenuInputAction::kLongPress:
-  default:
-    break;
+    case MenuInputAction::kUp:
+      handleNavigation(t_action);
+      break;
+
+    case MenuInputAction::kDown:
+      handleNavigation(t_action);
+      break;
+
+    case MenuInputAction::kLongPress:
+    default:
+      break;
   }
 }
 
