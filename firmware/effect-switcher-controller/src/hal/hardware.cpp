@@ -28,9 +28,9 @@ LayoutManager layoutManager(&displayManager);
 HomeMenu homeMenu(&displayManager, &layoutManager, nullptr);
 const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System"};
 ListMenu settingsMenu(&displayManager, &layoutManager, settingsItems, 4);
-LoopOrderMenu loopsMenu(&displayManager, &layoutManager, nullptr);
-MidiMessageMenu midiMessagesMenu(&displayManager, &layoutManager, nullptr);
-MidiMessageEditMenu midiMessageEditMenu(&displayManager, &layoutManager, nullptr, 0);
+LoopOrderMenu loopsMenu(&displayManager, &layoutManager);
+MidiMessageMenu midiMessagesMenu(&displayManager, &layoutManager);
+MidiMessageEditMenu midiMessageEditMenu(&displayManager, &layoutManager, 0);
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -93,12 +93,14 @@ void Hardware::processFootSwitchAction(uint8_t t_footSwitch, bool t_longPress) {
         if (presetManager.getFootSwitchTargetBank(t_footSwitch) == 1) {
           // Up
           presetManager.setPresetBankUp();
+          m_presetView = createPresetView(presetManager.getCurrentPreset());
           homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
           menuManager.update();
         }
         else {
           // Down
           presetManager.setPresetBankDown();
+          m_presetView = createPresetView(presetManager.getCurrentPreset());
           homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
           menuManager.update();
         }
@@ -106,6 +108,7 @@ void Hardware::processFootSwitchAction(uint8_t t_footSwitch, bool t_longPress) {
 
       case FootSwitchMode::kPresetSelect:
         presetManager.setCurrentPreset(presetManager.getFootSwitchTargetPreset(t_footSwitch));
+        m_presetView = createPresetView(presetManager.getCurrentPreset());
         homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
         menuManager.update();
         break;
@@ -138,29 +141,27 @@ void Hardware::transitionToState(SystemState t_newState) {
   else if (t_newState == SystemState::kLoopsEditState) {
     menuManager.setMenu(&loopsMenu);
     menuManager.reset();
-    m_presetView = createPresetView(presetManager.getCurrentPreset());
     loopsMenu.setPresetView(&m_presetView);
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessagesState) {
     menuManager.setMenu(&midiMessagesMenu);
     menuManager.reset();
-    midiMessagesMenu.setCurrentPreset(presetManager.getCurrentPreset());
+    midiMessagesMenu.setPresetView(&m_presetView);
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessageEditState) {
     menuManager.setMenu(&midiMessageEditMenu);
     menuManager.reset();
-    midiMessageEditMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getStartIndex() + midiMessagesMenu.getSelectedIndex());
+    midiMessageEditMenu.setPresetView(&m_presetView);
     midiMessageEditMenu.setMessageEditMode(true);
+    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getSelectedItem());
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessageAddState) {
     menuManager.setMenu(&midiMessageEditMenu);
     menuManager.reset();
-    midiMessageEditMenu.setCurrentPreset(presetManager.getCurrentPreset());
-    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getStartIndex() + midiMessagesMenu.getSelectedIndex());
+    midiMessageEditMenu.setPresetView(&m_presetView);
     midiMessageEditMenu.setMessageEditMode(false);
     menuManager.update();
   }
@@ -168,22 +169,22 @@ void Hardware::transitionToState(SystemState t_newState) {
 
 void Hardware::processMenuInput() {
   if (m_menuEncoderMoveLeft) {
-    menuManager.handleInput(MenuInputAction::kUp);
+    menuManager.handleAction(MenuInputAction::kUp);
     menuManager.update();
   }
 
   if (m_menuEncoderMoveRight) {
-    menuManager.handleInput(MenuInputAction::kDown);
+    menuManager.handleAction(MenuInputAction::kDown);
     menuManager.update();
   }
 
   if (m_menuEncoderSwitchPress) {
-    menuManager.handleInput(MenuInputAction::kPress);
+    menuManager.handleAction(MenuInputAction::kPress);
     menuManager.update();
   }
 
   if (m_menuEncoderSwitchLongPress) {
-    menuManager.handleInput(MenuInputAction::kLongPress);
+    menuManager.handleAction(MenuInputAction::kLongPress);
     menuManager.update();
   }
 }
@@ -226,7 +227,7 @@ void Hardware::processSettingsState() {
   }
 
   if (settingsMenu.isItemSelected()) {
-    switch (settingsMenu.getSelectedIndex()) {
+    switch (settingsMenu.getSelectedItem()) {
       case 0:
         transitionToState(kLoopsEditState);
         break;
@@ -283,7 +284,7 @@ void Hardware::processMidiMessagesState() {
     transitionToState(kMidiMessageAddState);
   }
 
-  if (midiMessagesMenu.isGoBackRequested()) {
+  if (midiMessagesMenu.isBackRequested()) {
     transitionToState(kSettingsState);
   }
 
@@ -306,13 +307,11 @@ void Hardware::processMidiMessageEditState() {
   }
 
   if(midiMessageEditMenu.isSaveRequested()) {
-    presetManager.setMidiMessageValues(midiMessageEditMenu.getMidiMessageIndex() ,midiMessageEditMenu.getNewMessageType(), midiMessageEditMenu.getNewMessageChannel(), midiMessageEditMenu.getNewMessageDataByte1(), midiMessageEditMenu.getNewMessageDataByte2(), midiMessageEditMenu.getNewMessageHasDataByte2());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
   }
 
   if (midiMessageEditMenu.isAddRequested()) {
-    presetManager.addMidiMessage(midiMessageEditMenu.getNewMessageType(), midiMessageEditMenu.getNewMessageChannel(), midiMessageEditMenu.getNewMessageDataByte1(), midiMessageEditMenu.getNewMessageDataByte2(), midiMessageEditMenu.getNewMessageHasDataByte2());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
   }
@@ -406,6 +405,7 @@ void Hardware::startup() {
 
   presetManager.initialize();
   delay(200);
+  m_presetView = createPresetView(presetManager.getCurrentPreset());
   homeMenu.setCurrentPreset(presetManager.getCurrentPreset());
   menuManager.update();
   delay(100);
