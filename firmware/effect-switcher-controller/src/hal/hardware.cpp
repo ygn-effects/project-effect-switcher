@@ -141,18 +141,21 @@ void Hardware::transitionToState(SystemState t_newState) {
   else if (t_newState == SystemState::kLoopsEditState) {
     menuManager.setMenu(&loopsMenu);
     menuManager.reset();
+    m_presetView = createPresetView(presetManager.getCurrentPreset());
     loopsMenu.setPresetView(&m_presetView);
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessagesState) {
     menuManager.setMenu(&midiMessagesMenu);
     menuManager.reset();
+    m_presetView = createPresetView(presetManager.getCurrentPreset());
     midiMessagesMenu.setPresetView(&m_presetView);
     menuManager.update();
   }
   else if (t_newState == SystemState::kMidiMessageEditState) {
     menuManager.setMenu(&midiMessageEditMenu);
     menuManager.reset();
+    m_presetView = createPresetView(presetManager.getCurrentPreset());
     midiMessageEditMenu.setPresetView(&m_presetView);
     midiMessageEditMenu.setMessageEditMode(true);
     midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getSelectedItem());
@@ -161,6 +164,7 @@ void Hardware::transitionToState(SystemState t_newState) {
   else if (t_newState == SystemState::kMidiMessageAddState) {
     menuManager.setMenu(&midiMessageEditMenu);
     menuManager.reset();
+    m_presetView = createPresetView(presetManager.getCurrentPreset());
     midiMessageEditMenu.setPresetView(&m_presetView);
     midiMessageEditMenu.setMessageEditMode(false);
     menuManager.update();
@@ -301,17 +305,19 @@ void Hardware::processMidiMessageEditState() {
   }
 
   if (midiMessageEditMenu.isDeleteRequested()) {
-    presetManager.removeMidiMessage(midiMessageEditMenu.getMidiMessageIndex());
+    applyPresetView(presetManager.getCurrentPreset());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
   }
 
   if(midiMessageEditMenu.isSaveRequested()) {
+    applyPresetView(presetManager.getCurrentPreset());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
   }
 
   if (midiMessageEditMenu.isAddRequested()) {
+    applyPresetView(presetManager.getCurrentPreset());
     presetManager.saveCurrentPreset();
     transitionToState(kMidiMessagesState);
   }
