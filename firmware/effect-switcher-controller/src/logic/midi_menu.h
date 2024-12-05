@@ -51,12 +51,9 @@ class MidiMessageMenu : public MenuBase {
 /// channel, data bytes, and other settings.
 class MidiMessageEditMenu : public MenuBase {
   private:
-    PresetView* m_presetView;             // Pointer to the current Preset object.
     uint8_t m_midiMessageIndex;           // Index of the MIDI message being edited.
-    uint8_t m_selectedIndex;              // Index of the currently selected field in the message.
 
     bool m_messageEditMode;               // Flag indicating if edit mode is active for a MIDI message.
-    bool m_fieldEditMode;                 // Flag indicating if field edit mode is active.
     bool m_cancelRequested;               // Flag indicating if a cancel action was requested.
     bool m_deleteRequested;               // Flag indicating if a delete action was requested.
     bool m_saveRequested;                 // Flag indicating if a save action was requested.
@@ -68,6 +65,10 @@ class MidiMessageEditMenu : public MenuBase {
     uint8_t m_newMessageDataByte2 = 64;   // Default value for the second data byte.
     bool m_NewMessageHasDataByte2 = true; // Default flag for the presence of a second data byte.
 
+    void addMidiMessage();
+    void saveMidiMessage();
+    void deleteMidiMessage();
+
   public:
     /// @brief Constructor to initialize the MIDI message edit menu with a display, preset, and message index.
     /// @param t_display Pointer to the Display object.
@@ -76,11 +77,11 @@ class MidiMessageEditMenu : public MenuBase {
     MidiMessageEditMenu(DisplayManager* t_display, LayoutManager* t_layout, uint8_t t_midiMessageIndex) :
       MenuBase(t_display, t_layout),
       m_midiMessageIndex(t_midiMessageIndex),
-      m_selectedIndex(0),
       m_messageEditMode(false),
-      m_fieldEditMode(false),
       m_cancelRequested(false),
-      m_saveRequested(false) { };
+      m_deleteRequested(false),
+      m_saveRequested(false),
+      m_addRequested(false) { };
 
     /// @brief Updates the display to show the current MIDI message edit fields.
     void update() override;
@@ -89,8 +90,6 @@ class MidiMessageEditMenu : public MenuBase {
     void reset() override;
 
     void handleAction(MenuInputAction t_action) override;
-
-    void setPresetView(PresetView* t_view);
 
     /// @brief Retrieves the index of the MIDI message being edited.
     /// @return uint8_t The index of the MIDI message.
