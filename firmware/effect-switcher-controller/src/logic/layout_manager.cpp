@@ -23,14 +23,36 @@ void LayoutManager::clearRows() {
 uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
   uint8_t totalRowWidth = 0;
   for (uint8_t j = 0; j < row.columnsCount; j++) {
-    totalRowWidth += m_display->calcTextWidth(row.columns[j].text) + m_display->getNewTab();
+    if (row.columns[j].width > 0) {
+      totalRowWidth = row.columns[j].width;
+    }
+    else {
+      totalRowWidth += m_display->calcTextWidth(row.columns[j].text) + m_display->getNewTab();
 
-    if (row.columns[j].value != nullptr) {
-      totalRowWidth += m_display->calcTextWidth(row.columns[j].value);
+      if (row.columns[j].value != nullptr) {
+        totalRowWidth += m_display->calcTextWidth(row.columns[j].value);
+      }
     }
   }
 
   return totalRowWidth;
+}
+
+uint8_t LayoutManager::calculateColumnWidth(Column& t_column) {
+  uint8_t totalColumnWidth = 0;
+
+  if (t_column.width > 0) {
+    totalColumnWidth = t_column.width;
+  }
+  else {
+    totalColumnWidth += m_display->calcTextWidth(t_column.text);
+
+    if (t_column.value != nullptr) {
+      totalColumnWidth += m_display->calcTextWidth(t_column.value);
+    }
+  }
+
+  return totalColumnWidth;
 }
 
 uint8_t LayoutManager::calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap) {
@@ -52,6 +74,7 @@ uint8_t LayoutManager::calculateStartingX(Row& row, uint8_t totalRowWidth, uint8
 void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap) {
   for (uint8_t j = 0; j < row.columnsCount; j++) {
     Column& column = row.columns[j];
+    uint8_t columnWidth = calculateColumnWidth(column);
 
     // Print the cursor if this is the active row and column
     if (rowIndex == m_activeRow && j == m_activeColumn && !m_isFooterActive) {
@@ -100,23 +123,19 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
     // Render the value if present
     if (column.value != nullptr) {
       // Update X position for the next column
-      xPosition += m_display->calcTextWidth(column.text);
+      uint8_t valuePosition = xPosition + m_display->calcTextWidth(column.text);
 
       // Use a specific style for highlighted values
       if (column.style == Column::kValueHighLighted) {
-        m_display->printHighlightedItem(column.value, xPosition, yPosition);
+        m_display->printHighlightedItem(column.value, valuePosition, yPosition);
       }
       else {
-        m_display->printItem(column.value, xPosition, yPosition);
+        m_display->printItem(column.value, valuePosition, yPosition);
       }
+    }
 
-      // Update X position for the value
-      xPosition += m_display->calcTextWidth(column.value) + newTab;
-    }
-    else {
-      // Update X position for the next column
-      xPosition += m_display->calcTextWidth(column.text) + newTab;
-    }
+    // Update X position for the next column
+    xPosition += columnWidth + newTab;
 
     // Add gap for justify alignment
     if (row.alignment == Row::kJustify && j < row.columnsCount - 1) {
