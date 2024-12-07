@@ -27,7 +27,8 @@ enum SystemState {
   kLoopsEditState,        // Loops edit menu
   kMidiMessagesState,     // MIDI messages list
   kMidiMessageEditState,  // MIDI messages edit
-  kMidiMessageAddState    // MIDI Messages add
+  kMidiMessageAddState,   // MIDI Messages add
+  kFootSwitchesListState
 };
 
 class Hardware
@@ -73,6 +74,7 @@ class Hardware
     void processLoopsEditState();
     void processMidiMessagesState();
     void processMidiMessageEditState();
+    void processFootSwitchesListState();
 
     PresetView createPresetView(const Preset* t_preset);
     void applyPresetView(Preset* t_preset);

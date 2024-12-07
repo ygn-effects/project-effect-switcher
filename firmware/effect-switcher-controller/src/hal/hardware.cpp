@@ -26,11 +26,13 @@ MenuManager menuManager;
 DisplayManager displayManager(128, 64);
 LayoutManager layoutManager(&displayManager);
 HomeMenu homeMenu(&displayManager, &layoutManager, nullptr);
-const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "System"};
-ListMenu settingsMenu(&displayManager, &layoutManager, settingsItems, 4);
+const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "FootSwitches", "System"};
+ListMenu settingsMenu(&displayManager, &layoutManager, settingsItems, 5);
 LoopOrderMenu loopsMenu(&displayManager, &layoutManager);
 MidiMessageMenu midiMessagesMenu(&displayManager, &layoutManager);
 MidiMessageEditMenu midiMessageEditMenu(&displayManager, &layoutManager, 0);
+const char* footSwitchesItems[] = {"FootSwitch 0", "FootSwitch 1", "FootSwitch 2", "FootSwitch 3", "FootSwitch 4", "FootSwitch 5"};
+ListMenu FootSwitchesMenu(&displayManager, &layoutManager, footSwitchesItems, 6);
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -125,49 +127,57 @@ void Hardware::processFootSwitchAction(uint8_t t_footSwitch, bool t_longPress) {
 void Hardware::transitionToState(SystemState t_newState) {
   m_systemState = t_newState;
 
-  if (t_newState == SystemState::kPresetState) {
-    settingsMenu.reset();
-    loopsMenu.reset();
-    midiMessagesMenu.reset();
-    midiMessageEditMenu.reset();
-    menuManager.setMenu(&homeMenu);
-    menuManager.update();
-  }
-  else if (t_newState == SystemState::kSettingsState) {
-    menuManager.reset();
-    menuManager.setMenu(&settingsMenu);
-    menuManager.update();
-  }
-  else if (t_newState == SystemState::kLoopsEditState) {
-    menuManager.setMenu(&loopsMenu);
-    menuManager.reset();
-    m_presetView = createPresetView(presetManager.getCurrentPreset());
-    loopsMenu.setPresetView(&m_presetView);
-    menuManager.update();
-  }
-  else if (t_newState == SystemState::kMidiMessagesState) {
-    menuManager.setMenu(&midiMessagesMenu);
-    menuManager.reset();
-    m_presetView = createPresetView(presetManager.getCurrentPreset());
-    midiMessagesMenu.setPresetView(&m_presetView);
-    menuManager.update();
-  }
-  else if (t_newState == SystemState::kMidiMessageEditState) {
-    menuManager.setMenu(&midiMessageEditMenu);
-    menuManager.reset();
-    m_presetView = createPresetView(presetManager.getCurrentPreset());
-    midiMessageEditMenu.setPresetView(&m_presetView);
-    midiMessageEditMenu.setMessageEditMode(true);
-    midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getSelectedItem());
-    menuManager.update();
-  }
-  else if (t_newState == SystemState::kMidiMessageAddState) {
-    menuManager.setMenu(&midiMessageEditMenu);
-    menuManager.reset();
-    m_presetView = createPresetView(presetManager.getCurrentPreset());
-    midiMessageEditMenu.setPresetView(&m_presetView);
-    midiMessageEditMenu.setMessageEditMode(false);
-    menuManager.update();
+  switch (t_newState) {
+    case SystemState::kPresetState:
+      settingsMenu.reset();
+      loopsMenu.reset();
+      midiMessagesMenu.reset();
+      midiMessageEditMenu.reset();
+      FootSwitchesMenu.reset();
+      menuManager.setMenu(&homeMenu);
+      menuManager.update();
+      break;
+
+    case SystemState::kSettingsState:
+      menuManager.reset();
+      menuManager.setMenu(&settingsMenu);
+      menuManager.update();
+      break;
+
+    case SystemState::kLoopsEditState:
+      menuManager.setMenu(&loopsMenu);
+      menuManager.reset();
+      m_presetView = createPresetView(presetManager.getCurrentPreset());
+      loopsMenu.setPresetView(&m_presetView);
+      menuManager.update();
+      break;
+
+    case SystemState::kMidiMessageEditState:
+      menuManager.setMenu(&midiMessageEditMenu);
+      menuManager.reset();
+      m_presetView = createPresetView(presetManager.getCurrentPreset());
+      midiMessageEditMenu.setPresetView(&m_presetView);
+      midiMessageEditMenu.setMessageEditMode(true);
+      midiMessageEditMenu.setMidiMessageIndex(midiMessagesMenu.getSelectedItem());
+      menuManager.update();
+      break;
+
+    case SystemState::kMidiMessageAddState:
+      menuManager.setMenu(&midiMessageEditMenu);
+      menuManager.reset();
+      m_presetView = createPresetView(presetManager.getCurrentPreset());
+      midiMessageEditMenu.setPresetView(&m_presetView);
+      midiMessageEditMenu.setMessageEditMode(false);
+      menuManager.update();
+      break;
+
+    case SystemState::kFootSwitchesListState:
+      menuManager.setMenu(&FootSwitchesMenu);
+      menuManager.update();
+      break;
+
+    default:
+      break;
   }
 }
 
@@ -244,6 +254,7 @@ void Hardware::processSettingsState() {
         break;
 
       case 3:
+        transitionToState(kFootSwitchesListState);
         break;
 
       case 4:
@@ -324,6 +335,40 @@ void Hardware::processMidiMessageEditState() {
 
   if (m_menuEditSwitchLongPress) {
     transitionToState(kPresetState);
+  }
+}
+
+void Hardware::processFootSwitchesListState() {
+  processMenuInput();
+
+  if (m_menuEditSwitchLongPress) {
+    transitionToState(kPresetState);
+  }
+
+  if (FootSwitchesMenu.isItemSelected()) {
+    switch (FootSwitchesMenu.getSelectedItem()) {
+      case 0:
+        break;
+
+      case 1:
+        break;
+
+      case 2:
+        break;
+
+      case 3:
+        break;
+
+      case 4:
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (FootSwitchesMenu.isBackRequested()) {
+    transitionToState(kSettingsState);
   }
 }
 
@@ -429,6 +474,7 @@ void Hardware::poll() {
     case kMidiMessagesState:
     case kMidiMessageAddState:
     case kMidiMessageEditState:
+    case kFootSwitchesListState:
       pollMenuEditSwitch();
       pollMenuEncoder();
       break;
@@ -459,6 +505,9 @@ void Hardware::process() {
     case kMidiMessageAddState:
     case kMidiMessageEditState:
       processMidiMessageEditState();
+
+    case kFootSwitchesListState:
+      processFootSwitchesListState();
 
     default:
       break;
