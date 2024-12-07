@@ -5,7 +5,7 @@ void ListMenu::update() {
   m_layoutManager->clear();
 
   // Set header
-  m_layoutManager->setHeader("Settings");
+  m_layoutManager->setHeader(m_header);
 
   // Set footer
   m_footerColumnCount = 1;
