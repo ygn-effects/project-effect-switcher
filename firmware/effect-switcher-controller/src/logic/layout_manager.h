@@ -53,8 +53,8 @@ enum Cursor {
 class LayoutManager {
   private:
     DisplayManager* m_display;
-    uint8_t m_screenWidth;
-    uint8_t m_screenHeight;
+    uint16_t m_screenWidth;
+    uint16_t m_screenHeight;
     uint8_t m_rowsCount;
     uint8_t m_visibleRowsCount;
     uint8_t m_contentStartIndex;
