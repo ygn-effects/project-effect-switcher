@@ -20,8 +20,8 @@ void LayoutManager::clearRows() {
   }
 }
 
-uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
-  uint8_t totalRowWidth = 0;
+uint16_t LayoutManager::calculateTotalRowWidth(Row& row) {
+  uint16_t totalRowWidth = 0;
   for (uint8_t j = 0; j < row.columnsCount; j++) {
     if (row.columns[j].width > 0) {
       totalRowWidth = row.columns[j].width;
@@ -38,8 +38,8 @@ uint8_t LayoutManager::calculateTotalRowWidth(Row& row) {
   return totalRowWidth;
 }
 
-uint8_t LayoutManager::calculateColumnWidth(Column& t_column) {
-  uint8_t totalColumnWidth = 0;
+uint16_t LayoutManager::calculateColumnWidth(Column& t_column) {
+  uint16_t totalColumnWidth = 0;
 
   if (t_column.width > 0) {
     totalColumnWidth = t_column.width;
@@ -55,7 +55,7 @@ uint8_t LayoutManager::calculateColumnWidth(Column& t_column) {
   return totalColumnWidth;
 }
 
-uint8_t LayoutManager::calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap) {
+uint16_t LayoutManager::calculateStartingX(Row& row, uint16_t totalRowWidth, uint8_t gap) {
   switch (row.alignment) {
     case Row::kCenter:
       return (m_screenWidth - totalRowWidth) / 2;
@@ -71,10 +71,10 @@ uint8_t LayoutManager::calculateStartingX(Row& row, uint8_t totalRowWidth, uint8
   }
 }
 
-void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap) {
+void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint16_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap) {
   for (uint8_t j = 0; j < row.columnsCount; j++) {
     Column& column = row.columns[j];
-    uint8_t columnWidth = calculateColumnWidth(column);
+    uint16_t columnWidth = calculateColumnWidth(column);
 
     // Print the cursor if this is the active row and column
     if (rowIndex == m_activeRow && j == m_activeColumn && !m_isFooterActive) {
@@ -123,7 +123,7 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
     // Render the value if present
     if (column.value != nullptr) {
       // Update X position for the next column
-      uint8_t valuePosition = xPosition + m_display->calcTextWidth(column.text);
+      uint16_t valuePosition = xPosition + m_display->calcTextWidth(column.text);
 
       // Use a specific style for highlighted values
       if (column.style == Column::kValueHighLighted) {
@@ -147,14 +147,14 @@ void LayoutManager::renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition,
 void LayoutManager::renderHeader() {
   if (m_header.columnsCount > 0) {
     m_display->drawInvertedLine(0);
-    uint8_t xPosition = (m_screenWidth - m_display->calcTextWidth(m_header.columns[0].text)) / 2;
+    uint16_t xPosition = (m_screenWidth - m_display->calcTextWidth(m_header.columns[0].text)) / 2;
     m_display->printHighlightedItem(m_header.columns[0].text, xPosition, 0);
   }
 }
 
 void LayoutManager::renderFooter() {
-  uint8_t totalRawWidth = calculateTotalRowWidth(m_footer);
-  uint8_t xPosition = calculateStartingX(m_footer, totalRawWidth, 0);
+  uint16_t totalRawWidth = calculateTotalRowWidth(m_footer);
+  uint16_t xPosition = calculateStartingX(m_footer, totalRawWidth, 0);
   uint8_t yPosition = m_display->getHeight() - m_display->getNewLine();
 
   for (uint8_t i = 0; i < m_footer.columnsCount; i++) {
@@ -241,16 +241,16 @@ void LayoutManager::render() {
     uint8_t yPosition = (i - m_contentStartIndex) * newLine + newLine;
 
     // Total row width and gap for justify alignment
-    uint8_t totalRowWidth = calculateTotalRowWidth(row);
+    uint16_t totalRowWidth = calculateTotalRowWidth(row);
     uint8_t gap = 0;
 
     if (row.alignment == Row::kJustify && row.columnsCount > 1) {
-      uint8_t remainingSpace = m_screenWidth - totalRowWidth;
+      uint16_t remainingSpace = m_screenWidth - totalRowWidth;
       gap = remainingSpace / (row.columnsCount - 1);
     }
 
     // Starting X position
-    uint8_t xPosition = calculateStartingX(row, totalRowWidth, gap);
+    uint16_t xPosition = calculateStartingX(row, totalRowWidth, gap);
 
     switch (row.alignment)
     {
