@@ -52,12 +52,12 @@ uint8_t DisplayManager::getMaxVisibleLines() {
   return m_height / m_newLine;
 }
 
-void DisplayManager::printItem(const char* t_text, uint8_t t_x, uint8_t t_y) {
+void DisplayManager::printItem(const char* t_text, uint16_t t_x, uint16_t t_y) {
   m_st7789.setCursor(t_x, t_y);
   m_st7789.write(t_text);
 }
 
-void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHeight, uint8_t t_usableWidth) {
+void DisplayManager::printFullScreenItem(const char* t_text, uint16_t t_usableHeight, uint16_t t_usableWidth) {
   for (uint8_t fontSize = 16; fontSize >= 0; fontSize -= 2) {
     m_st7789.setTextSize(fontSize);
 
@@ -65,8 +65,8 @@ void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHei
     uint16_t textWidth = calcTextWidth(t_text);
 
     if (textHeight <= t_usableHeight && textWidth <= t_usableWidth) {
-      uint8_t xPosition = (m_height - textHeight) / 2;
-      uint8_t yPosition = (m_width - textWidth) / 2;
+      uint16_t xPosition = (m_height - textHeight) / 2;
+      uint16_t yPosition = (m_width - textWidth) / 2;
 
       printItem(t_text, xPosition, yPosition);
       m_st7789.setTextSize(m_fontSize);
@@ -75,7 +75,7 @@ void DisplayManager::printFullScreenItem(const char* t_text, uint8_t t_usableHei
   }
 }
 
-void DisplayManager::printHighlightedItem(const char* t_text, uint8_t t_x, uint8_t t_y) {
+void DisplayManager::printHighlightedItem(const char* t_text, uint16_t t_x, uint16_t t_y) {
   m_st7789.setTextColor(ST77XX_BLACK, ST77XX_WHITE);
   printItem(t_text, t_x, t_y);
   m_st7789.setTextColor(ST77XX_WHITE, ST77XX_BLACK);

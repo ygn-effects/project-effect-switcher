@@ -45,11 +45,11 @@ class DisplayManager {
 
     uint8_t getMaxVisibleLines();
 
-    void printItem(const char* t_text, uint8_t t_x, uint8_t t_y);
+    void printItem(const char* t_text, uint16_t t_x, uint16_t t_y);
 
-    void printFullScreenItem(const char* t_text, uint8_t t_usableHeight, uint8_t t_usableWidth);
+    void printFullScreenItem(const char* t_text, uint16_t t_usableHeight, uint16_t t_usableWidth);
 
-    void printHighlightedItem(const char* t_text, uint8_t t_x, uint8_t t_y);
+    void printHighlightedItem(const char* t_text, uint16_t t_x, uint16_t t_y);
 
     void drawInvertedLine(uint8_t t_y);
 };
