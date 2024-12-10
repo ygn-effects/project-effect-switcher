@@ -70,13 +70,13 @@ class LayoutManager {
 
     void clearRows();
 
-    uint8_t calculateTotalRowWidth(Row& t_row);
+    uint16_t calculateTotalRowWidth(Row& t_row);
 
-    uint8_t calculateColumnWidth(Column& t_column);
+    uint16_t calculateColumnWidth(Column& t_column);
 
-    uint8_t calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap);
+    uint16_t calculateStartingX(Row& row, uint16_t totalRowWidth, uint8_t gap);
 
-    void renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap = 0);
+    void renderColumns(Row& row, uint8_t rowIndex, uint16_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap = 0);
 
     void renderHeader();
 
