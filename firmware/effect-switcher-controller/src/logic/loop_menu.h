@@ -1,7 +1,6 @@
 #pragma once
 
 #include "menu_base.h"
-#include "peripherals/display.h"
 #include "utils/static_string.h"
 
 class LoopOrderMenu : public MenuBase {

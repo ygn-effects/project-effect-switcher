@@ -2,7 +2,6 @@
 
 #include "menu_base.h"
 #include "logic/preset.h"
-#include "peripherals/display.h"
 
 /// @brief Home menu for displaying the last used bank and preset
 class HomeMenu : public MenuBase {

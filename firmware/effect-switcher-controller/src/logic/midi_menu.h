@@ -1,7 +1,6 @@
 #pragma once
 
 #include "menu_base.h"
-#include "peripherals/display.h"
 #include "utils/static_string.h"
 
 /// @brief Class representing the MIDI message menu, allowing the user to view, add, or edit MIDI messages.
