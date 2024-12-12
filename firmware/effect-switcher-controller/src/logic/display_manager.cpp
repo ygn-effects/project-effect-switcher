@@ -2,14 +2,13 @@
 
 void DisplayManager::setup() {
   m_st7789.init(m_height, m_width);
-  m_st7789.setSPISpeed(8000000);
   m_st7789.setRotation(1);
 }
 
 void DisplayManager::reset() {
-  m_st7789.fillScreen(ST77XX_BLACK);
+  m_st7789.fillScreen(BLACK);
   m_st7789.setFont();
-  m_st7789.setTextColor(ST77XX_WHITE);
+  m_st7789.setTextColor(WHITE);
 }
 
 void DisplayManager::render() {
@@ -76,12 +75,12 @@ void DisplayManager::printFullScreenItem(const char* t_text, uint16_t t_usableHe
 }
 
 void DisplayManager::printHighlightedItem(const char* t_text, uint16_t t_x, uint16_t t_y) {
-  m_st7789.setTextColor(ST77XX_BLACK, ST77XX_WHITE);
+  m_st7789.setTextColor(BLACK, WHITE);
   printItem(t_text, t_x, t_y);
-  m_st7789.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+  m_st7789.setTextColor(WHITE, BLACK);
 }
 
 void DisplayManager::drawInvertedLine(uint8_t t_y) {
-  m_st7789.fillRect(0, 0, m_width, m_newLine, ST77XX_WHITE);
-  m_st7789.setTextColor(ST77XX_WHITE);
+  m_st7789.fillRect(0, 0, m_width, m_newLine, WHITE);
+  m_st7789.setTextColor(WHITE);
 }
