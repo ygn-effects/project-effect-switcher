@@ -2,13 +2,13 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <ST7789_AVR.h>
+#include <Adafruit_ST7789.h>
 #include <Adafruit_GFX.h>
 
 
 class DisplayManager {
   private:
-    ST7789_AVR m_st7789;
+    Adafruit_ST7789 m_st7789;
     uint16_t m_width;
     uint16_t m_height;
     uint8_t m_newLine;
@@ -17,7 +17,7 @@ class DisplayManager {
 
   public:
     DisplayManager(uint16_t t_width, uint16_t t_height, uint8_t t_cs, uint8_t t_dc, uint8_t t_rst) :
-      m_st7789(t_dc, t_rst, t_cs),
+      m_st7789(t_cs, t_dc, t_rst),
       m_width(t_width),
       m_height(t_height) {
         m_st7789.setTextSize(m_fontSize);
@@ -53,5 +53,4 @@ class DisplayManager {
 
     void drawInvertedLine(uint8_t t_y);
 };
-
 
