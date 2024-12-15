@@ -255,11 +255,11 @@ void MidiMessageEditMenu::update() {
     };
 
     if (rowIndex == 0) {
-      row.columns[0] = { Column::kLabel, getColumnStyle(0), "T:", type.c_str(), 0 };
+      row.columns[0] = { Column::kLabel, getColumnStyle(0), "T:", type.c_str(), 50 };
       row.columns[1] = { Column::kLabel, getColumnStyle(1), "C:", channel.c_str(), 0 };
     }
     else {
-      row.columns[0] = { Column::kLabel, getColumnStyle(0), "B1:", byte1.c_str(), 0 };
+      row.columns[0] = { Column::kLabel, getColumnStyle(0), "B1:", byte1.c_str(), 50 };
 
       if (m_NewMessageHasDataByte2) {
         row.columns[1] = { Column::kLabel, getColumnStyle(1), "B2:", byte2.c_str(), 0 };
