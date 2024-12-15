@@ -53,8 +53,8 @@ enum Cursor {
 class LayoutManager {
   private:
     DisplayManager* m_display;
-    uint16_t m_screenWidth;
-    uint16_t m_screenHeight;
+    uint8_t m_screenWidth;
+    uint8_t m_screenHeight;
     uint8_t m_rowsCount;
     uint8_t m_visibleRowsCount;
     uint8_t m_contentStartIndex;
@@ -70,13 +70,13 @@ class LayoutManager {
 
     void clearRows();
 
-    uint16_t calculateTotalRowWidth(Row& t_row);
+    uint8_t calculateTotalRowWidth(Row& t_row);
 
-    uint16_t calculateColumnWidth(Column& t_column);
+    uint8_t calculateColumnWidth(Column& t_column);
 
-    uint16_t calculateStartingX(Row& row, uint16_t totalRowWidth, uint8_t gap);
+    uint8_t calculateStartingX(Row& row, uint8_t totalRowWidth, uint8_t gap);
 
-    void renderColumns(Row& row, uint8_t rowIndex, uint16_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap = 0);
+    void renderColumns(Row& row, uint8_t rowIndex, uint8_t xPosition, uint8_t yPosition, uint8_t newTab, uint8_t gap = 0);
 
     void renderHeader();
 
