@@ -27,12 +27,12 @@ DisplayManager displayManager(128, 64);
 LayoutManager layoutManager(&displayManager);
 HomeMenu homeMenu(&displayManager, &layoutManager, nullptr);
 const char* settingsItems[] = {"Loops Order", "MIDI", "Expression", "FootSwitches", "System"};
-ListMenu settingsMenu(&displayManager, &layoutManager, settingsItems, 5);
+ListMenu settingsMenu(&displayManager, &layoutManager, settingsItems, 5, "Settings");
 LoopOrderMenu loopsMenu(&displayManager, &layoutManager);
 MidiMessageMenu midiMessagesMenu(&displayManager, &layoutManager);
 MidiMessageEditMenu midiMessageEditMenu(&displayManager, &layoutManager, 0);
 const char* footSwitchesItems[] = {"FootSwitch 0", "FootSwitch 1", "FootSwitch 2", "FootSwitch 3", "FootSwitch 4", "FootSwitch 5"};
-ListMenu FootSwitchesMenu(&displayManager, &layoutManager, footSwitchesItems, 6);
+ListMenu FootSwitchesMenu(&displayManager, &layoutManager, footSwitchesItems, 6, "FootSwitches");
 
 void Hardware::pollSwitch(MomentarySwitch& t_switch, bool& t_pressFlag) {
   t_switch.poll();
@@ -149,6 +149,14 @@ void Hardware::transitionToState(SystemState t_newState) {
       menuManager.reset();
       m_presetView = createPresetView(presetManager.getCurrentPreset());
       loopsMenu.setPresetView(&m_presetView);
+      menuManager.update();
+      break;
+
+    case SystemState::kMidiMessagesState:
+      menuManager.setMenu(&midiMessagesMenu);
+      menuManager.reset();
+      m_presetView = createPresetView(presetManager.getCurrentPreset());
+      midiMessagesMenu.setPresetView(&m_presetView);
       menuManager.update();
       break;
 
